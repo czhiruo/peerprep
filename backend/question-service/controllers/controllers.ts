@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
+import { querySchema } from "../validations/querySchema.js";
 
 class QuestionController {
-  async getAll(req: Request, res: Response) {
-    res.status(200).json("All questions here.");
-  }
+  async get(req: Request, res: Response) {
+    const result = querySchema.safeParse(req.query);
 
-  async getById(req: Request, res: Response) {
-    res.status(200).json("Get by ID");
-  }
+    if (!result.success) {
+      return res.status(400).json({ errors: result.error.format() });
+    }
 
-  async getByFilter(req: Request, res: Response) {
-    res.status(200).json("Get by filter");
+    const { id, c, d } = result.data;
+
+    res.status(200).json(`Questions filtered by: id: ${id}, c: ${c}, d: ${d}`);
   }
 
   async create(req: Request, res: Response) {
