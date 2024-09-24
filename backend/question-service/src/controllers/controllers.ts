@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { querySchema, createSchema, updateSchema} from "../validations/querySchema.js";
+import { addQuestion, getQuestionById, getQuestionsByFilter } from "../services/questionService.js";
+import { ObjectId } from "mongodb";
 
 class QuestionController {
   async get(req: Request, res: Response) {
@@ -9,9 +11,22 @@ class QuestionController {
       return res.status(400).json({ errors: validation.error.format() });
     }
 
-    const { id, c, d } = validation.data;
+    var { id, c, d } = validation.data;
 
-    res.status(200).json(`Questions filtered by: id: ${id}, c: ${c}, d: ${d}`);
+    if (typeof c === 'string') {
+      c = [c];
+    }
+
+    if (typeof d === 'string') {
+      d = [d];
+    }
+
+    if (id) {
+      const question = await getQuestionById(new ObjectId(id));
+      return res.status(200).json(question);
+    }
+
+    res.status(200).json(await getQuestionsByFilter(c, d));
   }
 
   async create(req: Request, res: Response) {

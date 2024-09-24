@@ -1,6 +1,7 @@
 import { connectToDatabase } from '../config/database.js';
 import { Question } from '../models/question.js';
 import { ObjectId } from 'mongodb';
+import { Difficulty } from '../types/types.js';
 
 // Add a new question
 export async function addQuestion(question: Omit<Question, 'questionId'>) {
@@ -17,6 +18,30 @@ export async function getQuestionById(questionId: ObjectId) {
     const collection = db.collection('questions');
     const question = await collection.findOne({ _id: questionId });
     return question;
+}
+
+// Get questions filtered by category and difficulty
+export async function getQuestionsByFilter(categories?: string[], difficulties?: Difficulty[]) {
+  const db = await connectToDatabase();
+  const collection = db.collection('questions');
+
+  const filter: { [key: string]: any } = {};
+  
+  if (categories) {
+      filter['question.questionCategory'] = { 
+        $elemMatch: {
+          $in: categories.map(category => new RegExp(`^${category}$`, 'i')) // Case insensitive match
+        }
+      };
+  }
+  if (difficulties) {
+      filter['question.questionComplexity'] = { 
+        $in: difficulties.map(difficulty => new RegExp(`^${difficulty}$`, 'i')) // Case insensitive match
+      };
+  }
+
+  const questions = await collection.find(filter).toArray();
+  return questions;
 }
   
 // Update a question by ID
