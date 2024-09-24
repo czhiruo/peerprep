@@ -28,3 +28,31 @@ export const createSchema = z.object({
   c: z.union([z.string(), z.array(z.string())]),
   d: z.nativeEnum(Difficulty),
 });
+
+// id is required and must be able to be converted to a number
+// title is optional and must be a string
+// desc is optional and must be a string
+// c (category) is optional and must be a string or an array of strings
+// d (difficulty) is optional and must be a string or array of "easy", "medium", or "hard"
+export const updateSchema = z.object({
+  id: z
+    .string()
+    .refine((val) => !val || !isNaN(Number(val)), {
+      message: "ID must be a number",
+    }),
+  title: z.string().optional(),
+  desc: z.string().optional(),
+  c: z.union([z.string(), z.array(z.string())]).optional(),
+  d: z
+    .union([z.nativeEnum(Difficulty), z.array(z.nativeEnum(Difficulty))])
+    .optional(),
+});
+
+// id is required and must be able to be converted to a number
+export const deleteSchema = z.object({
+  id: z
+    .string()
+    .refine((val) => !val || !isNaN(Number(val)), {
+      message: "ID must be a number",
+    }),
+});
