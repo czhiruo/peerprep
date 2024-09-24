@@ -27,7 +27,7 @@ Run server
 npm run start
 ```
 
-Service runs on port 3000.
+Service runs on port 8080.
 
 ## Validation with Zod
 
