@@ -8,3 +8,9 @@ export interface Question {
     questionComplexity: string;
   }
   
+export enum Difficulty {
+  Easy = "easy",
+  Medium = "medium",
+  Hard = "hard",
+}
+  

@@ -1,7 +1,7 @@
 import { connectToDatabase } from '../config/database.js';
 import { Question } from '../models/question.js';
 import { ObjectId } from 'mongodb';
-import { Difficulty } from '../types/types.js';
+import { Difficulty } from '../models/question.js';
 
 // Add a new question
 export async function addQuestion(question: Omit<Question, 'questionId'>) {

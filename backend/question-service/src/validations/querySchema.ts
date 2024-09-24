@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Difficulty } from "../types/types.js";
+import { Difficulty } from "../models/question.js";
 import { ObjectId } from "mongodb";
 
 // id is optional and must be able to be converted to a number
