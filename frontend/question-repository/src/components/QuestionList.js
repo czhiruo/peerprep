@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Container, Row, Col } from 'react-bootstrap';
-import QuestionChart from './QuestionChart';
 
 const QuestionList = () => {
   const [questions, setQuestions] = useState([]);
 
+  // Mock data fetching
   useEffect(() => {
     const storedQuestions = JSON.parse(localStorage.getItem('questions')) || [];
-    console.log('Stored Questions:', storedQuestions); // Add this line
     setQuestions(storedQuestions);
   }, []);
 
@@ -19,30 +17,26 @@ const QuestionList = () => {
   };
 
   return (
-    <Container>
-      <h2 className="my-4">Question Repository</h2>
-      <Link to="/add" className="btn btn-primary mb-3">Add New Question</Link>
-
-      {/* Add the chart above the question list */}
-      <QuestionChart />
-
-      <Row>
+    <div>
+      <h2>Question Repository</h2>
+      <Link to="/add">Add New Question</Link>
+      <ul>
         {questions.map((question) => (
-          <Col md={4} key={question.id} className="mb-4">
-            <Card>
-              <Card.Body>
-                <Card.Title>{question.title}</Card.Title>
-                <Card.Text>{question.description}</Card.Text>
-                <Card.Text><strong>Category:</strong> {question.category}</Card.Text>
-                <Card.Text><strong>Complexity:</strong> {question.complexity}</Card.Text>
-                <Button variant="outline-primary" as={Link} to={`/edit/${question.id}`}>Edit</Button>
-                <Button variant="outline-danger" className="ml-2" onClick={() => deleteQuestion(question.id)}>Delete</Button>
-              </Card.Body>
-            </Card>
-          </Col>
+          <li key={question.id}>
+            <h3>{question.title}</h3>
+            <p>{question.description}</p>
+            <p>
+              <strong>Category:</strong> {question.category}
+            </p>
+            <p>
+              <strong>Complexity:</strong> {question.complexity}
+            </p>
+            <Link to={`/edit/${question.id}`}>Edit</Link>
+            <button onClick={() => deleteQuestion(question.id)}>Delete</button>
+          </li>
         ))}
-      </Row>
-    </Container>
+      </ul>
+    </div>
   );
 };
 
