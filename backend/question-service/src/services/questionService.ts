@@ -1,14 +1,14 @@
 import { connectToDatabase } from '../config/database.js';
 import { Question } from '../models/question.js';
 import { ObjectId } from 'mongodb';
-import { Difficulty } from '../types/types.js';
+import { Difficulty } from '../models/question.js';
 
 // Add a new question
 export async function addQuestion(question: Omit<Question, 'questionId'>) {
     const db = await connectToDatabase();
     const collection = db.collection('questions');
     const result = await collection.insertOne({ question });
-    console.log('User inserted with _id:', result.insertedId);
+    console.log('Question inserted with _id:', result.insertedId);
     return result.insertedId;
 }
 

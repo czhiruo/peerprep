@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Difficulty } from "../types/types.js";
+import { Difficulty } from "../models/question.js";
 import { ObjectId } from "mongodb";
 
-// id is optional and must be able to be converted to a number
+// id is optional and must be a valid MongoDB ObjectId
 // c (category) is optional and must be a string or an array of strings
 // d (difficulty) is optional and must be a string or array of "easy", "medium", or "hard"
 export const querySchema = z.object({
@@ -17,7 +17,6 @@ export const querySchema = z.object({
     .optional(),
 });
 
-// id is optional and must be able to be converted to a number
 // title is required and must be a string
 // desc is required and must be a string
 // c (category) is required and must be a string or an array of strings

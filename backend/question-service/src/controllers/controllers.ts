@@ -36,10 +36,22 @@ class QuestionController {
       return res.status(400).json({ errors: validation.error.format() });
     }
 
-    const { title, desc, c, d } = validation.data;
+    var { title, desc, c, d } = validation.data;
+
+    if (typeof c === 'string') {
+      c = [c];
+    }
+
+    const id = await addQuestion({
+      questionTitle: title,
+      questionDescription: desc,
+      questionCategory: c,
+      questionComplexity: d,
+    });
 
     res.status(201).json(
       `Question created with: 
+        id: ${id},
         title: ${title}, 
         desc: ${desc}, 
         category: ${c}, 
