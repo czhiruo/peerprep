@@ -42,9 +42,7 @@ export const updateSchema = z.object({
   title: z.string().optional(),
   desc: z.string().optional(),
   c: z.union([z.string(), z.array(z.string())]).optional(),
-  d: z
-    .union([z.nativeEnum(Difficulty), z.array(z.nativeEnum(Difficulty))])
-    .optional(),
+  d: z.nativeEnum(Difficulty),
 });
 
 // id is required and must be able to be converted to a number
