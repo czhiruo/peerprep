@@ -8,7 +8,7 @@ const QuestionList = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await api.get("/api/questions");
+        const response = await api.get("/");
         setQuestions(response.data);
       } catch (error) {
         console.error("Error fetching questions:", error);
