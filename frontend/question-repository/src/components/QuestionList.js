@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from "../api";
 
 const QuestionList = () => {
   const [questions, setQuestions] = useState([]);
 
-  // Mock data fetching
   useEffect(() => {
-    const storedQuestions = JSON.parse(localStorage.getItem('questions')) || [];
-    setQuestions(storedQuestions);
+    const fetchQuestions = async () => {
+      try {
+        const response = await api.get("/api/questions");
+        setQuestions(response.data);
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchQuestions();
   }, []);
 
-  const deleteQuestion = (id) => {
-    const updatedQuestions = questions.filter((q) => q.id !== id);
-    setQuestions(updatedQuestions);
-    localStorage.setItem('questions', JSON.stringify(updatedQuestions));
+  const deleteQuestion = async (id) => {
+    try {
+        await api.delete(`/api/questions?id=${id}`);
+        const updatedQuestions = questions.filter((q) => q.id !== id);
+        setQuestions(updatedQuestions);
+    } catch (error) {
+        console.error("Error deleting question:", error);
+    }
   };
 
   return (
