@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
+import api from "../api";
 
 const QuestionForm = ({ questionId }) => {
   const navigate = useNavigate();
@@ -8,39 +9,59 @@ const QuestionForm = ({ questionId }) => {
     id: '',
     title: '',
     description: '',
-    category: '',
+    category: [],
     complexity: '',
   });
 
-  useEffect(() => {
-    if (questionId) {
-      const storedQuestions = JSON.parse(localStorage.getItem('questions')) || [];
-      const existingQuestion = storedQuestions.find((q) => q.id === questionId);
-      if (existingQuestion) {
-        setQuestion(existingQuestion);
+    useEffect(() => {
+      if (questionId) {
+        const fetchQuestion = async () => {
+          try {
+            const response = await api.get(`/questions?id=${questionId}`);
+            const existingQuestion = response.data;
+            console.log(existingQuestion)
+            if (existingQuestion) {
+              setQuestion({
+                title: existingQuestion.question.questionTitle,
+                description: existingQuestion.question.questionDescription,
+                category: existingQuestion.question.questionCategory,
+                complexity: existingQuestion.question.questionComplexity,
+              });
+            }
+          } catch (error) {
+            console.error("Error fetching question:", error);
+          }
+        };
+        fetchQuestion();
       }
-    }
-  }, [questionId]);
+    }, [questionId]);
 
   const handleChange = (e) => {
     setQuestion({ ...question, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const storedQuestions = JSON.parse(localStorage.getItem('questions')) || [];
-
-    if (questionId) {
-      const updatedQuestions = storedQuestions.map((q) =>
-        q.id === questionId ? question : q
-      );
-      localStorage.setItem('questions', JSON.stringify(updatedQuestions));
-    } else {
-      question.id = Date.now().toString();
-      storedQuestions.push(question);
-      localStorage.setItem('questions', JSON.stringify(storedQuestions));
+      const questionData = {
+        title: question.title,
+        desc: question.description,
+        c: question.category,
+        d: question.complexity.toLowerCase(),
+      };
+    
+    try {
+      if (questionId) {
+        //update question
+        await api.put(`/questions?id=${questionId}`, questionData);
+      } else {
+        //create a new question
+        console.log(questionData);
+        await api.post("/questions", questionData);
+      }
+        navigate("/");
+    } catch (error) {
+        console.error("Error saving question:", error);
     }
-    navigate('/');
   };
 
   return (

@@ -8,7 +8,7 @@ const QuestionList = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await api.get("/");
+        const response = await api.get("/questions");
         setQuestions(response.data);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -20,7 +20,7 @@ const QuestionList = () => {
 
   const deleteQuestion = async (id) => {
     try {
-        await api.delete(`/api/questions?id=${id}`);
+        await api.delete(`/questions?id=${id}`);
         const updatedQuestions = questions.filter((q) => q.id !== id);
         setQuestions(updatedQuestions);
     } catch (error) {
@@ -38,7 +38,7 @@ const QuestionList = () => {
             <h3>{item.question.questionTitle}</h3>
             <p>{item.question.questionDescription}</p>
             <p>
-              <strong>Category:</strong>
+              <strong>Category: </strong>
               {/* Checks if question belongs to more than one category */}
               {Array.isArray(item.question.questionCategory)
                 ? item.question.questionCategory.join(", ")
