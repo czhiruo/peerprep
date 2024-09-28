@@ -17,7 +17,20 @@ export async function getQuestionById(questionId: ObjectId) {
     const db = await connectToDatabase();
     const collection = db.collection('questions');
     const question = await collection.findOne({ _id: questionId });
-    return question;
+
+    if (!question) {
+      return null;
+    }
+
+    console.log(question)
+
+    return {
+      "id": question._id,
+      "title": question.question.questionTitle,
+      "desc": question.question.questionDescription,
+      "c": question.question.questionCategory,
+      "d": question.question.questionComplexity
+    }
 }
 
 // Get questions filtered by category and difficulty
@@ -41,7 +54,20 @@ export async function getQuestionsByFilter(categories?: string[], difficulties?:
   }
 
   const questions = await collection.find(filter).toArray();
-  return questions;
+
+  if (!questions) {
+    return null;
+  }
+
+  return questions.map(question => {
+    return {
+      "id": question._id,
+      "title": question.question.questionTitle,
+      "desc": question.question.questionDescription,
+      "c": question.question.questionCategory,
+      "d": question.question.questionComplexity
+    }
+  });
 }
   
 // Update a question by ID
