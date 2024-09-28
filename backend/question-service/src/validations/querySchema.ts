@@ -13,12 +13,12 @@ export const querySchema = z.object({
 });
 
 // id is required and must be a valid MongoDB ObjectId
-export const ObjectIdSchema = z.object({
+export const objectIdSchema = z.object({
   id: z.string().refine((val) => {
     return ObjectId.isValid(val);
   }, {
     message: "ID must be a valid MongoDB ObjectId",
-  }).optional(),
+  }),
 });
 
 // title is required and must be a string
@@ -32,19 +32,13 @@ export const createSchema = z.object({
   d: z.nativeEnum(Difficulty),
 });
 
-// id is required and must be able to be converted to a number
 // title is optional and must be a string
 // desc is optional and must be a string
 // c (category) is optional and must be a string or an array of strings
-// d (difficulty) is optional and must be a string or array of "easy", "medium", or "hard"
+// d (difficulty) is optional and must be a string of "easy", "medium", or "hard"
 export const updateSchema = z.object({
-  id: z
-    .string()
-    .refine((val) => !val || !isNaN(Number(val)), {
-      message: "ID must be a number",
-    }),
   title: z.string().optional(),
   desc: z.string().optional(),
   c: z.union([z.string(), z.array(z.string())]).optional(),
-  d: z.nativeEnum(Difficulty),
+  d: z.nativeEnum(Difficulty).optional(),
 });

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Question } from "../models/question.js";
-import { querySchema, ObjectIdSchema, createSchema, updateSchema } from "../validations/querySchema.js";
+import { querySchema, createSchema, updateSchema, objectIdSchema } from "../validations/querySchema.js";
 import { addQuestion, getQuestionById, getQuestionsByFilter, updateQuestion, deleteQuestion } from "../services/questionService.js";
 import { ObjectId } from "mongodb";
 
@@ -31,7 +31,7 @@ class QuestionController {
 
   // Get question by id
   async getById(req: Request, res: Response) {
-    const validation = ObjectIdSchema.safeParse(req.params);
+    const validation = objectIdSchema.safeParse(req.params);
 
     // If the id is not a valid ObjectId, return a 400 status code
     if (!validation.success) {
@@ -78,26 +78,43 @@ class QuestionController {
 
   // Update a question
   async update(req: Request, res: Response) {
-    const validation = updateSchema.safeParse(req.body);
+    const id_validation = objectIdSchema.safeParse(req.params); 
 
-    if (!validation.success) {
-      return res.status(400).json({ errors: validation.error.format() });
+    console.log(req.query);
+    if (!id_validation.success) {
+      return res.status(400).json({ errors: id_validation.error.format() });
     }
 
-    var { id, title, desc, c, d } = validation.data;
+    const { id } = id_validation.data;
+
+    console.log(req.body);
+    const update_validation = updateSchema.safeParse(req.body);
+
+    if (!update_validation.success) {
+      return res.status(400).json({ errors: update_validation.error.format() });
+    }
+
+    var { title, desc, c, d } = update_validation.data;
 
     // Category can be an array but there should only be one difficulty per question
     if (typeof c === 'string') {
       c = [c];
     }
 
-    const updatedQuestion: Partial<Question> = {
-      questionId: new ObjectId(id),
-      questionTitle: title,
-      questionDescription: desc,
-      questionCategory: c,
-      questionComplexity: d,
-    };
+    const updatedQuestion: Partial<Question> = {};
+
+    if (title) {
+        updatedQuestion.questionTitle = title;
+    }
+    if (desc) {
+        updatedQuestion.questionDescription = desc;
+    }
+    if (c) {
+        updatedQuestion.questionCategory = c;
+    }
+    if (d) {
+        updatedQuestion.questionComplexity = d;
+    }
 
     const updateSuccessful: boolean = await updateQuestion(new ObjectId(id), updatedQuestion);
 
@@ -107,18 +124,20 @@ class QuestionController {
       console.log('Failed to update the question');
     }
 
-    res.status(200).json(
-      `Question with id ${id} updated with: 
-        title: ${title}, 
-        desc: ${desc}, 
-        category: ${c}, 
-        difficulty: ${d}`
+    res.status(201).json(
+      {
+        "id": id,
+        "title": title,
+        "desc": desc,
+        "category": c,
+        "difficulty": d
+      }
     );
   }
 
   // Delete a question
   async delete(req: Request, res: Response) {
-    const validation = ObjectIdSchema.safeParse(req.params); 
+    const validation = objectIdSchema.safeParse(req.params); 
 
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
