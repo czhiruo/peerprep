@@ -20,7 +20,7 @@ const QuestionList = () => {
 
   const deleteQuestion = async (id) => {
     try {
-        await deleteData(`?id=${id}`);
+        await deleteData(`/${id}`);
         const updatedQuestions = questions.filter((q) => q.id !== id);
         setQuestions(updatedQuestions);
     } catch (error) {
@@ -34,21 +34,19 @@ const QuestionList = () => {
       <Link to="/add">Add New Question</Link>
       <ul>
         {questions.map((item) => (
-          <li key={item._id}>
-            <h3>{item.question.questionTitle}</h3>
-            <p>{item.question.questionDescription}</p>
+          <li key={item.id}>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
             <p>
               <strong>Category: </strong>
               {/* Checks if question belongs to more than one category */}
-              {Array.isArray(item.question.questionCategory)
-                ? item.question.questionCategory.join(", ")
-                : item.question.questionCategory}
+              {item.c.join(", ")}
             </p>
             <p>
-              <strong>Complexity:</strong> {item.question.questionComplexity}
+              <strong>Complexity:</strong> {item.d}
             </p>
-            <Link to={`/edit/${item._id}`}>Edit</Link>
-            <button onClick={() => deleteQuestion(item._id)}>Delete</button>
+            <Link to={`/edit/${item.id}`}>Edit</Link>
+            <button onClick={() => deleteQuestion(item.id)}>Delete</button>
           </li>
         ))}
       </ul>

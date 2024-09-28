@@ -17,13 +17,13 @@ const QuestionForm = ({ questionId }) => {
       if (questionId) {
         const fetchQuestion = async () => {
           try {
-            const existingQuestion = await getData(`/:${questionId}`);
+            const existingQuestion = await getData(`/${questionId}`);
             if (existingQuestion) {
               setQuestion({
-                title: existingQuestion.question.questionTitle,
-                description: existingQuestion.question.questionDescription,
-                category: existingQuestion.question.questionCategory,
-                complexity: existingQuestion.question.questionComplexity,
+                title: existingQuestion.title,
+                description: existingQuestion.desc,
+                category: existingQuestion.c,
+                complexity: existingQuestion.d,
               });
             }
           } catch (error) {
@@ -34,9 +34,17 @@ const QuestionForm = ({ questionId }) => {
       }
     }, [questionId]);
 
-  const handleChange = (e) => {
-    setQuestion({ ...question, [e.target.name]: e.target.value });
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  if (name === "category") {
+    setQuestion({
+      ...question,
+      category: value.split(",").map((cat) => cat.trim()), 
+    });
+  } else {
+    setQuestion({ ...question, [name]: value });
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,16 +52,17 @@ const QuestionForm = ({ questionId }) => {
         title: question.title,
         desc: question.description,
         c: question.category,
-        d: question.complexity.toLowerCase(),
+        d: question.complexity,
       };
     
     try {
       if (questionId) {
         //update question
-        await addData('/', questionData);
+        console.log(questionData);
+        await updateData(`/${questionId}`, questionData);
       } else {
         //create a new question
-        await updateData(`/:${questionId}`, questionData);
+        await addData("/", questionData);
       }
         navigate("/");
     } catch (error) {
@@ -105,9 +114,9 @@ const QuestionForm = ({ questionId }) => {
             required
           >
             <option value="">Select Complexity</option>
-            <option value="Easy">Easy</option>
-            <option value="Moderate">Moderate</option>
-            <option value="Hard">Hard</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </Form.Control>
         </Form.Group>
         <Button variant="primary" type="submit">
