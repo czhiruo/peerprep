@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Question } from "../models/question.js";
-import { querySchema, createSchema, updateSchema, deleteSchema} from "../validations/querySchema.js";
+import { querySchema, createSchema, updateSchema, deleteSchema, queryIdSchema} from "../validations/querySchema.js";
 import { addQuestion, getQuestionById, getQuestionsByFilter, updateQuestion, deleteQuestion } from "../services/questionService.js";
 import { ObjectId } from "mongodb";
 
@@ -29,6 +29,7 @@ class QuestionController {
       const question = await getQuestionById(new ObjectId(id));
       return res.status(200).json(question);
     }
+
 
     res.status(200).json(await getQuestionsByFilter(c, d));
   }
@@ -65,26 +66,43 @@ class QuestionController {
   }
 
   async update(req: Request, res: Response) {
-    const validation = updateSchema.safeParse(req.body);
+    const id_validation = queryIdSchema.safeParse(req.query); 
 
-    if (!validation.success) {
-      return res.status(400).json({ errors: validation.error.format() });
+    console.log(req.query);
+    if (!id_validation.success) {
+      return res.status(400).json({ errors: id_validation.error.format() });
     }
 
-    var { id, title, desc, c, d } = validation.data;
+    const { id } = id_validation.data;
+
+    console.log(req.body);
+    const update_validation = updateSchema.safeParse(req.body);
+
+    if (!update_validation.success) {
+      return res.status(400).json({ errors: update_validation.error.format() });
+    }
+
+    var { title, desc, c, d } = update_validation.data;
 
     // Category can be an array but there should only be one difficulty per question
     if (typeof c === 'string') {
       c = [c];
     }
 
-    const updatedQuestion: Partial<Question> = {
-      questionId: new ObjectId(id),
-      questionTitle: title,
-      questionDescription: desc,
-      questionCategory: c,
-      questionComplexity: d,
-    };
+    const updatedQuestion: Partial<Question> = {};
+
+    if (title) {
+        updatedQuestion.questionTitle = title;
+    }
+    if (desc) {
+        updatedQuestion.questionDescription = desc;
+    }
+    if (c) {
+        updatedQuestion.questionCategory = c;
+    }
+    if (d) {
+        updatedQuestion.questionComplexity = d;
+    }
 
     const updateSuccessful: boolean = await updateQuestion(new ObjectId(id), updatedQuestion);
 
@@ -98,7 +116,7 @@ class QuestionController {
       `Question with id ${id} updated with: 
         title: ${title}, 
         desc: ${desc}, 
-        category: ${c}, 
+        category: ${c},
         difficulty: ${d}`
     );
   }

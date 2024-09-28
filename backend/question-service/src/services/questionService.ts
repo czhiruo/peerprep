@@ -43,13 +43,32 @@ export async function getQuestionsByFilter(categories?: string[], difficulties?:
   const questions = await collection.find(filter).toArray();
   return questions;
 }
-  
-// Update a question by ID
+
+// Update a question by ID, only the fields that are provided in the updatedQuestion object will be updated
 export async function updateQuestion(questionId: ObjectId, updatedQuestion: Partial<Question>) {
-    const db = await connectToDatabase();
-    const collection = db.collection('questions');
-    const result = await collection.updateOne({ _id: questionId }, { $set: updatedQuestion });
-    return result.modifiedCount > 0;
+  const db = await connectToDatabase();
+  const collection = db.collection('questions');
+
+  // Retrieve the current question document
+  const currentQuestion = await collection.findOne({ _id: questionId });
+  
+  if (!currentQuestion) {
+      throw new Error('Question not found');
+  }
+
+  // Prepare the update object
+  const updateData = {
+      question: {
+          questionTitle: updatedQuestion.questionTitle || currentQuestion.question.questionTitle,
+          questionDescription: updatedQuestion.questionDescription || currentQuestion.question.questionDescription,
+          questionCategory: updatedQuestion.questionCategory || currentQuestion.question.questionCategory,
+          questionComplexity: updatedQuestion.questionComplexity || currentQuestion.question.questionComplexity
+      }
+  };
+
+  // Perform the update operation
+  const result = await collection.updateOne({ _id: questionId }, { $set: updateData });
+  return result.modifiedCount > 0;
 }
 
 // Delete a question by ID
