@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
-import api from "../api";
+import { getData, updateData, addData } from '../services/api';
 
 const QuestionForm = ({ questionId }) => {
   const navigate = useNavigate();
@@ -17,9 +17,8 @@ const QuestionForm = ({ questionId }) => {
       if (questionId) {
         const fetchQuestion = async () => {
           try {
-            const response = await api.get(`/questions?id=${questionId}`);
+            const response = await getData('/');
             const existingQuestion = response.data;
-            console.log(existingQuestion)
             if (existingQuestion) {
               setQuestion({
                 title: existingQuestion.question.questionTitle,
@@ -52,11 +51,10 @@ const QuestionForm = ({ questionId }) => {
     try {
       if (questionId) {
         //update question
-        await api.put(`/questions?id=${questionId}`, questionData);
+        await addData('/', questionData);
       } else {
         //create a new question
-        console.log(questionData);
-        await api.post("/questions", questionData);
+        await updateData(`/:${questionId}`, questionData);
       }
         navigate("/");
     } catch (error) {

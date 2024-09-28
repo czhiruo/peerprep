@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from "../api";
+import { getData, deleteData } from "../services/api";
 
 const QuestionList = () => {
   const [questions, setQuestions] = useState([]);
@@ -8,7 +8,8 @@ const QuestionList = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await api.get("/questions");
+        const response = await getData("/");
+        console.log(response);
         setQuestions(response.data);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -20,7 +21,7 @@ const QuestionList = () => {
 
   const deleteQuestion = async (id) => {
     try {
-        await api.delete(`/questions?id=${id}`);
+        await deleteData(`/:${id}`)
         const updatedQuestions = questions.filter((q) => q.id !== id);
         setQuestions(updatedQuestions);
     } catch (error) {
