@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { Question } from "../models/question.js";
-import { querySchema, createSchema, updateSchema, deleteSchema} from "../validations/querySchema.js";
+import { querySchema, ObjectIdSchema, createSchema, updateSchema } from "../validations/querySchema.js";
 import { addQuestion, getQuestionById, getQuestionsByFilter, updateQuestion, deleteQuestion } from "../services/questionService.js";
 import { ObjectId } from "mongodb";
 
 class QuestionController {
+  // Get all questions or filter
   async get(req: Request, res: Response) {
     const validation = querySchema.safeParse(req.query);
 
@@ -13,7 +14,7 @@ class QuestionController {
     }
 
     // Use var instead of const to avoid redeclaring id, c, and d
-    var { id, c, d } = validation.data;
+    var { c, d } = validation.data;
 
     // Convert Category and Difficulty to arrays if they are strings to standardize the data 
     // and make it easier for filtering with multiple values of c and d
@@ -25,27 +26,37 @@ class QuestionController {
       d = [d];
     }
 
-    if (id) {
-      const question = await getQuestionById(new ObjectId(id));
-      return res.status(200).json(question);
-    }
-
     res.status(200).json(await getQuestionsByFilter(c, d));
   }
 
+  // Get question by id
+  async getById(req: Request, res: Response) {
+    const validation = ObjectIdSchema.safeParse(req.params);
+
+    // If the id is not a valid ObjectId, return a 400 status code
+    if (!validation.success) {
+      return res.status(400).json({ errors: validation.error.format() });
+    }
+    const id = validation.data.id;
+    const question = await getQuestionById(new ObjectId(id));
+    
+    // If the question is not found, return a 404 status code
+    if (!question) {
+      return res.status(404).json({ error: "Question not found"});
+    }
+    res.status(200).json(question);
+  }
+
+  // Create a new question
   async create(req: Request, res: Response) {
     const validation = createSchema.safeParse(req.body);
 
+    // If the request body does not match the schema, return a 400 status code
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
     }
 
     var { title, desc, c, d } = validation.data;
-
-    // Category can be an array but there should only be one difficulty per question
-    if (typeof c === 'string') {
-      c = [c];
-    }
 
     const id = await addQuestion({
       questionTitle: title,
@@ -55,15 +66,17 @@ class QuestionController {
     });
 
     res.status(201).json(
-      `Question created with: 
-        id: ${id},
-        title: ${title}, 
-        desc: ${desc}, 
-        category: ${c}, 
-        difficulty: ${d}`
+      {
+        "id": id,
+        "title": title,
+        "desc": desc,
+        "c": c,
+        "d": d
+      }
     );
   }
 
+  // Update a question
   async update(req: Request, res: Response) {
     const validation = updateSchema.safeParse(req.body);
 
@@ -103,8 +116,9 @@ class QuestionController {
     );
   }
 
+  // Delete a question
   async delete(req: Request, res: Response) {
-    const validation = deleteSchema.safeParse(req.query); 
+    const validation = ObjectIdSchema.safeParse(req.params); 
 
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -114,13 +128,13 @@ class QuestionController {
 
     const deleteSuccessful: boolean = await deleteQuestion(new ObjectId(id));
 
-    if (deleteSuccessful) {
-      console.log('Question deleted successfully');
-    } else {
-      console.log('Failed to delete the question');
+    if (!deleteSuccessful) {
+      res.status(404).json({ error: "Question not found" });
+      console.log(`Failed to delete the question with id ${id}`);
     }
 
-    res.status(200).json(`Question with id ${id} has been deleted.`);
+    console.log(`Question with id ${id} deleted successfully`);
+    res.status(204).json();
   }
 }
 
