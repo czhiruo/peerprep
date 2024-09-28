@@ -1,10 +1,12 @@
 import axios from "axios";
 
+const baseUrl = process.env.REACT_APP_API_BASE_URL;
+
 const api = axios.create({
-  baseURL: process.env.API_BASE_URL
+  baseURL: baseUrl,
 });
 
-export const getData = async (url) => {
+const getData = async (url) => {
   try {
     const response = await api.get(url);
     return response.data;
@@ -14,7 +16,7 @@ export const getData = async (url) => {
   }
 };
 
-export const addData = async (url, dataToBeAdded) => {
+const addData = async (url, dataToBeAdded) => {
   try {
     const response = await api.post(url, dataToBeAdded);
     return response.data;
@@ -24,7 +26,7 @@ export const addData = async (url, dataToBeAdded) => {
   }
 };
 
-export const updateData = async (url, updatedData) => {
+const updateData = async (url, updatedData) => {
   try {
     const response = await api.patch(url, updatedData);
     return response.data;
@@ -34,7 +36,7 @@ export const updateData = async (url, updatedData) => {
   }
 };
 
-export const deleteData = async (url) => {
+const deleteData = async (url) => {
   try {
     const response = await api.delete(url);
     return response.data;
@@ -43,3 +45,5 @@ export const deleteData = async (url) => {
     throw error;
   }
 };
+
+export { getData, updateData, deleteData, addData };

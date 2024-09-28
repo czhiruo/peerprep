@@ -17,8 +17,7 @@ const QuestionForm = ({ questionId }) => {
       if (questionId) {
         const fetchQuestion = async () => {
           try {
-            const response = await getData('/');
-            const existingQuestion = response.data;
+            const existingQuestion = await getData(`/:${questionId}`);
             if (existingQuestion) {
               setQuestion({
                 title: existingQuestion.question.questionTitle,

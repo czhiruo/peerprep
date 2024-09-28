@@ -9,8 +9,7 @@ const QuestionList = () => {
     const fetchQuestions = async () => {
       try {
         const response = await getData("/");
-        console.log(response);
-        setQuestions(response.data);
+        setQuestions(response);
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
@@ -21,7 +20,7 @@ const QuestionList = () => {
 
   const deleteQuestion = async (id) => {
     try {
-        await deleteData(`/:${id}`)
+        await deleteData(`?id=${id}`);
         const updatedQuestions = questions.filter((q) => q.id !== id);
         setQuestions(updatedQuestions);
     } catch (error) {
