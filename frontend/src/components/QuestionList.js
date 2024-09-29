@@ -49,8 +49,8 @@ const QuestionList = () => {
                 <Card.Text><strong>Category:</strong> {question.category}</Card.Text>
                 <Card.Text><strong>Complexity:</strong> {question.complexity}</Card.Text>
                 <div className="d-flex justify-content-between">
-                  <Button variant="outline-primary" as={Link} to={`/edit/${question.id}`}>Edit</Button>
-                  <Button variant="outline-danger" onClick={() => deleteQuestion(question.id)}>Delete</Button>
+                  <Button variant="outline-primary" as={Link} to={`/edit/${question.id}`} onClick={(e) => e.stopPropagation()}>Edit</Button>
+                  <Button variant="outline-danger" onClick={(e) => {e.stopPropagation(); deleteQuestion(question.id)}}>Delete</Button>
                 </div>
               </Card.Body>
             </Card>
