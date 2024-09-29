@@ -1,0 +1,36 @@
+.container {
+  max-width: 700px; /* Set a maximum width for better alignment */
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  margin-top: 20px;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 1.1em; /* Slightly larger font for form labels */
+  color: #495057; /* Darker color for form labels */
+}
+
+.form-control {
+  border-radius: 12px; /* Rounded input fields */
+  border: 1px solid #ced4da; /* Subtle border color */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue shadow on focus */
+}
+
+button {
+  padding: 10px 20px; /* Larger button size */
+  border-radius: 20px; /* Fully rounded button */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
+}

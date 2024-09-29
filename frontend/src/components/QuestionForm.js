@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { getData, updateData, addData } from '../services/api';
+import './QuestionForm.css';
 
 const QuestionForm = ({ questionId }) => {
   const navigate = useNavigate();
@@ -69,9 +70,9 @@ const handleChange = (e) => {
         console.error("Error saving question:", error);
     }
   };
-
   return (
-    <Container>
+    <Container className="mt-4">
+      <h3 className="mb-4">{questionId ? 'Edit Question' : 'Add New Question'}</h3>
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formTitle">
           <Form.Label>Question Title</Form.Label>
@@ -81,9 +82,10 @@ const handleChange = (e) => {
             value={question.title}
             onChange={handleChange}
             required
+            placeholder="Enter the title of the question"
           />
         </Form.Group>
-        <Form.Group controlId="formDescription">
+        <Form.Group controlId="formDescription" className="mt-3">
           <Form.Label>Question Description</Form.Label>
           <Form.Control
             as="textarea"
@@ -92,9 +94,10 @@ const handleChange = (e) => {
             value={question.description}
             onChange={handleChange}
             required
+            placeholder="Describe the question in detail"
           />
         </Form.Group>
-        <Form.Group controlId="formCategory">
+        <Form.Group controlId="formCategory" className="mt-3">
           <Form.Label>Question Category</Form.Label>
           <Form.Control
             type="text"
@@ -102,9 +105,10 @@ const handleChange = (e) => {
             value={question.category}
             onChange={handleChange}
             required
+            placeholder="Enter the category of the question"
           />
         </Form.Group>
-        <Form.Group controlId="formComplexity">
+        <Form.Group controlId="formComplexity" className="mt-3">
           <Form.Label>Question Complexity</Form.Label>
           <Form.Control
             as="select"
@@ -114,13 +118,13 @@ const handleChange = (e) => {
             required
           >
             <option value="">Select Complexity</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
           </Form.Control>
         </Form.Group>
-        <Button variant="primary" type="submit">
-          {questionId ? 'Update' : 'Add'} Question
+        <Button variant="primary" type="submit" className="mt-3">
+          {questionId ? 'Update Question' : 'Add Question'}
         </Button>
       </Form>
     </Container>
