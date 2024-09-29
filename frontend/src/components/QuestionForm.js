@@ -40,7 +40,7 @@ const handleChange = (e) => {
   if (name === "category") {
     setQuestion({
       ...question,
-      category: value.split(",").map((cat) => cat.trim()), 
+      category: value.split(", "),
     });
   } else {
     setQuestion({ ...question, [name]: value });
@@ -49,7 +49,6 @@ const handleChange = (e) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-	// console.log('Form submitted'); // Debug log
 
       const questionData = {
         title: question.title,
@@ -61,7 +60,6 @@ const handleChange = (e) => {
     try {
       if (questionId) {
         //update question
-        console.log(questionData);
         await updateData(`/${questionId}`, questionData);
       } else {
         //create a new question
@@ -120,9 +118,9 @@ const handleChange = (e) => {
             required
           >
             <option value="">Select Complexity</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </Form.Control>
         </Form.Group>
         <Button variant="primary" type="submit" className="mt-3">

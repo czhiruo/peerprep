@@ -32,7 +32,7 @@ const QuestionList = () => {
   };
 
   const handleQuestionClick = (id) => {
-	  navigate('/questions/${id}');
+	  navigate(`/questions/${id}`);
   };
 
   return (
@@ -45,9 +45,8 @@ const QuestionList = () => {
             <Card className="question-card shadow-sm" onClick={() => handleQuestionClick(question.id)}>
               <Card.Body>
                 <Card.Title>{question.title}</Card.Title>
-                <Card.Text>{question.description}</Card.Text>
-                <Card.Text><strong>Category:</strong> {question.category}</Card.Text>
-                <Card.Text><strong>Complexity:</strong> {question.complexity}</Card.Text>
+                <Card.Text><strong>Category:</strong> {question.c.join(', ')}</Card.Text>
+                <Card.Text><strong>Complexity:</strong> {question.d}</Card.Text>
                 <div className="d-flex justify-content-between">
                   <Button variant="outline-primary" as={Link} to={`/edit/${question.id}`} onClick={(e) => e.stopPropagation()}>Edit</Button>
                   <Button variant="outline-danger" onClick={(e) => {e.stopPropagation(); deleteQuestion(question.id)}}>Delete</Button>
