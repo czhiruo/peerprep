@@ -20,7 +20,7 @@ const QuestionList = () => {
 
     fetchQuestions();
   }, []);
-
+  		
   const deleteQuestion = async (id) => {
     try {
         await deleteData(`/${id}`);
@@ -42,7 +42,7 @@ const QuestionList = () => {
       <Row>
         {questions.map((question) => (
           <Col md={4} key={question.id} className="mb-4">
-            <Card className="question-card shadow-sm">
+            <Card className="question-card shadow-sm" onClick={() => handleQuestionClick(question.id)}>
               <Card.Body>
                 <Card.Title>{question.title}</Card.Title>
                 <Card.Text>{question.description}</Card.Text>
