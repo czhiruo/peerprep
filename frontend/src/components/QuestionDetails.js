@@ -1,4 +1,3 @@
-// QuestionDetails.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getData as getQuestion } from '../services/api';
