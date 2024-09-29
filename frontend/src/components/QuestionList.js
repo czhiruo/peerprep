@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Container, Row, Col } from 'react-bootstrap';
 import { getData, deleteData } from "../services/api";
 import './QuestionList.css'; // Custom CSS for QuestionList
 
 const QuestionList = () => {
   const [questions, setQuestions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -29,6 +30,11 @@ const QuestionList = () => {
         console.error("Error deleting question:", error);
     }
   };
+
+  const handleQuestionClick = (id) => {
+	  navigate('/questions/${id}');
+  };
+
   return (
     <Container className="my-4">
       <h2 className="text-center mb-4">Question Repository</h2>
