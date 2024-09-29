@@ -1,7 +1,7 @@
 // QuestionDetails.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getData as getQuestions } from '../services/api';
+import { getData as getQuestion } from '../services/api';
 import { Container, Card, Button } from 'react-bootstrap';
 import './QuestionDetails.css'; 
 
@@ -14,7 +14,7 @@ const QuestionDetails = () => {
   useEffect(() => {
     const fetchQuestionDetails = async () => {
       try {
-        const questions = await getQuestions(); // Fetch all questions
+        const questions = await getQuestion(); // Fetch all questions
         const selectedQuestion = questions.find((q) => q.id === id); // Find the question by ID
         setQuestion(selectedQuestion);
       } catch (error) {
@@ -40,13 +40,13 @@ const QuestionDetails = () => {
         <Card.Body>
           <Card.Title>{question.title}</Card.Title>
           <Card.Text>
-            <strong>Description: </strong>{question.description}
+            <strong>Description: </strong>{question.desc}
           </Card.Text>
           <Card.Text>
-            <strong>Category: </strong>{question.category}
+            <strong>Category: </strong>{question.c.join(', ')}
           </Card.Text>
           <Card.Text>
-            <strong>Complexity: </strong>{question.complexity}
+            <strong>Complexity: </strong>{question.d}
           </Card.Text>
           <Button variant="primary" onClick={() => navigate('/')}>
             Back to List

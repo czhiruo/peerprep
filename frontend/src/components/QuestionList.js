@@ -32,7 +32,7 @@ const QuestionList = () => {
   };
 
   const handleQuestionClick = (id) => {
-	  navigate('/questions/${id}');
+	  navigate(`/questions/${id}`);
   };
 
   return (

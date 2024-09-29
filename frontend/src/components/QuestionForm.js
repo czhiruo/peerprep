@@ -49,7 +49,6 @@ const handleChange = (e) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-	// console.log('Form submitted'); // Debug log
 
       const questionData = {
         title: question.title,
@@ -61,7 +60,6 @@ const handleChange = (e) => {
     try {
       if (questionId) {
         //update question
-        console.log(questionData);
         await updateData(`/${questionId}`, questionData);
       } else {
         //create a new question
