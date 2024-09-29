@@ -1,15 +1,27 @@
 import React from 'react';
 import QuestionForm from './QuestionForm';
-import { useParams } from 'react-router-dom';
+import {updateData as editQuestion} from "../services/api";
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EditQuestion = () => {
   const { id } = useParams();
-  return (
+  const navigate = useNavigate();
+
+  const handleSubmit = async (updatedQuestionData) => {
+    try {
+      await editQuestion(id, updatedQuestionData); // Use the editQuestion API function
+      navigate('/'); // Navigate to home page after successful edit
+    } catch (error) {
+      console.error("Error editing question", error);
+    }
+  };
+
+	return (
     <div>
       <h2>Edit Question</h2>
-      <QuestionForm questionId={id} />
+      <QuestionForm questionId={id} onSubmit={handleSubmit} />
     </div>
-  );
+  	);
 };
 
 export default EditQuestion;

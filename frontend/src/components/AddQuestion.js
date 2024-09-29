@@ -8,6 +8,7 @@ const AddQuestion = () => {
   const handleSubmit = async (questionData) => {
     try {
       await addQuestion(questionData); // Use the addQuestion API function
+	  console.log('Question added successfully'); // Debug log for success
       navigate('/'); // Navigate to home page after successful addition
     } catch (error) {
       console.error("Error adding question", error);
@@ -16,7 +17,7 @@ const AddQuestion = () => {
 
   return (
     <div>
-      <h2>Add New Question</h2>
+	  <h2 className="text-center">Adding</h2>
       <QuestionForm onSubmit={handleSubmit}/>
     </div>
   );
