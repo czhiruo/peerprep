@@ -1,6 +1,6 @@
 import React from 'react';
 import QuestionForm from './QuestionForm';
-import {updateData as editQuestion} from "../services/api";
+import {updateData as editQuestion} from "../services/questionService";
 import { useParams, useNavigate } from 'react-router-dom';
 
 const EditQuestion = () => {

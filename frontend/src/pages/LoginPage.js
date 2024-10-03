@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { userLogin } from '../services/userService';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -8,6 +9,14 @@ function LoginPage() {
     e.preventDefault();
     // Add logic for login (e.g., API call)
     console.log('Logging in with:', { email, password });
+    userLogin(email, password)
+      .then((token) => {
+        console.log('Logged in successfully:', token);
+      })
+      .catch((error) => {
+        console.error('Login failed:', error);
+      }
+    );
   };
 
   return (

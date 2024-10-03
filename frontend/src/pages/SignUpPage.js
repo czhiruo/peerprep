@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createUser } from '../services/userService';
 
 function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -9,7 +10,23 @@ function SignUpPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add logic for sign up (e.g., API call)
-    console.log('Signing up with:', { email, username, password, confirmPassword });
+    console.log('Signing up with:', { email, username, password });
+
+    if (password !== confirmPassword) {
+      console.error('Passwords do not match');
+      // DO SOMETHING TO UI HERE
+      return;
+    }
+
+    createUser(email, username, password, confirmPassword)
+      .then((user) => {
+        // DO SOMETHING TO UI HERE
+        console.log('Signed up successfully:', user);
+      })
+      .catch((error) => {
+        // DO SOMETHING TO UI HERE
+        console.error('Sign up failed:', error);
+      });
   };
 
   return (
