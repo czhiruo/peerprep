@@ -1,12 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
-import AddQuestion from './components/AddQuestion';
-import EditQuestion from './components/EditQuestion';
-import QuestionDetails from './components/QuestionDetails';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import SelectComplexityPage from './pages/SelectComplexityPage';
+import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -19,18 +18,22 @@ function App() {
         {/* Main Content */}
         <main className="flex-grow">
         <Routes>
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/complexity" element={<SelectComplexityPage />} />
-            <Route path="/questions" element={<QuestionList />} />
-            <Route path="/add" element={<AddQuestion />} />
-            <Route path="/edit/:id" element={<EditQuestion />} />
-            <Route path="/questions/:id" element={<QuestionDetails />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />
           </Routes>
         </main>
       {/* </div> */}
     </Router>
   );
+}
+
+const Logout = () => {
+  localStorage.removeItem('accessToken');
+  console.log('logout')
+  return <LoginPage />;
 }
 
 export default App;

@@ -31,7 +31,20 @@ const verifyToken = async (token) => {
         Authorization: `Bearer ${token}`
       }
     });
-    return response.data;
+    return response.data.message === 'Token verified';
+  } catch (error) {
+    throw new Error(error.response ? error.response.data.message : "Token verification failed");
+  }
+}
+
+const isUserAdmin = async (token) => {
+  try {
+    const response = await api.get('/auth/verify-token', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data.data.isAdmin;
   } catch (error) {
     throw new Error(error.response ? error.response.data.message : "Token verification failed");
   }
@@ -145,4 +158,4 @@ const deleteUser = async (userId, token) => {
   }
 };
 
-export { userLogin, createUser, getUser, getAllUsers, updateUser, updateUserPrivilege, deleteUser, verifyToken };
+export { userLogin, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };

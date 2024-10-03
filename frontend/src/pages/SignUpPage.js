@@ -18,7 +18,7 @@ function SignUpPage() {
       return;
     }
 
-    createUser(email, username, password, confirmPassword)
+    createUser(username, email, password)
       .then((user) => {
         // DO SOMETHING TO UI HERE
         console.log('Signed up successfully:', user);
