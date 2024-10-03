@@ -26,7 +26,8 @@ function App() {
         
         {/* Main Content */}
         <main className="flex-grow">
-          <Routes>
+        <Routes>
+            <Route path="/signup" element={<SignUpPage />} />
             <Route path="/complexity" element={<SelectComplexityPage />} />
             <Route path="/questions" element={<QuestionList />} />
             <Route path="/add" element={<AddQuestion />} />
