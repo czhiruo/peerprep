@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createUser } from '../services/userService';
+import '.././index.css';
 
 function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -30,77 +31,74 @@ function SignUpPage() {
   };
 
   return (
-    <div className="h-screen w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
+    <div className="h-[calc(100vh-65px)] w-full bg-neutral flex flex-col justify-center items-center">
 
-      {/* Sign Up Form Section */}
-      <form onSubmit={handleSubmit} className="w-full max-w-lg flex-grow flex flex-col justify-start items-center gap-[20px]">
-        <div className="text-center text-white text-[40px] font-bold">Sign Up</div>
-        
-        {/* Email Field */}
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="email">Email</label>
+      <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-3 pt-3 items-center">
+        <h2 className="w-full text-center text-white text-4xl font-bold">
+            Sign Up
+        </h2>
+        {/* Email Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">
           <input
-            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b] placeholder:text-[#a6a6a6]"
+            placeholder="Email"
             required
           />
         </div>
 
-        {/* Username Field */}
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="username">Username</label>
+        {/* Username Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">
           <input
-            id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b] placeholder:text-[#a6a6a6]"
+            placeholder="Username"
             required
           />
         </div>
 
-        {/* Password Field */}
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="password">Password</label>
+        {/* Password Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">
           <input
-            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b] placeholder:text-[#a6a6a6]"
+            placeholder="Password"
             required
           />
         </div>
 
-        {/* Confirm Password Field */}
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="confirm-password">Confirm Password</label>
+        {/* Confirm Password Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">
           <input
-            id="confirm-password"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b] placeholder:text-[#a6a6a6]"
+            placeholder="Confirm Password"
             required
           />
         </div>
 
         {/* Already have an account? */}
-        <div className="flex justify-center items-center gap-2.5">
-          <div className="text-white text-base font-medium">Already have an account?</div>
-          <div className="text-[#90a9fd] text-base font-medium cursor-pointer">Log in</div>
+        <div className="flex justify-center items-center gap-2">
+          <span className="text-white">Already have an account?</span>
+          <span className="text-[#90a9fd] cursor-pointer hover:text-[#b0c4de] transition-colors">
+            Log in
+          </span>
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full h-[60px] bg-[#282828] rounded-[20px] flex justify-center items-center"
-        >
-          <div className="text-white text-xl font-semibold">Sign Up</div>
-        </button>
+        <div className="flex justify-center w-full">
+          <button type="submit" className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]">
+            Sign Up
+          </button>
+        </div>
       </form>
     </div>
   );
