@@ -25,7 +25,7 @@ function App() {
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full">
               {/* Replace the src with the path to your avatar image */}
-              <img src="https://placeimg.com/80/80/people" alt="avatar" />
+              <img src="https://avatar.iran.liara.run/public" alt="avatar" />
             </div>
           </label>
           <ul
