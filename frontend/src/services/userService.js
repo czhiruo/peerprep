@@ -16,8 +16,13 @@ const userLogin = async (email, password) => {
     localStorage.setItem('accessToken', token);
     return token;
   } catch (error) {
+    console.log(error)
     throw new Error(error.response ? error.response.data.message : "Login failed");
   }
+}
+
+const userLogout = () => {
+  localStorage.removeItem('accessToken');
 }
 
 const getToken = () => {
@@ -158,4 +163,4 @@ const deleteUser = async (userId, token) => {
   }
 };
 
-export { userLogin, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };
+export { userLogin, userLogout, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };

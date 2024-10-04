@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { createUser } from '../services/userService';
 import '.././index.css';
 
@@ -89,7 +90,9 @@ function SignUpPage() {
         <div className="flex justify-center items-center gap-2">
           <span className="text-white">Already have an account?</span>
           <span className="text-[#90a9fd] cursor-pointer hover:text-[#b0c4de] transition-colors">
-            Log in
+            <Link to="/" className='no-underline text-inherit'>
+              Log In
+            </Link>
           </span>
         </div>
 
