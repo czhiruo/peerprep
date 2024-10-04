@@ -7,71 +7,64 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add logic for login (e.g., API call)
-    console.log('Logging in with:', { email, password });
     userLogin(email, password)
       .then((token) => {
         console.log('Logged in successfully:', token);
       })
       .catch((error) => {
         console.error('Login failed:', error);
-      }
-    );
+      });
   };
 
   return (
-    <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
-
-      {/* Login Form Section */}
-      <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-start items-center gap-[30px]">
-        <div className="text-center text-white text-[40px] font-bold">
+    <div className="h-[calc(100vh-65px)] w-full bg-neutral flex flex-col justify-center items-center">
+      <h2 className="w-full text-center text-white bg-[#1a1a1a] text-4xl font-bold mb-0 pt-3">
           Log In
-        </div>
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="email">
-            Email or username
+      </h2>
+
+      <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-4 items-center">
+        {/* Email Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent border-none items-center">
+          <label className="label text-[#ffffff]">
+            <span>Email or username</span>
           </label>
           <input
-            id="email"
             type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b]"
             required
           />
+
         </div>
-        <div className="w-full h-[60px] px-5 py-2.5 rounded-[20px] border border-[#5b5b5b] flex flex-col justify-center items-start">
-          <label className="text-[#5b5b5b] text-base" htmlFor="password">
-            Password
+        {/* Password Input */}
+        <div className="form-control flex flex-col w-full max-w-lg bg-transparent border-none items-center">
+          <label className="label text-[#ffffff]">
+            <span>Password</span>
           </label>
           <input
-            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-transparent outline-none w-full text-white"
+            className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b]"
             required
           />
         </div>
-
         {/* Forgot Password */}
-        <div className="text-[#90a9fd] text-base font-medium cursor-pointer">
-          Forgot password?
+        <div className="text-right">
+          <span className="text-[#90a9fd] cursor-pointer">Forgot password?</span>
         </div>
-
-        {/* Sign Up Section */}
+        {/* Sign Up */}
         <div className="flex justify-center items-center gap-2">
-          <div className="text-white text-base font-medium">New to the app?</div>
-          <div className="text-[#90a9fd] text-base font-medium cursor-pointer">Sign up</div>
+          <span className="text-white">New to the app?</span>
+          <span className="text-[#90a9fd] cursor-pointer">Sign up</span>
         </div>
-
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full h-[60px] bg-[#282828] rounded-[20px] flex justify-center items-center"
-        >
-          <div className="text-white text-xl font-semibold">Log In</div>
-        </button>
+        <div className="flex justify-center w-full">
+          <button type="submit" className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]">
+            Log In
+          </button>
+        </div>
       </form>
     </div>
   );

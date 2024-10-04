@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "concurrently": "^9.0.1"
+    "concurrently": "^9.0.1",
+    "daisyui": "^4.12.11"
   },
   "scripts": {
     "frontend": "cd frontend && npm start",
