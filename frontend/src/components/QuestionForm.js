@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
-import { getData, updateData, addData } from '../services/api';
+import { getData, updateData, addData } from '../services/questionService';
 import './QuestionForm.css';
 
 const QuestionForm = ({ questionId }) => {
