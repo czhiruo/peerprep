@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import '.././index.css';
 
 function ResetPasswordPage() {
@@ -42,7 +43,9 @@ function ResetPasswordPage() {
               
         <div className="text-center">
           <span className=" text-[#ffffff] cursor-pointer hover:text-[#b0c4de] transition-colors">
-            Back
+            <Link to="/" className='no-underline text-inherit'>
+              Back
+            </Link>
           </span>
         </div>
       </form>

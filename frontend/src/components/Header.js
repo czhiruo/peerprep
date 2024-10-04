@@ -1,5 +1,6 @@
 import React from 'react'
 import { userLogout } from '../services/userService';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const handleLogout = () => {
@@ -10,7 +11,11 @@ const Header = () => {
 
   return (
     <div className="w-full h-[65px] px-4 bg-[#282828] flex justify-between items-center">
-      <div className="text-white text-xl font-bold">App Name</div>
+      <div className="text-white text-xl font-bold">
+        <Link to='/' className='no-underline text-inherit'>
+          App Name
+        </Link>
+      </div>
       {/* Avatar with Dropdown */}
       <div className="dropdown dropdown-end">
         <label tabIndex={0} className="btn btn-ghost btn-circle avatar">

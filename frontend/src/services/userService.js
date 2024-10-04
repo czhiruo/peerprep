@@ -16,6 +16,7 @@ const userLogin = async (email, password) => {
     localStorage.setItem('accessToken', token);
     return token;
   } catch (error) {
+    console.log(error)
     throw new Error(error.response ? error.response.data.message : "Login failed");
   }
 }
