@@ -20,6 +20,10 @@ const userLogin = async (email, password) => {
   }
 }
 
+const userLogout = () => {
+  localStorage.removeItem('accessToken');
+}
+
 const getToken = () => {
   return localStorage.getItem('accessToken');
 }
@@ -158,4 +162,4 @@ const deleteUser = async (userId, token) => {
   }
 };
 
-export { userLogin, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };
+export { userLogin, userLogout, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };
