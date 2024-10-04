@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
 import LoginPage from './pages/LoginPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import SignUpPage from './pages/SignUpPage';
 import SelectComplexityPage from './pages/SelectComplexityPage';
 import PrivateRoute from './components/PrivateRoute';
@@ -18,9 +19,11 @@ function App() {
         {/* Main Content */}
         <main className="flex-grow">
         <Routes>
-            <Route path="/" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
+            {/* <Route path="/" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} /> */}
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/complexity" element={<SelectComplexityPage />} />
+            <Route path="/reset" element={<ResetPasswordPage />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />
           </Routes>
