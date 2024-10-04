@@ -1,0 +1,21 @@
+services:
+  question-service:
+    build: ./backend/question-service
+    container_name: question-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - peerprep-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - peerprep-network
+
+  
+networks:
+  peerprep-network:
+    driver: bridge

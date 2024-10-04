@@ -65,7 +65,7 @@ const handleChange = (e) => {
         //create a new question
         await addData("/", questionData);
       }
-        navigate("/");
+        navigate("/questions");
     } catch (error) {
         console.error("Error saving question:", error);
     }
