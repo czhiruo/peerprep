@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getData as getQuestion } from '../services/api';
+import { getData as getQuestion } from '../services/questionService';
 import { Container, Card, Button } from 'react-bootstrap';
 import './QuestionDetails.css'; 
 
