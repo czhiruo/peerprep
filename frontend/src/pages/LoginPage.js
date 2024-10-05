@@ -86,11 +86,13 @@ function LoginPage() {
         </div>
 
         {/* Error Message */}
-        {error && (
-          <div className="text-red-500 text-center mb-4">
-            {error}
-          </div>
-        )}
+        <div className="flex justify-center w-full">
+          {error && (
+            <div className="text-red-500 text-center">
+              {error}
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
