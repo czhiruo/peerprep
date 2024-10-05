@@ -5,8 +5,9 @@
   },
   "scripts": {
     "frontend": "cd frontend && npm start",
-    "backend": "cd backend/question-service && npm run build && npm run start",
-    "start-all": "concurrently \"npm run frontend\" \"npm run backend\""
+    "question-service": "cd backend/question-service && npm run build && npm run start",
+    "user-service": "cd backend/user-service && npm start",
+    "start-all": "concurrently \"npm run frontend\" \"npm run question-service\" \"npm run user-service\""
   },
   "dependencies": {
     "axios": "^1.7.7"
