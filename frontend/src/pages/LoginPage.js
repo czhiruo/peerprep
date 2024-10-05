@@ -42,7 +42,7 @@ function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="input input-bordered w-full max-w-lg bg-[#1a1a1a] text-white border-[#5b5b5b] placeholder:text-[#a6a6a6]"
-            placeholder="Email or username"
+            placeholder="Email"
             required
           />
         </div>
