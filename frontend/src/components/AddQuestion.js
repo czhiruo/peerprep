@@ -1,6 +1,6 @@
 import React from 'react';
 import QuestionForm from './QuestionForm';
-import { addData as addQuestion } from '../services/api';
+import { addData as addQuestion } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
 
 const AddQuestion = () => {

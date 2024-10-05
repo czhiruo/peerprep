@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '.././index.css';
 
 function SelectComplexityPage() {
   const [selectedDifficulties, setSelectedDifficulties] = useState({
@@ -27,7 +28,7 @@ function SelectComplexityPage() {
         <div className="flex-grow flex flex-col justify-start items-center gap-[30px]">
           <div 
             onClick={() => toggleDifficulty('easy')}
-            className={`self-stretch h-[80px] px-5 py-2.5 rounded-[20px] 
+            className={`self-stretch h-[80px] px-5 py-2.5 rounded-[20px]
               border ${selectedDifficulties.easy ? 'border-[#39ff14] bg-[#39ff14]' : 'border-[#39ff14]'}
               transition-all duration-300 ease-in-out
               hover:border-[#39ff14] hover:shadow-md hover:shadow-[#39ff14] hover:scale-105 hover:transition-all cursor-pointer`}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Container, Row, Col } from 'react-bootstrap';
-import { getData, deleteData } from "../services/api";
+import { getData, deleteData } from "../services/questionService";
 import './QuestionList.css'; // Custom CSS for QuestionList
 
 const QuestionList = () => {
