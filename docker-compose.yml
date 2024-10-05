@@ -7,6 +7,14 @@ services:
     networks:
       - peerprep-network
 
+  user-service:
+    build: ./backend/user-service
+    container_name: user-backend
+    ports:
+      - "3001:3001"
+    networks:
+      - peerprep-network
+
   frontend:
     build: ./frontend
     container_name: frontend
