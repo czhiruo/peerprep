@@ -26,10 +26,10 @@ const Header = () => {
         </label>
         <ul
           tabIndex={0}
-          className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-gray-600 rounded-box w-52"
+          className="menu menu-sm dropdown-content bg-gray-600 rounded-box w-40 mt-2"
         >
           <li>
-            <a onClick={handleLogout} className='text-white no-underline'>Logout</a>
+            <a onClick={handleLogout} className='menu-item no-underline text-white hover:bg-gray-500'>Logout</a>
           </li>
         </ul>
       </div>
