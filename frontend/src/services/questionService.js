@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = process.env.REACT_APP_API_BASE_URL;
+const baseUrl = process.env.REACT_APP_QUESTION_SERVICE_BASE_URL;
 // references to variables inside .env files in react must start with REACT_APP_
 
 const api = axios.create({
