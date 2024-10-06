@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { userLogin } from '../services/userService';
+import { isUserAdmin, userLogin } from '../services/userService';
+import { Navigate } from 'react-router-dom';
 import '.././index.css';
 import { Link } from 'react-router-dom';
 
@@ -15,8 +16,14 @@ function LoginPage() {
     userLogin(email, password)
       .then((token) => {
         console.log('Logged in successfully:', token);
-        // Redirect to the home page
-        window.location.href = '/';
+
+        isUserAdmin(token).then((isAdmin) => {
+          if (isAdmin) {
+            window.location.href = '/questions';
+          } else {
+            window.location.href = '/';
+          }
+        });
       })
       .catch((error) => {
         if (error.message === 'Wrong email and/or password') {
