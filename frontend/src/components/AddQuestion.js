@@ -1,15 +1,15 @@
-import React from 'react';
-import QuestionForm from './QuestionForm';
-import { addData as addQuestion } from '../services/questionService';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import QuestionForm from "./QuestionForm";
+import { addData as addQuestion } from "../services/questionService";
+import { useNavigate } from "react-router-dom";
 
 const AddQuestion = () => {
   const navigate = useNavigate();
   const handleSubmit = async (questionData) => {
     try {
       await addQuestion(questionData); // Use the addQuestion API function
-	  console.log('Question added successfully'); // Debug log for success
-      navigate('/'); // Navigate to home page after successful addition
+      console.log("Question added successfully"); // Debug log for success
+      navigate("/questions"); // Navigate to home page after successful addition
     } catch (error) {
       console.error("Error adding question", error);
     }
@@ -17,8 +17,8 @@ const AddQuestion = () => {
 
   return (
     <div>
-	  <h2 className="text-center">Adding</h2>
-      <QuestionForm onSubmit={handleSubmit}/>
+      <h2 className="text-center">Adding</h2>
+      <QuestionForm onSubmit={handleSubmit} />
     </div>
   );
 };

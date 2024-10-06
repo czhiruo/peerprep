@@ -28,7 +28,7 @@ const QuestionDetails = () => {
     return (
       <Container>
         <h3>Question not found</h3>
-        <Button onClick={() => navigate('/')}>Back to List</Button>
+        <Button onClick={() => navigate('/questions')}>Back to List</Button>
       </Container>
     );
   }
@@ -47,7 +47,7 @@ const QuestionDetails = () => {
           <Card.Text>
             <strong>Complexity: </strong>{question.d}
           </Card.Text>
-          <Button variant="primary" onClick={() => navigate('/')}>
+          <Button variant="primary" onClick={() => navigate('/questions')}>
             Back to List
           </Button>
         </Card.Body>
