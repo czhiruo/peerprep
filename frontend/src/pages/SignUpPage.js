@@ -22,8 +22,8 @@ function SignUpPage() {
 
     createUser(username, email, password)
       .then((user) => {
-        // DO SOMETHING TO UI HERE
         console.log('Signed up successfully:', user);
+        window.location.href = '/'; // Redirect to login
       })
       .catch((error) => {
         // DO SOMETHING TO UI HERE

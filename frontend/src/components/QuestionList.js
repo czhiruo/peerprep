@@ -38,7 +38,7 @@ const QuestionList = () => {
   return (
     <Container className="my-4">
       <h2 className="text-center mb-4">Question Repository</h2>
-      <Link to="/add" className="btn btn-primary mb-3">Add New Question</Link>
+      <Link to="/questions/add" className="btn btn-primary mb-3">Add New Question</Link>
       <Row>
         {questions.map((question) => (
           <Col md={4} key={question.id} className="mb-4">
@@ -48,7 +48,7 @@ const QuestionList = () => {
                 <Card.Text><strong>Category:</strong> {question.c.join(', ')}</Card.Text>
                 <Card.Text><strong>Complexity:</strong> {question.d}</Card.Text>
                 <div className="d-flex justify-content-between">
-                  <Button variant="outline-primary" as={Link} to={`/edit/${question.id}`} onClick={(e) => e.stopPropagation()}>Edit</Button>
+                  <Button variant="outline-primary" as={Link} to={`/questions/edit/${question.id}`} onClick={(e) => e.stopPropagation()}>Edit</Button>
                   <Button variant="outline-danger" onClick={(e) => {e.stopPropagation(); deleteQuestion(question.id)}}>Delete</Button>
                 </div>
               </Card.Body>

@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
+import AddQuestion from './components/AddQuestion';
+import EditQuestion from './components/EditQuestion';
+import QuestionDetails from './components/QuestionDetails';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SignUpPage from './pages/SignUpPage';
@@ -29,6 +32,9 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route path="/questions/add" element={<AdminRoute><AddQuestion /></AdminRoute>} />
+          <Route path="/questions/edit/:id" element={<AdminRoute><EditQuestion /></AdminRoute>} />
+          <Route path="/questions/:id" element={<AdminRoute><QuestionDetails /></AdminRoute>} />
         </Routes>
       </main>
     </Router>
