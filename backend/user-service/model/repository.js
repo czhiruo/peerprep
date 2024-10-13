@@ -83,3 +83,17 @@ export async function addAttemptedQuestion(userId, questionId) {
     { new: true },  // return the updated user
   );
 }
+
+export async function deleteAttemptedQuestion(userId, questionId) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $pull: {
+        attemptedQuestions: {
+          questionId,
+        },
+      },
+    },
+    { new: true },  // return the updated user
+  );
+}
