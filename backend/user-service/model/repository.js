@@ -70,6 +70,10 @@ export async function deleteUserById(userId) {
   return UserModel.findByIdAndDelete(userId);
 }
 
+export async function getAttemptedQuestions(userId) {
+  return UserModel.findById(userId, "attemptedQuestions");
+}
+
 export async function addAttemptedQuestion(userId, questionId) {
   return UserModel.findByIdAndUpdate(
     userId,

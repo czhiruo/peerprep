@@ -12,6 +12,7 @@ import {
   updateUserPrivilegeById as _updateUserPrivilegeById,
   addAttemptedQuestion as _addAttemptedQuestion,
   deleteAttemptedQuestion as _deleteAttemptedQuestion,
+  getAttemptedQuestions as _getAttemptedQuestions,
 } from "../model/repository.js";
 
 const questionServiceUrl = process.env.QUESTION_SERVICE_BASE_URL;
@@ -157,6 +158,28 @@ export async function deleteUser(req, res) {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Unknown error when deleting user!" });
+  }
+}
+
+export async function getAttemptedQuestions(req, res) {
+  try {
+    const userId = req.params.id;
+    if (!isValidObjectId(userId)) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+    const user = await _findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+
+    const attemptedQuestions = await _getAttemptedQuestions(userId);
+    return res.status(200).json({
+      message: `Found attempted questions for user ${userId}`,
+      data: attemptedQuestions,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when getting attempted questions!" });
   }
 }
 

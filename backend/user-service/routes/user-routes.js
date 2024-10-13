@@ -9,6 +9,7 @@ import {
   getUser,
   updateUser,
   updateUserPrivilege,
+  getAttemptedQuestions,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -25,6 +26,8 @@ router.get("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, getUser);
 router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
 router.delete("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, deleteUser);
+
+router.get("/:id/attempts", verifyAccessToken, verifyIsOwnerOrAdmin, getAttemptedQuestions);
 
 router.post("/:id/attempts", verifyAccessToken, verifyIsOwnerOrAdmin, addAttemptedQuestion);
 
