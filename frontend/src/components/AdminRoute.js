@@ -48,7 +48,6 @@ const AdminRoute = ({ children }) => {
   }
 
   if (!isAuthenticated || !isAdmin) {
-    console.log('hi')
     return <Navigate to="/" />;
   }
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { isUserAdmin, userLogin } from '../services/userService';
-import { Navigate } from 'react-router-dom';
 import '.././index.css';
 import { Link } from 'react-router-dom';
 
@@ -8,12 +7,13 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add logic for login (e.g., API call)
-    console.log('Logging in with:', { email, password });
-    userLogin(email, password)
+    console.log('Logging in to', { email });
+    userLogin(email, password, rememberMe)
       .then((token) => {
         console.log('Logged in successfully:', token);
 
@@ -36,10 +36,12 @@ function LoginPage() {
 
   return (
     <div className="h-[calc(100vh-65px)] w-full bg-neutral flex flex-col justify-center items-center">
-
-      <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-4 items-center pt-5">
+      <form
+        onSubmit={handleSubmit}
+        className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-4 items-center pt-5"
+      >
         <h2 className="w-full text-center text-white text-4xl font-bold">
-            Log In
+          Log In
         </h2>
 
         {/* Email Input */}
@@ -66,10 +68,22 @@ function LoginPage() {
           />
         </div>
 
+        {/* Remember Me */}
+        <div className="form-control flex flex-row w-full max-w-lg items-center justify-between bg-transparent no-border">
+          <label className="text-[#e0e0e0] flex items-center gap-2 ">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            Remember Me
+          </label>
+        </div>
+
         {/* Forgot Password */}
         <div className="text-right">
           <span className="text-[#90a9fd] cursor-pointer hover:text-[#b0c4de] transition-colors">
-            <Link to="/reset" className='no-underline text-inherit'>
+            <Link to="/reset" className="no-underline text-inherit">
               Forgot password?
             </Link>
           </span>
@@ -79,7 +93,7 @@ function LoginPage() {
         <div className="flex justify-center items-center gap-2">
           <span className="text-white">New to the app?</span>
           <span className="text-[#90a9fd] cursor-pointer hover:text-[#b0c4de] transition-colors">
-            <Link to="/signup" className='no-underline text-inherit'>
+            <Link to="/signup" className="no-underline text-inherit">
               Sign Up
             </Link>
           </span>
@@ -87,18 +101,17 @@ function LoginPage() {
 
         {/* Submit Button */}
         <div className="flex justify-center w-full">
-          <button type="submit" className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]">
+          <button
+            type="submit"
+            className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]"
+          >
             Log In
           </button>
         </div>
 
         {/* Error Message */}
         <div className="flex justify-center w-full">
-          {error && (
-            <div className="text-red-500 text-center">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-500 text-center">{error}</div>}
         </div>
       </form>
     </div>

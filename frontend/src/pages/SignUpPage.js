@@ -11,7 +11,6 @@ function SignUpPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add logic for sign up (e.g., API call)
     console.log('Signing up with:', { email, username, password });
 
     if (password !== confirmPassword) {

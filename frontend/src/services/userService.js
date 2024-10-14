@@ -8,12 +8,17 @@ const api = axios.create({
 
 // Logs in a user with the provided email and password
 // Stores the access token in localStorage and returns it.
-const userLogin = async (email, password) => {
+const userLogin = async (email, password, rememberMe) => {
   try {
     const response = await api.post('/auth/login', { email, password });
     const token = response.data.data.accessToken;
 
-    localStorage.setItem('accessToken', token);
+    if (rememberMe) {
+      sessionStorage.setItem("accessToken", token);
+    } else {
+      localStorage.setItem("accessToken", token);
+    }
+
     return token;
   } catch (error) {
     console.log(error)
@@ -22,11 +27,14 @@ const userLogin = async (email, password) => {
 }
 
 const userLogout = () => {
-  localStorage.removeItem('accessToken');
+  localStorage.removeItem("accessToken");
+  sessionStorage.removeItem("accessToken");
 }
 
 const getToken = () => {
-  return localStorage.getItem('accessToken');
+  return (
+    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+  );
 }
 
 const verifyToken = async (token) => {
