@@ -5,3 +5,17 @@
 .no-border {
   border: none !important; /* Use !important to ensure it overrides existing styles */
 }
+
+.bg-error {
+  background-color: rgb(255, 63, 63) !important;
+}
+
+/* .border-error {
+  border: none !important;
+  /* border-color: rgb(255, 63, 63) !important; */
+
+
+.border {
+  border: none !important;
+  /* border-color: rgb(255, 63, 63) !important; */
+}

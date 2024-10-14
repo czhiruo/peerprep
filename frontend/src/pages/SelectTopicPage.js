@@ -43,7 +43,7 @@ function SelectTopicPage() {
           {topics.map((topic) => (
             <div
               key={topic}
-              className={`btn text-white ${selectedTopics[topic] || 'bg-neutral'} hover:bg-neutral-focus`}
+              className={`btn border pt-2 text-white ${selectedTopics[topic] || 'bg-neutral'} hover:bg-neutral-focus`}
               onClick={() => toggleTopic(topic)}
             >
               {topic}
