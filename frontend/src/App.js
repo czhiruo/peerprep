@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SignUpPage from './pages/SignUpPage';
 import SelectComplexityPage from './pages/SelectComplexityPage';
+import SelectLanguagePage from './pages/SelectLanguagePage';
 import SelectTopicPage from './pages/SelectTopicPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
@@ -21,9 +22,10 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
-          {/* <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} /> */}
+          <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
           <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
-          <Route path="/" element={<SelectComplexityPage />} />
+          <Route path="/language" element={<PrivateRoute><SelectLanguagePage /></PrivateRoute>} />
+          <Route path="/" element={<SelectLanguagePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<ResetPasswordPage />} />
