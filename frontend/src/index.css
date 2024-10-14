@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .no-border {
-    border: none !important; /* Use !important to ensure it overrides existing styles */
-  }
+  border: none !important; /* Use !important to ensure it overrides existing styles */
+}
