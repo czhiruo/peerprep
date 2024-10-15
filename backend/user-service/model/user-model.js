@@ -26,6 +26,12 @@ const UserModelSchema = new Schema({
     required: true,
     default: false,
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpiresIn: {
+    type: Date,
+  },
 });
 
 export default mongoose.model("UserModel", UserModelSchema);

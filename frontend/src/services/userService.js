@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_USER_SERVICE_BASE_URL;
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: BASE_URL,
 });
 
@@ -65,7 +65,7 @@ const isUserAdmin = async (token) => {
 
 const createUser = async (username, email, password) => {
   try {
-    const response = await axios.post('http://localhost:3001/users', {
+    const response = await api.post('/users', {
       username,
       email,
       password,
@@ -83,7 +83,7 @@ const createUser = async (username, email, password) => {
 
 const getUser = async (userId) => {
   try {
-    const response = await axios.get(`http://localhost:3001/users/${userId}`, {
+    const response = await api.get(`/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -101,7 +101,7 @@ const getUser = async (userId) => {
 
 const getAllUsers = async () => {
   try {
-    const response = await axios.get('http://localhost:3001/users', {
+    const response = await api.get('/users', {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -119,7 +119,7 @@ const getAllUsers = async () => {
 
 const updateUser = async (userId, updatedData) => {
   try {
-    const response = await axios.patch(`http://localhost:3001/users/${userId}`, updatedData, {
+    const response = await api.patch(`/users/${userId}`, updatedData, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -137,7 +137,7 @@ const updateUser = async (userId, updatedData) => {
 
 const updateUserPrivilege = async (userId, isAdmin) => {
   try {
-    const response = await axios.patch(`http://localhost:3001/users/${userId}`, { isAdmin }, {
+    const response = await api.patch(`/users/${userId}`, { isAdmin }, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -155,7 +155,7 @@ const updateUserPrivilege = async (userId, isAdmin) => {
 
 const deleteUser = async (userId, token) => {
   try {
-    const response = await axios.delete(`http://localhost:3001/users/${userId}`, {
+    const response = await api.delete(`/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -171,4 +171,30 @@ const deleteUser = async (userId, token) => {
   }
 };
 
-export { userLogin, userLogout, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken };
+const requestPasswordReset = async (email) => {
+    try {
+    const response = await api.post("/auth/request-password-reset", {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+  }
+}
+
+const resetPassword = async (token, newPassword) => {
+  try {
+    console.log(`Sending request to reset password for token: ${token}`);
+    const response = await api.post(`/auth/reset-password/${token}`, {
+      newPassword,
+    });
+    console.log("Password reset response:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response ? error.response.data.message : "Reset password failed"
+    );
+  }
+}
+
+export { userLogin, userLogout, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken, resetPassword, requestPasswordReset };

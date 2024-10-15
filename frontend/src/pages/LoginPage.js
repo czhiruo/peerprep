@@ -11,7 +11,6 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add logic for login (e.g., API call)
     console.log('Logging in to', { email });
     userLogin(email, password, rememberMe)
       .then((token) => {
