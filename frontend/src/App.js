@@ -26,31 +26,18 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
-          {/* <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
+          <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
           <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
           <Route path="/language" element={<PrivateRoute><SelectLanguagePage /></PrivateRoute>} />
-          <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} /> 
+          <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage /></PrivateRoute>} />
-          <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} /> */}
-          <Route path="/" element={<MatchingFailedPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/matched" element={<MatchedPage />} />
-          <Route path="/matching" element={<MatchingPage />} />
-          {/* <Route path="/failed" element={<MatchingFailedPage />} /> */}
-          <Route path="/topic" element={<SelectTopicPage />} />
-          <Route path="/complexity" element={<SelectComplexityPage />} />
-          <Route path="/language" element={<SelectLanguagePage />} />
+          <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
+          <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
+          <Route path="/" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<ResetPasswordPage />} />
-          <Route
-            path="/questions"
-            element={
-              <AdminRoute>
-                <QuestionList />
-              </AdminRoute>
-            }
-          />
+          <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />
           <Route path="/questions/add" element={<AdminRoute><AddQuestion /></AdminRoute>} />
           <Route path="/questions/edit/:id" element={<AdminRoute><EditQuestion /></AdminRoute>} />
           <Route path="/questions/:id" element={<AdminRoute><QuestionDetails /></AdminRoute>} />

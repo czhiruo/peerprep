@@ -21,7 +21,7 @@ function LoginPage() {
           if (isAdmin) {
             window.location.href = '/questions';
           } else {
-            window.location.href = '/';
+            window.location.href = '/topic';
           }
         });
       })
@@ -39,7 +39,7 @@ function LoginPage() {
 
       <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-4 items-center pt-5">
         <h2 className="w-full text-center text-white text-4xl font-bold">
-            Log In
+          Log In
         </h2>
 
         {/* Email Input */}
