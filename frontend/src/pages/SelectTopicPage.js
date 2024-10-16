@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 function SelectTopicPage() {
+
   const topics = [
-    "Strings", "Algorithms", "Data Structures", 
+    "Strings", "Algorithms", "Data Structures",
     "Bit Manipulation", "Recursion", "Databases", "Brainteaser"
   ];
 
