@@ -12,6 +12,7 @@ import SelectLanguagePage from './pages/SelectLanguagePage';
 import SelectTopicPage from './pages/SelectTopicPage';
 import MatchingPage from './pages/MatchingPage';
 import MatchedPage from './pages/MatchedPage';
+import MatchingFailedPage from './pages/MatchingFailedPage';
 import HistoryPage from './pages/HistoryPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
@@ -31,9 +32,11 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} /> 
           <Route path="/matched" element={<PrivateRoute><MatchedPage /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} /> */}
-          <Route path="/" element={<HistoryPage />} />
+          <Route path="/" element={<MatchingFailedPage />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/matched" element={<MatchedPage />} />
           <Route path="/matching" element={<MatchingPage />} />
+          {/* <Route path="/failed" element={<MatchingFailedPage />} /> */}
           <Route path="/topic" element={<SelectTopicPage />} />
           <Route path="/complexity" element={<SelectComplexityPage />} />
           <Route path="/language" element={<SelectLanguagePage />} />
