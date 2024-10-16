@@ -11,6 +11,7 @@ import SelectComplexityPage from './pages/SelectComplexityPage';
 import SelectLanguagePage from './pages/SelectLanguagePage';
 import SelectTopicPage from './pages/SelectTopicPage';
 import MatchingPage from './pages/MatchingPage';
+import MatchedPage from './pages/MatchedPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
@@ -23,11 +24,15 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
-          <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
+          {/* <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
           <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
           <Route path="/language" element={<PrivateRoute><SelectLanguagePage /></PrivateRoute>} />
-          <Route path="/language" element={<PrivateRoute><MatchingPage /></PrivateRoute>} />
-          <Route path="/" element={<MatchingPage />} />
+          <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} /> */}
+          <Route path="/" element={<MatchedPage />} />
+          <Route path="/matching" element={<MatchingPage />} />
+          <Route path="/topic" element={<SelectTopicPage />} />
+          <Route path="/complexity" element={<SelectComplexityPage />} />
+          <Route path="/language" element={<SelectLanguagePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<ResetPasswordPage />} />

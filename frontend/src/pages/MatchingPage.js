@@ -20,7 +20,7 @@ function MatchingPage() {
           </div>      
         
         {/* Cancel Button */}
-        <div className="mt-6">
+        <div>
           <button className="btn btn-secondary">
             Cancel
           </button>

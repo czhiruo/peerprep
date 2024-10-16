@@ -13,7 +13,7 @@ const Header = () => {
     <div className="w-full h-[65px] px-4 bg-[#282828] flex justify-between items-center">
       <div className="text-white text-xl font-bold">
         <Link to='/' className='no-underline text-inherit'>
-          App Name
+          PeerPrep
         </Link>
       </div>
       {/* Avatar with Dropdown */}
