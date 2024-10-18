@@ -36,6 +36,10 @@ export async function findUserByUsernameOrEmail(username, email) {
   });
 }
 
+export async function findUserByResetPasswordToken(resetPasswordToken) {
+  return UserModel.findOne({ resetPasswordToken });
+}
+
 export async function findAllUsers() {
   return UserModel.find();
 }
@@ -53,6 +57,20 @@ export async function updateUserById(userId, username, email, password) {
     { new: true },  // return the updated user
   );
 }
+
+export async function updatePasswordTokenById(userId, resetPasswordToken, resetPasswordExpiresIn) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        resetPasswordToken,
+        resetPasswordExpiresIn
+      },
+    },
+    { new: true } // return the updated user
+  );
+}
+
 
 export async function updateUserPrivilegeById(userId, isAdmin) {
   return UserModel.findByIdAndUpdate(
