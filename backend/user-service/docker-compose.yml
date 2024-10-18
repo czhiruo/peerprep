@@ -1,0 +1,13 @@
+services:
+  user-service:
+    build: .
+    container_name: user-backend
+    ports:
+      - "3001:3001"
+    networks:
+      - peerprep-network
+
+  
+networks:
+  peerprep-network:
+    driver: bridge
