@@ -20,7 +20,7 @@ function LoginPage() {
           if (isAdmin) {
             window.location.href = '/questions';
           } else {
-            window.location.href = '/';
+            window.location.href = '/topic';
           }
         });
       })
