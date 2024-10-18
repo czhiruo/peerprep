@@ -27,14 +27,14 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
+          <Route path="/" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
           <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
           <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
           <Route path="/language" element={<PrivateRoute><SelectLanguagePage /></PrivateRoute>} />
           <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
-          <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<ResetPasswordPage />} />

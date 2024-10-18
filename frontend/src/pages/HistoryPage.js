@@ -1,6 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getAttemptedQuestions } from '../services/userService';
+import { getData } from '../services/questionService';
 
 function HistoryComponent() {
+  const { userId } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        // Retrieve questionId and attemptedAt from the user service
+        const { data } = await getAttemptedQuestions(userId);
+        // format of questionPartialInfo: [{ questionId, attemptedAt }, ...]
+        const questionPartialInfo = data.attemptedQuestions;
+
+        for (const partialInfo of questionPartialInfo) {
+          const question = {};
+
+          // Retrieve question title, difficulty, and topics from the question service
+          const questionData = await getData(`/${partialInfo.questionId}`);
+          if (questionData) {
+            question.title = questionData.title;
+            question.difficulty = questionData.d;
+            question.topics = questionData.c;
+          } else {
+            question.title = "Unknown";
+            question.difficulty = "Unknown";
+            question.topics = ["Unknown"];
+          }
+
+          question.attemptedAt = partialInfo.attemptedAt;
+          question.questionId = partialInfo.questionId;
+          
+          setQuestions((prevQuestions) => [...prevQuestions, question]);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [userId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col items-center justify-start bg-[#1a1a1a] px-2">
       <h2 className="w-full text-center text-white text-4xl font-bold">
@@ -23,31 +72,38 @@ function HistoryComponent() {
           <div className="text-white text-xs font-semibold text-center">Date/Time of Attempt</div>
         </div>
 
-        {/* First Row */}
-        <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
-          <div className="text-white text-xs text-center">9</div>
-          <div className="text-white text-xs text-center">Course Schedule</div>
-          <div className="text-[#f9ff00] text-xs text-center">Medium</div>
-          <div className="flex justify-center">
-            <span className="badge badge-secondary">Data Structures</span>
-          </div>
-          <div className="text-white text-xs text-center">10 Sep 2024 10:40 PM</div>
-        </div>
+        { questions.map((question) => (
+          <HistoryRow
+            key={ question._id }
+            questionId={ question.questionId }
+            title={ question.title }
+            difficulty={ question.difficulty }
+            topics={ question.topics }
+            attemptTime={ question.attemptedAt }
+          />
+        )) }
 
-        {/* Second Row */}
-        <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
-          <div className="text-white text-xs text-center">1</div>
-          <div className="text-white text-xs text-center">Reverse a String</div>
-          <div className="text-[#05ff00] text-xs text-center">Easy</div>
-          <div className="flex flex-row justify-center gap-2">
-            <span className="badge badge-secondary">Strings</span>
-            <span className="badge badge-secondary">Algorithms</span>
-          </div>
-          <div className="text-white text-xs text-center">10 Sep 2024 9:40 PM</div>
-        </div>
       </div>
     </div>
   );
 };
+
+function HistoryRow({ questionId, title, difficulty, topics, attemptTime }) {
+  console.log(topics)
+
+  return (
+    <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
+    <div className="text-white text-xs text-center">{ questionId }</div>
+    <div className="text-white text-xs text-center">{ title }</div>
+    <div className="text-[#f9ff00] text-xs text-center">{ difficulty }</div>
+    <div className="flex justify-center">
+      { topics.map((topic) => (
+        <span key={ topic } className="badge badge-secondary">{ topic }</span>
+      )) }
+    </div>
+    <div className="text-white text-xs text-center">{ attemptTime }</div>
+  </div>
+  )
+}
 
 export default HistoryComponent;

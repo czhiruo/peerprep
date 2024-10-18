@@ -172,7 +172,7 @@ const deleteUser = async (userId, token) => {
 };
 
 const requestPasswordReset = async (email) => {
-    try {
+  try {
     const response = await api.post("/auth/request-password-reset", {
       email,
     });
@@ -197,4 +197,22 @@ const resetPassword = async (token, newPassword) => {
   }
 }
 
-export { userLogin, userLogout, createUser, getUser, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken, resetPassword, requestPasswordReset };
+const getAttemptedQuestions = async (userId) => {
+  try {
+    const response = await api.get(`/users/${userId}/attempts`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data; // 200 OK
+  } catch (error) {
+    if (error.response) {
+      console.error('Error:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+}
+
+export { userLogin, userLogout, createUser, getUser, getAttemptedQuestions, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken, resetPassword, requestPasswordReset };
