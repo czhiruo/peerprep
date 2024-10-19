@@ -15,13 +15,20 @@ function ResetPasswordPage() {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setSuccess(null);
+      setTimeout(() => {
+          window.location.reload();
+      }, 1000);  // 1 second
       return;
     }
 
     try {
-      await resetPassword(token, password); 
+      await resetPassword(token, password);
       setSuccess("Password reset successful. You can now log in.");
       setError(null);
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1000); // 1 second
     } catch (err) {
       console.log(err);
       setError("Failed to reset password. Please try again.");

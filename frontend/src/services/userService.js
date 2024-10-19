@@ -178,7 +178,8 @@ const requestPasswordReset = async (email) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+      console.error('Error sending password reset email:', error.response.data);
+      throw error;
   }
 }
 
