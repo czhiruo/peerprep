@@ -6,17 +6,15 @@ export const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// Logs in a user with the provided email and password
-// Stores the access token in localStorage and returns it.
 const userLogin = async (email, password, rememberMe) => {
   try {
     const response = await api.post('/auth/login', { email, password });
     const token = response.data.data.accessToken;
 
     if (rememberMe) {
-      sessionStorage.setItem("accessToken", token);
-    } else {
       localStorage.setItem("accessToken", token);
+    } else {
+      sessionStorage.setItem("accessToken", token);
     }
 
     return token;
