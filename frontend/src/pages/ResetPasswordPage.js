@@ -15,6 +15,7 @@ function ResetPasswordPage() {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setSuccess(null);
       setTimeout(() => {
           window.location.reload();
       }, 1000);  // 1 second
