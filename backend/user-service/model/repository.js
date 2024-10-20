@@ -36,6 +36,10 @@ export async function findUserByUsernameOrEmail(username, email) {
   });
 }
 
+export async function findUserByResetPasswordToken(resetPasswordToken) {
+  return UserModel.findOne({ resetPasswordToken });
+}
+
 export async function findAllUsers() {
   return UserModel.find();
 }
@@ -54,6 +58,20 @@ export async function updateUserById(userId, username, email, password) {
   );
 }
 
+export async function updatePasswordTokenById(userId, resetPasswordToken, resetPasswordExpiresIn) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        resetPasswordToken,
+        resetPasswordExpiresIn
+      },
+    },
+    { new: true } // return the updated user
+  );
+}
+
+
 export async function updateUserPrivilegeById(userId, isAdmin) {
   return UserModel.findByIdAndUpdate(
     userId,
@@ -68,4 +86,36 @@ export async function updateUserPrivilegeById(userId, isAdmin) {
 
 export async function deleteUserById(userId) {
   return UserModel.findByIdAndDelete(userId);
+}
+
+export async function getAttemptedQuestions(userId) {
+  return UserModel.findById(userId, "attemptedQuestions");
+}
+
+export async function addAttemptedQuestion(userId, questionId) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $push: {
+        attemptedQuestions: {
+          questionId,
+        },
+      },
+    },
+    { new: true },  // return the updated user
+  );
+}
+
+export async function deleteAttemptedQuestion(userId, questionId) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $pull: {
+        attemptedQuestions: {
+          questionId,
+        },
+      },
+    },
+    { new: true },  // return the updated user
+  );
 }
