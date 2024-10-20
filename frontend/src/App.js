@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, {useState}from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
 import AddQuestion from './components/AddQuestion';
 import EditQuestion from './components/EditQuestion';
@@ -20,6 +20,14 @@ import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
 
 function App() {
+  const [topics, setTopics] = useState([]);
+  const [difficulties, setDifficulties] = useState({
+    easy: false,
+    medium: false,
+    hard: false,
+  });
+  const [languages, setLanguages] = React.useState('');
+
   return (
     <Router>
       <Header />
@@ -27,11 +35,11 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
-          <Route path="/topic" element={<PrivateRoute><SelectTopicPage /></PrivateRoute>} />
-          <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage /></PrivateRoute>} />
-          <Route path="/language" element={<PrivateRoute><SelectLanguagePage /></PrivateRoute>} />
-          <Route path="/matching" element={<PrivateRoute><MatchingPage /></PrivateRoute>} />
+          <Route path="/" element={<Navigate to='/complexity'/>} />
+          <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage difficulties={difficulties} setDifficulties={setDifficulties}/></PrivateRoute>} />
+          <Route path="/topic" element={<PrivateRoute><SelectTopicPage topics={topics} setTopics={setTopics}/></PrivateRoute>} />
+          <Route path="/language" element={<PrivateRoute><SelectLanguagePage languages={languages} setLanguages={setLanguages}/></PrivateRoute>} />
+          <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages}/></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />

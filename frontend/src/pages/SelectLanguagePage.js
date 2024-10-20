@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-function SelectLanguagePage() {
-  const languages = [
+function SelectLanguagePage( {languages, setLanguages} ) {
+  const languageList = [
       'Python', 'Java', 'Javascript',
       'Typescript', 'C#', 'C', 'C++'
   ];
@@ -11,11 +12,8 @@ function SelectLanguagePage() {
     'bg-info', 'bg-success', 'bg-warning'
   ];
     
-  // State to track selected languages and their colors
-  const [selectedLanguages, setSelectedLanguages] = useState({});
-    
   const toggleLanguage = (language) => {
-        setSelectedLanguages((prevSelected) => {
+        setLanguages((prevSelected) => {
           const newSelected = { ...prevSelected };
     
           if (newSelected[language]) {
@@ -39,10 +37,10 @@ function SelectLanguagePage() {
 
         {/* Language Options */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {languages.map((language) => (
+          {languageList.map((language) => (
             <div
               key={language}
-              className={`btn border pt-2 text-white ${selectedLanguages[language] || 'bg-neutral'} hover:bg-neutral-focus`}
+              className={`btn border pt-2 text-white ${languages[language] || 'bg-neutral'} hover:bg-neutral-focus`}
               onClick={() => toggleLanguage(language)}
             >
               {language}
@@ -52,12 +50,17 @@ function SelectLanguagePage() {
 
         {/* Navigation Buttons */}
         <div className="flex justify-between w-full">
-          <button className="btn btn-secondary">
-            Back
-          </button>
-          <button className="btn btn-primary">
-            Find Match
-          </button>
+          <Link to="/topic">
+            <button className="btn btn-secondary">
+              Back
+            </button>
+          </Link>
+          
+          <Link to="/matching">
+            <button className="btn btn-primary">
+              Find Match
+            </button>
+          </Link>        
         </div>
       </main>
     </div>

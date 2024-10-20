@@ -2,7 +2,9 @@ import React from 'react';
 import AvatarDisplay from '../components/AvatarDisplay';
 import LoadingDots from '../components/LoadingDots';
 
-function MatchingPage() {
+function MatchingPage({ difficulties, topics, languages }) {
+
+  console.log(difficulties, topics, languages);
 
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
 
