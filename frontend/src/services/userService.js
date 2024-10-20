@@ -44,7 +44,7 @@ const verifyToken = async (token) => {
         Authorization: `Bearer ${token}`
       }
     });
-    return response.data.message === 'Token verified';
+    return response.data;
   } catch (error) {
     throw new Error(error.response ? error.response.data.message : "Token verification failed");
   }
