@@ -60,11 +60,17 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
               Back
             </button>
           </Link>
-          <Link to="/language">
-            <button className="btn btn-primary">
-              Next
-            </button>
-          </Link>
+          {
+            Object.values(difficulties).every(value => value === false) ?
+              <button className="btn btn-primary" disabled>
+                Next
+              </button> :
+              <Link to="/language" >
+                <button className="btn btn-primary">
+                  Next
+                </button>
+              </Link>
+          }
         </div>
       </div>
     </div>

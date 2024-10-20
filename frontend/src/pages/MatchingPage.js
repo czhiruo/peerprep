@@ -1,11 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import AvatarDisplay from '../components/AvatarDisplay';
 import LoadingDots from '../components/LoadingDots';
 import socketService from '../services/socketService'; // WebSocket service
 
 function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
+  const [time, setTime] = useState(30);
+  const [matchingFailed, setMatchingFailed] = useState(false);
+
+  useEffect(() => {
+    if (time <= 0) {
+      setMatchingFailed(true);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTime((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [time]);
+
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
+
+  if (matchingFailed) {
+    return <Navigate to="/failed" />;
+  }
   const navigate = useNavigate();
 
   const matchRequest = {
@@ -43,8 +63,15 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-center gap-5">
         <div className="self-stretch text-center text-white text-3xl font-bold leading-tight">
-          Matching you with another user within 30s...
+          Matching you with another user within {time}s...
         </div>
+        {
+          time < 10 ?
+            <div className="self-stretch text-center text-white text-xl font-bold leading-tight">
+              Cannot find an exact match, trying partial matches...
+            </div>
+            : <></>
+        }
 
         {/* Display Selected Topics, Difficulties, and Languages */}
         <div className="text-white text-lg mt-5">
