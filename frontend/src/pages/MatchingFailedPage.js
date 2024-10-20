@@ -24,7 +24,7 @@ function MatchingFailedPage() {
           </Link>
           <Link to='/matching'>
             <button className="btn btn-primary">
-              Try again
+              Rematch
             </button>
           </Link>
         </div>
