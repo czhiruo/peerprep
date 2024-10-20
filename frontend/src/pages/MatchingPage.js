@@ -65,7 +65,7 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
           <button className="btn btn-secondary" onClick={() => socketService.sendMatchCancel(matchRequest)}>
             Cancel
           </button>
-        </div>
+        </Link>
       </main>
     </div>
   );
