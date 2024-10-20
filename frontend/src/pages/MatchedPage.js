@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const baseAvatarUrl = "https://avatar.iran.liara.run/public";
 
@@ -37,9 +38,11 @@ function MatchedPage({ matchResult }) {
 
         {/* Cancel Button */}
         <div className="flex flex-row w-full justify-between">
-          <button className="btn btn-secondary">
-            Rematch
-          </button>
+          <Link to='/matching'>
+            <button className="btn btn-secondary">
+              Rematch
+            </button>
+          </Link>
           <button className="btn btn-primary">
             Start now!
           </button>
