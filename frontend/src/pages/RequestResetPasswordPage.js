@@ -6,8 +6,8 @@ import { requestPasswordReset } from '../services/userService';
 
 function RequestResetPasswordPage() {
   const [email, setEmail] = useState("");
-  const [success, setSuccess] = useState(null); // Track success
-  const [error, setError] = useState(null); // Track errors
+  const [success, setSuccess] = useState(null);
+  const [error, setError] = useState(null); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +17,11 @@ function RequestResetPasswordPage() {
       setSuccess("Email to reset password has been sent.");
       setError(null);
     } catch (err) {
-      setError("Something went wrong. Please try again."); 
+      if (err.response.data.message) {
+        setError(err.response.data.message); 
+      } else {
+        setError("An unexpected error occurred.");
+      }
       setSuccess(null);
     }
   };
