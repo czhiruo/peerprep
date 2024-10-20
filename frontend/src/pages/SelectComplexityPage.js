@@ -62,7 +62,7 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
           </Link>
           {
             Object.values(difficulties).every(value => value === false) ?
-              <button className="btn btn-primary className='flex-grow ml-2'" disabled>
+              <button className="btn btn-primary flex-grow ml-2" disabled>
                 Next
               </button> :
               <Link to="/language" className='flex-grow ml-2'>
