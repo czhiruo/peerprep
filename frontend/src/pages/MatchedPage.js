@@ -4,8 +4,9 @@ const baseAvatarUrl = "https://avatar.iran.liara.run/public";
 
 const generateRandomId = () => Math.floor(Math.random() * 1000);
 
-function MatchedPage() {
+function MatchedPage({ matchResult }) {
 
+  const { userId, matchedUserId, topic, difficulty, language } = matchResult;
   const avatarMatchUrl = `${baseAvatarUrl}?id=${generateRandomId()}`;
 
   return (
@@ -13,23 +14,23 @@ function MatchedPage() {
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-center gap-4">
         <div className="flex flex-row self-stretch text-center text-white text-2xl font-bold leading-tight gap-5">
-          <p> Category: Strings </p>
-          <p> Difficulty: Easy </p>
-          <p> Language: Python </p>
+          <p> Category: {topic} </p>
+          <p> Difficulty: {difficulty} </p>
+          <p> Language: {language} </p>
         </div>
 
         <div className='flex flex-row w-full items-center justify-center'>
           <div className='flex flex-col items-center justify-center gap-3'>
             <img className="w-40 h-40" src={baseAvatarUrl} alt="static avatar" />
             <div className='text-white text-xl'>
-              YourUsername
+              {userId}
             </div>
           </div>
           <div className="w-36 border-black"></div>
           <div className='flex flex-col items-center justify-center gap-3'>
             <img className="w-40 h-40" src={avatarMatchUrl} alt="avatar match" />
             <div className='text-white text-xl'>
-              MatchedUsername
+              {matchedUserId}
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function SelectTopicPage() {
 
@@ -16,16 +17,21 @@ function SelectTopicPage() {
   const [selectedTopics, setSelectedTopics] = useState({});
 
   const toggleTopic = (topic) => {
-    setSelectedTopics((prevSelected) => {
-      const newSelected = { ...prevSelected };
+    setTopics((prevSelected) => {
+      const newSelected = [...prevSelected];
 
       if (newSelected[topic]) {
         // Deselect the topic
-        delete newSelected[topic];
+        const index = newSelected.indexOf(topic);
+
+        newSelected.splice(index, 1);
+        setTopicColor((prevColor) => ({ ...prevColor, [topic]: null }));
       } else {
         // Select the topic and randomly assign a color
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        newSelected[topic] = randomColor;
+
+        setTopicColor((prevColor) => ({ ...prevColor, [topic]: randomColor }));
+        newSelected.push(topic);
       }
 
       return newSelected;
@@ -53,14 +59,11 @@ function SelectTopicPage() {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between w-full">
-          <button className="btn btn-secondary">
-            Back
-          </button>
-          <button className="btn btn-primary">
+        <Link to="/complexity" className='w-full'>
+          <button className="btn btn-primary w-full">
             Next
           </button>
-        </div>
+        </Link>
       </div>
     </div>
   );

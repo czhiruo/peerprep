@@ -8,6 +8,8 @@ function SignUpPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ function SignUpPage() {
 
       <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-3 pt-3 items-center">
         <h2 className="w-full text-center text-white text-4xl font-bold">
-            Sign Up
+          Sign Up
         </h2>
         {/* Email Input */}
         <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">

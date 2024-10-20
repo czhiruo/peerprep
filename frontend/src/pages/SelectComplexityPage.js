@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function SelectComplexityPage() {
   const [selectedDifficulties, setSelectedDifficulties] = useState({
@@ -59,10 +60,18 @@ function SelectComplexityPage() {
           </div>
         </div>
 
-        {/* Next Button */}
-        <button className="btn btn-primary w-full">
-          Next
-        </button>
+        <div className="flex justify-between w-full">
+          <Link to="/topic">
+            <button className="btn btn-secondary">
+              Back
+            </button>
+          </Link>
+          <Link to="/language">
+            <button className="btn btn-primary">
+              Next
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );

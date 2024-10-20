@@ -1,36 +1,42 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-function SelectLanguagePage() {
-  const languages = [
-      'Python', 'Java', 'Javascript',
-      'Typescript', 'C#', 'C', 'C++'
+function SelectLanguagePage({ languages, setLanguages }) {
+  // Example: {Strings: 'bg-info', Algorithms: 'bg-success'}
+  const [languageColor, setLanguageColor] = useState({});
+
+  const languageList = [
+    'Python', 'Java', 'Javascript',
+    'Typescript', 'C#', 'C', 'C++'
   ];
-    
+
   // Define an array of colors
   const colors = [
     'bg-info', 'bg-success', 'bg-warning'
   ];
-    
-  // State to track selected languages and their colors
-  const [selectedLanguages, setSelectedLanguages] = useState({});
-    
+
   const toggleLanguage = (language) => {
-        setSelectedLanguages((prevSelected) => {
-          const newSelected = { ...prevSelected };
-    
-          if (newSelected[language]) {
-            // Deselect the language
-            delete newSelected[language];
-          } else {
-            // Select the language and randomly assign a color
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            newSelected[language] = randomColor;
-          }
-    
-          return newSelected;
-        });
-      };
-    
+    setLanguages((prevSelected) => {
+      const newSelected = [...prevSelected];
+
+      if (newSelected.includes(language)) {
+        // Deselect the language
+        const index = newSelected.indexOf(language);
+
+        newSelected.splice(index, 1);
+        setLanguageColor((prevColor) => ({ ...prevColor, [language]: null }));
+      } else {
+        // Select the language and randomly assign a color
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        setLanguageColor((prevColor) => ({ ...prevColor, [language]: randomColor }));
+        newSelected.push(language);
+      }
+
+      return newSelected;
+    });
+  };
+
   return (
     <div className="min-h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
       {/* Main Content */}
@@ -52,12 +58,17 @@ function SelectLanguagePage() {
 
         {/* Navigation Buttons */}
         <div className="flex justify-between w-full">
-          <button className="btn btn-secondary">
-            Back
-          </button>
-          <button className="btn btn-primary">
-            Find Match
-          </button>
+          <Link to="/complexity">
+            <button className="btn btn-secondary">
+              Back
+            </button>
+          </Link>
+
+          <Link to="/matching">
+            <button className="btn btn-primary">
+              Find Match
+            </button>
+          </Link>
         </div>
       </main>
     </div>
