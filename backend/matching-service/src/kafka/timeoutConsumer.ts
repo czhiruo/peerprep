@@ -38,7 +38,7 @@ export async function connectTimeoutConsumer(
     });
 }
 
-export async function disconnectResultConsumer(): Promise<void> {
+export async function disconnectTimeoutConsumer(): Promise<void> {
     await consumer.disconnect();
     console.log('Timeout Consumer disconnected');
 }

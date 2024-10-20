@@ -58,7 +58,7 @@ export async function connectCancellationConsumer(
     });
 }
 
-export async function disconnectResultConsumer(): Promise<void> {
+export async function disconnectCancellationConsumer(): Promise<void> {
     await consumer.disconnect();
     console.log('Match Cancellation Consumer disconnected');
 }

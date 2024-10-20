@@ -71,7 +71,7 @@ export async function connectRequestConsumer(
     });
   }
 
-export async function disconnectConsumer(): Promise<void> {
+export async function disconnectRequestConsumer(): Promise<void> {
     await consumer.disconnect();
     console.log('Request Consumer disconnected');
 }
