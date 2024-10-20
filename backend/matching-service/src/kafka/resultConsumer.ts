@@ -1,4 +1,5 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import { sendMessage } from './producer';
 
 const kafka = new Kafka({
     clientId: 'matching-results-consumer',
@@ -18,19 +19,28 @@ export async function connectResultConsumer(
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-        console.log({
-            "[CONSUMER - MatchingResult]":
-            topic,
-            partition,
-            key: message.key?.toString(), // Check for possible undefined
-            value: message.value?.toString(), // Check for possible undefined
-        });
-        const matchResult = JSON.parse(message.value?.toString()!);
-        const { userId, matchUserId } = matchResult;
-        const socketId = userSocketMap.get(userId);
-        if (socketId) {
-            io.to(socketId).emit('match-result', matchResult);
-        }},
+        if (topic === 'matching-results') {
+            console.log({
+                "[CONSUMER]":
+                topic,
+                partition,
+                key: message.key?.toString(), // Check for possible undefined
+                value: message.value?.toString(), // Check for possible undefined
+            });
+            const matchResult = JSON.parse(message.value?.toString()!);
+            
+            console.log("---------------------[MATCHING_RESULT_CONSUMER]----------------------")
+            console.log(matchResult);
+            console.log('---------------------------------------------------------------------');
+            console.log();
+
+            const { userId, matchUserId } = matchResult;
+            const socketId = userSocketMap.get(userId);
+            if (socketId) {
+                io.to(socketId).emit('match-result', matchResult);
+            }
+        
+        }},        
     });
 }
 
