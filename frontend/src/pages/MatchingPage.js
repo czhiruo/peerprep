@@ -54,10 +54,13 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
 
       console.log("Sending match request:", matchRequest);
 
+      socketService.register(username);
+
       socketService.sendMatchRequest(matchRequest);
 
       // Set up WebSocket event listeners
       socketService.onMatchResult((result) => {
+        console.log("Match result received:", result);
         setMatchResult(result);
         navigate('/matched');
       });

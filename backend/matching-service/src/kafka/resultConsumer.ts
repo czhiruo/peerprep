@@ -34,10 +34,17 @@ export async function connectResultConsumer(
             console.log('---------------------------------------------------------------------');
             console.log();
 
-            const { userId, matchUserId } = matchResult;
-            const socketId = userSocketMap.get(userId);
-            if (socketId) {
-                io.to(socketId).emit('match-result', matchResult);
+            const { userId, matchedUserId } = matchResult;
+            const socketId1 = userSocketMap.get(userId);
+            const socketId2 = userSocketMap.get(matchedUserId);
+
+            console.log(`Sending match result to ${userId} and ${matchedUserId}`);
+
+            if (socketId1) {
+                io.to(socketId1).emit('match-result', matchResult);
+            }
+            if (socketId2) {
+                io.to(socketId2).emit('match-result', matchResult);
             }
         
         }},        
