@@ -54,11 +54,17 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
           </div>
         </div>
 
-        <Link to="/topic" className='w-full'>
-          <button className="btn btn-primary w-full">
+        {
+        Object.values(difficulties).every(value => value === false) ?
+          <button className="btn btn-primary w-full" disabled>
             Next
-          </button>
-        </Link>
+          </button> :
+          <Link to="/topic" className='w-full'>
+            <button className="btn btn-primary w-full">
+              Next
+            </button>
+          </Link>
+        }
       </div>
     </div>
   );

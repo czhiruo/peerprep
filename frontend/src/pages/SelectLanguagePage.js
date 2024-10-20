@@ -1,18 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-function SelectLanguagePage( {languages, setLanguages} ) {
-  // Example: {Strings: 'bg-info', Algorithms: 'bg-success'}
-  const [languageColor, setLanguageColor] = useState({});
-  
+function SelectLanguagePage( {languages, setLanguages} ) {  
   const languageList = [
       'Python', 'Java', 'Javascript',
       'Typescript', 'C#', 'C', 'C++'
-  ];
-    
-  // Define an array of colors
-  const colors = [
-    'bg-info', 'bg-success', 'bg-warning'
   ];
     
   const toggleLanguage = (language) => {
@@ -22,14 +14,8 @@ function SelectLanguagePage( {languages, setLanguages} ) {
       if (newSelected.includes(language)) {
         // Deselect the language
         const index = newSelected.indexOf(language);
-        
         newSelected.splice(index, 1);
-        setLanguageColor((prevColor) => ({ ...prevColor, [language]: null }));
       } else {
-        // Select the language and randomly assign a color
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        setLanguageColor((prevColor) => ({ ...prevColor, [language]: randomColor }));
         newSelected.push(language);
       }
 
@@ -48,7 +34,7 @@ function SelectLanguagePage( {languages, setLanguages} ) {
           {languageList.map((language) => (
             <div
               key={language}
-              className={`btn border pt-2 text-white ${languageColor[language] || 'bg-neutral'} hover:bg-neutral-focus`}
+              className={`btn text-white ${languages.includes(language) ? 'border-primary border-2' : 'border-white'} bg-neutral hover:bg-neutral-focus`}
               onClick={() => toggleLanguage(language)}
             >
               {language}
@@ -64,11 +50,17 @@ function SelectLanguagePage( {languages, setLanguages} ) {
             </button>
           </Link>
           
-          <Link to="/matching">
-            <button className="btn btn-primary">
+          {
+            languages.length === 0 ?
+            <button className="btn btn-primary" disabled>
               Find Match
-            </button>
-          </Link>        
+            </button> :
+            <Link to="/matching">
+              <button className="btn btn-primary">
+                Find Match
+              </button>
+            </Link>
+          }   
         </div>
       </main>
     </div>
