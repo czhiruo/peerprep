@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-function SelectLanguagePage( {languages, setLanguages} ) {
+function SelectLanguagePage({ languages, setLanguages }) {
   // Example: {Strings: 'bg-info', Algorithms: 'bg-success'}
   const [languageColor, setLanguageColor] = useState({});
-  
+
   const languageList = [
-      'Python', 'Java', 'Javascript',
-      'Typescript', 'C#', 'C', 'C++'
+    'Python', 'Java', 'Javascript',
+    'Typescript', 'C#', 'C', 'C++'
   ];
-    
+
   // Define an array of colors
   const colors = [
     'bg-info', 'bg-success', 'bg-warning'
   ];
-    
+
   const toggleLanguage = (language) => {
     setLanguages((prevSelected) => {
-      const newSelected = [ ...prevSelected ];
+      const newSelected = [...prevSelected];
 
       if (newSelected.includes(language)) {
         // Deselect the language
         const index = newSelected.indexOf(language);
-        
+
         newSelected.splice(index, 1);
         setLanguageColor((prevColor) => ({ ...prevColor, [language]: null }));
       } else {
         // Select the language and randomly assign a color
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        
+
         setLanguageColor((prevColor) => ({ ...prevColor, [language]: randomColor }));
         newSelected.push(language);
       }
@@ -36,7 +36,7 @@ function SelectLanguagePage( {languages, setLanguages} ) {
       return newSelected;
     });
   };
-    
+
   return (
     <div className="min-h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
       {/* Main Content */}
@@ -58,17 +58,17 @@ function SelectLanguagePage( {languages, setLanguages} ) {
 
         {/* Navigation Buttons */}
         <div className="flex justify-between w-full">
-          <Link to="/topic">
+          <Link to="/complexity">
             <button className="btn btn-secondary">
               Back
             </button>
           </Link>
-          
+
           <Link to="/matching">
             <button className="btn btn-primary">
               Find Match
             </button>
-          </Link>        
+          </Link>
         </div>
       </main>
     </div>

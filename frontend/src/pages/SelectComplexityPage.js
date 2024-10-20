@@ -54,11 +54,18 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
           </div>
         </div>
 
-        <Link to="/topic" className='w-full'>
-          <button className="btn btn-primary w-full">
-            Next
-          </button>
-        </Link>
+        <div className="flex justify-between w-full">
+          <Link to="/topic">
+            <button className="btn btn-secondary">
+              Back
+            </button>
+          </Link>
+          <Link to="/language">
+            <button className="btn btn-primary">
+              Next
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
