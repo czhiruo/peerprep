@@ -44,19 +44,19 @@ function SelectLanguagePage( {languages, setLanguages} ) {
 
         {/* Navigation Buttons */}
         <div className="flex justify-between w-full">
-          <Link to="/topic">
-            <button className="btn btn-secondary">
+          <Link to="/topic" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
               Back
             </button>
           </Link>
           
           {
             languages.length === 0 ?
-            <button className="btn btn-primary" disabled>
+            <button className="btn btn-primary flex-grow ml-2" disabled>
               Find Match
             </button> :
-            <Link to="/matching">
-              <button className="btn btn-primary">
+            <Link to="/matching" className='flex-grow ml-2'>
+              <button className="btn btn-primary w-full">
                 Find Match
               </button>
             </Link>

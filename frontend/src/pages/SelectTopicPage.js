@@ -43,18 +43,18 @@ function SelectTopicPage({ topics, setTopics }) {
         </div>
 
         <div className="flex justify-between w-full">
-          <Link to="/complexity">
-            <button className="btn btn-secondary">
+          <Link to="/complexity" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
               Back
             </button>
           </Link>
           {
             topics.length === 0 ?
-            <button className="btn btn-primary" disabled>
+            <button className="btn btn-primary flex-grow ml-2" disabled>
               Next
             </button> :
-            <Link to="/language">
-              <button className="btn btn-primary">
+            <Link to="/language" className='flex-grow ml-2'>
+              <button className="btn btn-primary w-full">
                 Next
               </button>
             </Link>
