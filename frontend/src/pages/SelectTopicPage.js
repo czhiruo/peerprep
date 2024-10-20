@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, {useState } from 'react';
 import { Link } from 'react-router-dom';
 
 function SelectTopicPage({ topics, setTopics }) {
+  // Example: {Strings: 'bg-info', Algorithms: 'bg-success'}
   const [topicColor, setTopicColor] = useState({});
 
   const topicList = [
@@ -16,17 +17,20 @@ function SelectTopicPage({ topics, setTopics }) {
 
   const toggleTopic = (topic) => {
     setTopics((prevSelected) => {
-      const newSelected = { ...prevSelected };
+      const newSelected = [ ...prevSelected ];
 
-      if (newSelected[topic]) {
+      if (newSelected.includes(topic)) {
         // Deselect the topic
-        delete newSelected[topic];
+        const index = newSelected.indexOf(topic);
+        
+        newSelected.splice(index, 1);
+        setTopicColor((prevColor) => ({ ...prevColor, [topic]: null }));
       } else {
         // Select the topic and randomly assign a color
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
         setTopicColor((prevColor) => ({ ...prevColor, [topic]: randomColor }));
-
-        newSelected[topic] = randomColor;
+        newSelected.push(topic);
       }
 
       return newSelected;
@@ -45,7 +49,7 @@ function SelectTopicPage({ topics, setTopics }) {
           {topicList.map((topic) => (
             <div
               key={topic}
-              className={`btn border pt-2 text-white ${topics[topic] || 'bg-neutral'} hover:bg-neutral-focus`}
+              className={`btn border pt-2 text-white ${topicColor[topic] || 'bg-neutral'} hover:bg-neutral-focus`}
               onClick={() => toggleTopic(topic)}
             >
               {topic}
