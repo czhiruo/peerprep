@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-function SelectComplexityPage() {
-  const [selectedDifficulties, setSelectedDifficulties] = useState({
-    easy: false,
-    medium: false,
-    hard: false,
-  });
-
+function SelectComplexityPage({ difficulties, setDifficulties }) {
   const toggleDifficulty = (difficulty) => {
-    setSelectedDifficulties((prev) => ({
+    setDifficulties((prev) => ({
       ...prev,
       [difficulty]: !prev[difficulty], // Toggle the selected state
     }));
@@ -27,7 +22,7 @@ function SelectComplexityPage() {
           <div
             onClick={() => toggleDifficulty('easy')}
             className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
-              ${selectedDifficulties.easy ? 'bg-success' : ''} hover:scale-105`}
+              ${difficulties.easy ? 'bg-success' : ''} hover:scale-105`}
           >
             <div className="text-white text-xl font-semibold">Easy</div>
             <div className="text-white text-sm mt-2">
@@ -38,7 +33,7 @@ function SelectComplexityPage() {
           <div
             onClick={() => toggleDifficulty('medium')}
             className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
-              ${selectedDifficulties.medium ? 'bg-warning' : ''} hover:scale-105`}
+              ${difficulties.medium ? 'bg-warning' : ''} hover:scale-105`}
           >
             <div className="text-white text-xl font-semibold">Medium</div>
             <div className="text-white text-sm mt-2">
@@ -49,7 +44,7 @@ function SelectComplexityPage() {
           <div
             onClick={() => toggleDifficulty('hard')}
             className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
-              ${selectedDifficulties.hard ? 'bg-error' : ''} 
+              ${difficulties.hard ? 'bg-error' : ''} 
               hover:shadow-lg hover:scale-105`}
           >
             <div className="text-white text-xl font-semibold">Hard</div>
@@ -59,10 +54,24 @@ function SelectComplexityPage() {
           </div>
         </div>
 
-        {/* Next Button */}
-        <button className="btn btn-primary w-full">
-          Next
-        </button>
+        <div className="flex justify-between w-full">
+          <Link to="/topic" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
+              Back
+            </button>
+          </Link>
+          {
+            Object.values(difficulties).every(value => value === false) ?
+              <button className="btn btn-primary className='flex-grow ml-2'" disabled>
+                Next
+              </button> :
+              <Link to="/language" className='flex-grow ml-2'>
+                <button className="btn btn-primary w-full">
+                  Next
+                </button>
+              </Link>
+          }
+        </div>
       </div>
     </div>
   );
