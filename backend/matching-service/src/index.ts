@@ -1,13 +1,15 @@
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { MatchRequest } from './models/matchRequest';
-import { attemptMatch } from './services/matchingService';
 import { connectProducer, sendMessage } from './kafka/producer';
-import dotenv from 'dotenv';
 import { connectRequestConsumer } from './kafka/requestConsumer';
+import { connectResultConsumer } from './kafka/resultConsumer';
+import { connectTimeoutConsumer } from './kafka/timeoutConsumer';
+import { connectCancellationConsumer } from './kafka/cancellationConsumer';
 import { adminInit } from './kafka/admin';
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 const app = express();
 app.use(cors());
@@ -76,8 +78,11 @@ const startServer = async () => {
     // Connect to Kafka producer
     await connectProducer();
 
-    // Start the Kafka consumer and matching service
+    // Start the Kafka consumers and matching service
     await connectRequestConsumer(io, userSocketMap);
+    await connectResultConsumer(io, userSocketMap);
+    await connectCancellationConsumer(io, userSocketMap);
+    await connectTimeoutConsumer(io, userSocketMap);
   
     // Start the WebSocket server
     const PORT = 8081;

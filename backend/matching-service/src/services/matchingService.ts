@@ -8,7 +8,7 @@ import { MatchStatus } from '../models/matchRequest';
 
 const matchingPools = MatchingPools.getInstance();
 
-export function attemptMatch(matchRequest: MatchRequest): MatchResult | null {
+export function attemptMatch(matchRequest: MatchRequest): void {
     // Try exact match immediately
     let match = attemptExactMatch(matchRequest);
     let partialMatchTimeout: NodeJS.Timeout;
@@ -16,7 +16,7 @@ export function attemptMatch(matchRequest: MatchRequest): MatchResult | null {
 
     if (match) {
         console.log('Exact match found for user: ', matchRequest.userId);
-        return finalizeMatch(matchRequest, match);
+        finalizeMatch(matchRequest, match);
     }
 
     // Schedule partial match attempt after 20 seconds
@@ -28,7 +28,7 @@ export function attemptMatch(matchRequest: MatchRequest): MatchResult | null {
             if (match) {
                 const matchResult = finalizeMatch(matchRequest, match);
                 clearTimeout(failMatchTimeout); // Clear the fail timeout if matched
-                return matchResult;
+                return;
             }
         }        
     }, 20000);
@@ -40,26 +40,24 @@ export function attemptMatch(matchRequest: MatchRequest): MatchResult | null {
             console.log('Match timeout for user: ', matchRequest.userId);
             // Notify frontend about match failure
             matchRequest.status = MatchStatus.Timeout;
-            matchingPools.removeFromPools(matchRequest);
+            matchingPools.removeMatchRequest(matchRequest);
             notifyMatchFailure(matchRequest);
-            return null;            
+            return;            
         }        
     }, 30000);
 
-    function finalizeMatch(user1: MatchRequest, user2: MatchRequest): MatchResult {
+    function finalizeMatch(user1: MatchRequest, user2: MatchRequest): void {
         // Remove both users from Pools
         user1.status = MatchStatus.Matched;
         user2.status = MatchStatus.Matched;
-        matchingPools.removeFromPools(user1);
-        matchingPools.removeFromPools(user2);
+        matchingPools.removeMatchRequest(user1);
+        matchingPools.removeMatchRequest(user2);
         clearTimeout(partialMatchTimeout);
         clearTimeout(failMatchTimeout);
     
         // Notify users
-        return getMatchResult(user1, user2);
+        getMatchResult(user1, user2);
     }
-
-    return null;
 }
 
 function attemptExactMatch(newMatchRequest: MatchRequest): MatchRequest | null {

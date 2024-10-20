@@ -54,7 +54,7 @@ export class MatchingPools {
         }
     }
 
-    removeFromPools(matchRequest: MatchRequest): void {
+    removeMatchRequest(matchRequest: MatchRequest): void {
       // Remove from topic Pools
         for (const topic of matchRequest.topics) {
             const pool = this.topicPools.get(topic);
@@ -91,5 +91,45 @@ export class MatchingPools {
                 }
             }
         }
+    }
+
+    findMatchRequestInTopicPools(userId: string, topics: string[]): MatchRequest | null {
+        for (const topic of topics) {
+            const pool = this.topicPools.get(topic);
+            if (pool) {
+                for (const item of pool.getItems()) {  // Use getItems() to retrieve the array of items
+                    if (item.userId === userId) {
+                        return item;
+                    }
+                }
+            }
+        }
+        return null; // Return null if no matching MatchRequest is found
+    }
+
+    removeMatchRequestByUserId(userId: string): void {
+        // Function to find and remove match requests by userId
+        const removeFromPool = (poolMap: Map<string, Queue<MatchRequest>>) => {
+            for (const [key, pool] of poolMap.entries()) {
+                pool.removeIf(matchRequest => matchRequest.userId === userId);
+                if (pool.isEmpty()) {
+                    poolMap.delete(key);
+                }
+            }
+        };
+    
+        // Remove from topic Pools
+        removeFromPool(this.topicPools);
+    
+        console.log('--------------Matching Pools After Remove Match Request--------------');
+        this.logTopicPools();
+        console.log('---------------------------------------------------------------------');
+        console.log();
+    
+        // Remove from difficulty Pools
+        removeFromPool(this.difficultyPools);
+    
+        // Remove from language Pools
+        removeFromPool(this.languagePools);
     }
 }

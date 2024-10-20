@@ -25,13 +25,22 @@ export class Queue<T> {
     forEach(callback: (item: T) => void): void {
       this.items.forEach(callback);
     }
+
+    // Get all items in the queue
+    getItems(): T[] {
+      return this.items;
+    }
   
     // Remove a specific item from the queue
     remove(item: T): void {
       this.items = this.items.filter((i) => i !== item);
     }
+
+    removeIf(predicate: (item: T) => boolean): void {
+      this.items = this.items.filter(item => !predicate(item));
+    }
   
-    // Get all items as an array
+    // COnvert to array
     toArray(): T[] {
       return [...this.items];
     }

@@ -1,43 +1,37 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { Difficulty, MatchRequest, MatchStatus } from '../models/matchRequest';
-import { MatchResult } from '../models/matchResult';
-import { attemptMatch } from '../services/matchingService';
 import { MatchingPools } from '../services/matchingPools';
-import { connectProducer, sendMessage } from './producer';
 
 const kafka = new Kafka({
-    clientId: 'matching-service-consumer',
+    clientId: 'match-cancellation-consumer',
     brokers: ['localhost:9092'],
 });
 
-const consumer: Consumer = kafka.consumer({ groupId: 'matching-service-group' });
-  
-export async function connectRequestConsumer(
+const consumer: Consumer = kafka.consumer({ groupId: 'matching-cancellation-group' });
+
+export async function connectCancellationConsumer(
     io: any,
     userSocketMap: Map<string, string>
-  ): Promise<void> {
+): Promise<void> { 
     await consumer.connect();
-    console.log('Match Request Consumer connected');
-    
-    await consumer.subscribe({ topic: 'matching-requests', fromBeginning: true });
+    console.log('Match Cancellation Consumer connected');
+
+    await consumer.subscribe({ topic: 'match-canceled', fromBeginning: true });
     const matchingPools = MatchingPools.getInstance();
     
     await consumer.run({
-      eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-        if (topic === 'matching-requests') {
-          console.log({
+        eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
+        console.log({
             "[CONSUMER]":
             topic,
             partition,
             key: message.key?.toString(), // Check for possible undefined
             value: message.value?.toString(), // Check for possible undefined
-          });
-          const matchRequestData: Partial<MatchRequest> = JSON.parse(
+        });
+        const matchRequestData: Partial<MatchRequest> = JSON.parse(
             message.value?.toString()!
-          );
-          // console.log("MATCHING_REQUEST_DATA")
-          // console.log(matchRequestData);
-          const matchRequest: MatchRequest = {
+        ); 
+        const canceledMatchRequest: MatchRequest = {
             userId: matchRequestData.userId!,
             topics: Array.isArray(matchRequestData.topics) ? matchRequestData.topics : [],
             difficulties: Array.isArray(matchRequestData.difficulties) ? matchRequestData.difficulties.map((difficulty: string) => {
@@ -54,24 +48,17 @@ export async function connectRequestConsumer(
             }) : [],
             languages: Array.isArray(matchRequestData.languages) ? matchRequestData.languages : [],
             requestTime: typeof matchRequestData.requestTime === 'number' ? matchRequestData.requestTime : Date.now(),
-            status: MatchStatus.Finding,
+            status: MatchStatus.Cancelled,
           };
-          console.log("--------------------[MATCHING_REQUEST_CONSUMER]----------------------")
-          console.log(matchRequest);
-          console.log('---------------------------------------------------------------------');
-          console.log();
-          // Enqueue the UserRequest into the matching pools
-          matchingPools.enqueueMatchRequest(matchRequest);
-  
-          // Attempt to find a match
-          attemptMatch(matchRequest);
-  
-        }
-      },
+        const userId = canceledMatchRequest.userId;
+        const matchRequest = matchingPools.findMatchRequestInTopicPools(userId, canceledMatchRequest.topics)!;
+        matchingPools.removeMatchRequest(matchRequest);
+        matchRequest.status = MatchStatus.Cancelled;
+        },
     });
-  }
+}
 
-export async function disconnectConsumer(): Promise<void> {
+export async function disconnectResultConsumer(): Promise<void> {
     await consumer.disconnect();
-    console.log('Request Consumer disconnected');
+    console.log('Match Cancellation Consumer disconnected');
 }
