@@ -2,7 +2,7 @@ import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 
 const kafka = new Kafka({
     clientId: 'matching-results-consumer',
-    brokers: ['localhost:9092'],
+    brokers: ['kafka:9092'],
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'matching-results-group' });

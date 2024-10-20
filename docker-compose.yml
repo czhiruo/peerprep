@@ -15,6 +15,19 @@ services:
     networks:
       - peerprep-network
 
+  matching-service:
+    build: ./backend/matching-service
+    container_name: matching-backend
+    ports:
+      - "8081:8081"
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: "matching-requests,matching-results,match-canceled,match-timeout"
+    depends_on:
+      - kafka
+    networks:
+      - peerprep-network
+
   frontend:
     build: ./frontend
     container_name: frontend
@@ -23,6 +36,30 @@ services:
     networks:
       - peerprep-network
 
+  kafka:
+    image: wurstmeister/kafka:2.13-2.7.0
+    container_name: kafka
+    ports:
+      - "19092:19092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    depends_on:
+      - zookeeper
+    networks:
+      - peerprep-network
+
+  zookeeper:
+    image: zookeeper:3.7.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - peerprep-network
   
 networks:
   peerprep-network:
