@@ -16,7 +16,7 @@ dotenv.config();
 
 const kafkaBrokers = process.env.KAFKA_BROKERS 
   ? process.env.KAFKA_BROKERS.split(',') 
-  : ['localhost:9092'];
+  : ['kafka:9092'];
 
 // create HTTP server
 const httpServer = createServer(app);
