@@ -10,6 +10,7 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
   const [username, setUsername] = useState('');
   const [matchingFailed, setMatchingFailed] = useState(false);
   const [matchRequest, setMatchRequest] = useState({});
+  const [cancelled, setCancelled] = useState(false);
 
   const navigate = useNavigate();
 
@@ -54,10 +55,13 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
 
       console.log("Sending match request:", matchRequest);
 
+      socketService.register(username);
+
       socketService.sendMatchRequest(matchRequest);
 
       // Set up WebSocket event listeners
       socketService.onMatchResult((result) => {
+        console.log("Match result received:", result);
         setMatchResult(result);
         navigate('/matched');
       });
@@ -69,37 +73,26 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
 
       // Clean up socket listeners and cancel request if unmount
       return () => {
-        socketService.sendMatchCancel(matchRequest);
+        if (!cancelled) {
+          socketService.sendMatchCancel(matchRequest);
+        }
       };
     }
-  }, [username, difficulties, topics, languages, setMatchResult, navigate]);
+  }, [username, difficulties, topics, languages, setMatchResult, navigate, cancelled]);
 
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
-
-  // Send match request when the component is mounted
-  // useEffect(() => {
-  //   socketService.sendMatchRequest(matchRequest);
-
-  //   // Set up WebSocket event listeners
-  //   socketService.onMatchResult((result) => {
-  //     setMatchResult(result);
-  //     navigate('/matched');
-  //   });
-
-  //   socketService.onMatchTimeout(() => {
-  //     console.log("Match timed out");
-  //     navigate('/failed');
-  //   });
-
-  //   // Clean up socket listeners and cancel request if unmount
-  //   return () => {
-  //     socketService.sendMatchCancel(matchRequest);
-  //   };
-  // }, [navigate, matchRequest]);
 
   if (matchingFailed) {
     return <Navigate to="/failed" />;
   }
+
+  const handleCancel = () => {
+    if (!cancelled) {
+      socketService.sendMatchCancel(matchRequest);
+      setCancelled(true);
+      navigate('/language');
+    }
+  };
 
   return (
     <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-start items-center">
@@ -131,8 +124,8 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
         </div>
 
         {/* Cancel Button */}
-        <Link to="/language">
-          <button className="btn btn-secondary" onClick={() => socketService.sendMatchCancel(matchRequest)}>
+        <Link to='/language'>
+          <button className="btn btn-secondary">
             Cancel
           </button>
         </Link>

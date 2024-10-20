@@ -55,6 +55,10 @@ export class MatchingPools {
     }
 
     removeMatchRequest(matchRequest: MatchRequest): void {
+      if (!matchRequest) {
+        return;
+      }
+
       // Remove from topic Pools
         for (const topic of matchRequest.topics) {
             const pool = this.topicPools.get(topic);
@@ -94,6 +98,7 @@ export class MatchingPools {
     }
 
     findMatchRequestInTopicPools(userId: string, topics: string[]): MatchRequest | null {
+        console.log(this.topicPools)
         for (const topic of topics) {
             const pool = this.topicPools.get(topic);
             if (pool) {
