@@ -1,18 +1,10 @@
-import React, {useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 function SelectTopicPage({ topics, setTopics }) {
-  // Example: {Strings: 'bg-info', Algorithms: 'bg-success'}
-  const [topicColor, setTopicColor] = useState({});
-
   const topicList = [
     "Strings", "Algorithms", "Data Structures",
     "Bit Manipulation", "Recursion", "Databases", "Brainteaser"
-  ];
-
-  // Define an array of colors
-  const colors = [
-    'bg-info', 'bg-success', 'bg-warning'
   ];
 
   const toggleTopic = (topic) => {
@@ -20,16 +12,9 @@ function SelectTopicPage({ topics, setTopics }) {
       const newSelected = [ ...prevSelected ];
 
       if (newSelected.includes(topic)) {
-        // Deselect the topic
         const index = newSelected.indexOf(topic);
-        
         newSelected.splice(index, 1);
-        setTopicColor((prevColor) => ({ ...prevColor, [topic]: null }));
       } else {
-        // Select the topic and randomly assign a color
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        setTopicColor((prevColor) => ({ ...prevColor, [topic]: randomColor }));
         newSelected.push(topic);
       }
 
@@ -49,7 +34,7 @@ function SelectTopicPage({ topics, setTopics }) {
           {topicList.map((topic) => (
             <div
               key={topic}
-              className={`btn border pt-2 text-white ${topicColor[topic] || 'bg-neutral'} hover:bg-neutral-focus`}
+              className={`btn text-white ${topics.includes(topic) ? 'border-primary border-2' : 'border-white'} bg-neutral hover:bg-neutral-focus`}
               onClick={() => toggleTopic(topic)}
             >
               {topic}
@@ -57,18 +42,23 @@ function SelectTopicPage({ topics, setTopics }) {
           ))}
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-between w-full">
-          <Link to="/complexity">
-            <button className="btn btn-secondary">
+          <Link to="/complexity" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
               Back
             </button>
           </Link>
-          <Link to="/language">
-            <button className="btn btn-primary">
+          {
+            topics.length === 0 ?
+            <button className="btn btn-primary flex-grow ml-2" disabled>
               Next
-            </button>
-          </Link>
+            </button> :
+            <Link to="/language" className='flex-grow ml-2'>
+              <button className="btn btn-primary w-full">
+                Next
+              </button>
+            </Link>
+          }
         </div>
       </div>
     </div>

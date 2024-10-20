@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function MatchingFailedPage() {
 
@@ -16,12 +17,16 @@ function MatchingFailedPage() {
 
         {/* Cancel Button */}
         <div className="flex flex-row w-full justify-between">
-          <button className="btn btn-secondary">
-            Back to Login
-          </button>
-          <button className="btn btn-primary">
-            Try again
-          </button>
+          <Link to='/complexity'>
+            <button className="btn btn-secondary">
+              Back
+            </button>    
+          </Link>
+          <Link to='/matching'>
+            <button className="btn btn-primary">
+              Try again
+            </button>
+          </Link>
         </div>
       </main>
     </div>
