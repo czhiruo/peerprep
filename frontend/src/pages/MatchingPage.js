@@ -3,10 +3,13 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import AvatarDisplay from '../components/AvatarDisplay';
 import LoadingDots from '../components/LoadingDots';
 import socketService from '../services/socketService'; // WebSocket service
+import { getToken, verifyToken } from '../services/userService';
 
 function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
   const [time, setTime] = useState(30);
+  const [username, setUsername] = useState('');
   const [matchingFailed, setMatchingFailed] = useState(false);
+  const [matchRequest, setMatchRequest] = useState({});
 
   const navigate = useNavigate();
 
@@ -23,37 +26,76 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
     return () => clearInterval(interval);
   }, [time]);
 
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      verifyToken(token)
+        .then((data) => {
+          setUsername(data.data.username);
+        })
+        .catch((error) => {
+          console.error("Error verifying token:", error);
+        });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (username) {
+      const matchRequest = {
+        userId: username,
+        topics: topics,
+        difficulties: Object.keys(difficulties).filter(key => difficulties[key]),
+        languages: languages,
+        requestTime: Date.now(),
+        status: 'pending',
+      };
+
+      setMatchRequest(matchRequest);
+
+      console.log("Sending match request:", matchRequest);
+
+      socketService.sendMatchRequest(matchRequest);
+
+      // Set up WebSocket event listeners
+      socketService.onMatchResult((result) => {
+        setMatchResult(result);
+        navigate('/matched');
+      });
+
+      socketService.onMatchTimeout(() => {
+        console.log("Match timed out");
+        navigate('/failed');
+      });
+
+      // Clean up socket listeners and cancel request if unmount
+      return () => {
+        socketService.sendMatchCancel(matchRequest);
+      };
+    }
+  }, [username, difficulties, topics, languages, setMatchResult, navigate]);
+
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
 
-  const matchRequest = {
-    userId: 'newUser', // Replace with actual user ID if available
-    topics: topics,
-    difficulties: difficulties,
-    languages: languages,
-    requestTime: Date.now(),
-    status: 'pending',
-  };
-
   // Send match request when the component is mounted
-  useEffect(() => {
-    socketService.sendMatchRequest(matchRequest);
+  // useEffect(() => {
+  //   socketService.sendMatchRequest(matchRequest);
 
-    // Set up WebSocket event listeners
-    socketService.onMatchResult((result) => {
-      setMatchResult(result);
-      navigate('/matched');
-    });
+  //   // Set up WebSocket event listeners
+  //   socketService.onMatchResult((result) => {
+  //     setMatchResult(result);
+  //     navigate('/matched');
+  //   });
 
-    socketService.onMatchTimeout(() => {
-      console.log("Match timed out");
-      navigate('/failed');
-    });
+  //   socketService.onMatchTimeout(() => {
+  //     console.log("Match timed out");
+  //     navigate('/failed');
+  //   });
 
-    // Clean up socket listeners and cancel request if unmount
-    return () => {
-      socketService.sendMatchCancel(matchRequest);
-    };
-  }, [navigate, matchRequest]);
+  //   // Clean up socket listeners and cancel request if unmount
+  //   return () => {
+  //     socketService.sendMatchCancel(matchRequest);
+  //   };
+  // }, [navigate, matchRequest]);
 
   if (matchingFailed) {
     return <Navigate to="/failed" />;
