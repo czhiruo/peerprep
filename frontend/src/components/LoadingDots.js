@@ -3,10 +3,10 @@ import '.././index.css';
 
 const LoadingDots = () => {
     return (
-      <div class="flex space-x-2">
-        <div class="bouncing-dot"></div>
-        <div class="bouncing-dot"></div>
-        <div class="bouncing-dot"></div>
+      <div className="flex space-x-2">
+        <div className="bouncing-dot"></div>
+        <div className="bouncing-dot"></div>
+        <div className="bouncing-dot"></div>
       </div>
       
     );
