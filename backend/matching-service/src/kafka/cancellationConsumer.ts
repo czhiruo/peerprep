@@ -4,7 +4,7 @@ import { MatchingPools } from '../services/matchingPools';
 
 const kafka = new Kafka({
     clientId: 'match-cancellation-consumer',
-    brokers: ['localhost:9092'],
+    brokers: ['kafka:9092'],
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'matching-cancellation-group' });

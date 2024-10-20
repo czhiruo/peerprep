@@ -2,7 +2,7 @@ import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 
 const kafka = new Kafka({
     clientId: 'match-timeout-consumer',
-    brokers: ['localhost:9092'],
+    brokers: ['kafka:9092'],
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'match-timeout-group' });

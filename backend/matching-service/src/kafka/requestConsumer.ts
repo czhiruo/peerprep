@@ -7,7 +7,7 @@ import { connectProducer, sendMessage } from './producer';
 
 const kafka = new Kafka({
     clientId: 'matching-service-consumer',
-    brokers: ['localhost:9092'],
+    brokers: ['kafka:9092'],
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'matching-service-group' });
