@@ -43,11 +43,6 @@ function SelectTopicPage({ topics, setTopics }) {
         </div>
 
         <div className="flex justify-between w-full">
-          <Link to="/login" className='flex-grow mr-2'>
-            <button className="btn btn-secondary w-full">
-              Back
-            </button>
-          </Link>
           {
             topics.length === 0 ?
               <button className="btn btn-primary flex-grow ml-2" disabled>

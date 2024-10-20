@@ -36,9 +36,9 @@ function App() {
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Navigate to='/complexity' />} />
-          <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage difficulties={difficulties} setDifficulties={setDifficulties} /></PrivateRoute>} />
+          <Route path="/" element={<Navigate to='/topic' />} />
           <Route path="/topic" element={<PrivateRoute><SelectTopicPage topics={topics} setTopics={setTopics} /></PrivateRoute>} />
+          <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage difficulties={difficulties} setDifficulties={setDifficulties} /></PrivateRoute>} />
           <Route path="/language" element={<PrivateRoute><SelectLanguagePage languages={languages} setLanguages={setLanguages} /></PrivateRoute>} />
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
