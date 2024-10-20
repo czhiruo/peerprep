@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import AvatarDisplay from '../components/AvatarDisplay';
 import LoadingDots from '../components/LoadingDots';
 
@@ -21,12 +22,11 @@ function MatchingPage({ difficulties, topics, languages }) {
           <AvatarDisplay baseUrl={baseAvatarUrl} />
         </div>
 
-        {/* Cancel Button */}
-        <div>
+        <Link to="/language">
           <button className="btn btn-secondary">
             Cancel
           </button>
-        </div>
+        </Link>
       </main>
     </div>
   );

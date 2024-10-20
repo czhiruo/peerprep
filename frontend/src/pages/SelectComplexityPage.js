@@ -54,7 +54,7 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
           </div>
         </div>
 
-        <Link to="/topic">
+        <Link to="/topic" className='w-full'>
           <button className="btn btn-primary w-full">
             Next
           </button>
