@@ -51,7 +51,10 @@ export async function connectCancellationConsumer(
             status: MatchStatus.Cancelled,
           };
         const userId = canceledMatchRequest.userId;
+        console.log(canceledMatchRequest)
+        console.log(canceledMatchRequest.topics)
         const matchRequest = matchingPools.findMatchRequestInTopicPools(userId, canceledMatchRequest.topics)!;
+        console.log(matchRequest);
         matchingPools.removeMatchRequest(matchRequest);
         matchRequest.status = MatchStatus.Cancelled;
         },

@@ -12,6 +12,7 @@ const socketService = {
   },
 
   sendMatchCancel: (matchRequest) => {
+    console.log('Cancelling match request:', matchRequest);
     socket.emit('match-cancel', matchRequest);
   },
 
