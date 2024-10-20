@@ -8,6 +8,8 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
   const [time, setTime] = useState(30);
   const [matchingFailed, setMatchingFailed] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (time <= 0) {
       setMatchingFailed(true);
@@ -22,11 +24,6 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
   }, [time]);
 
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
-
-  if (matchingFailed) {
-    return <Navigate to="/failed" />;
-  }
-  const navigate = useNavigate();
 
   const matchRequest = {
     userId: 'newUser', // Replace with actual user ID if available
@@ -57,6 +54,10 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
       socketService.sendMatchCancel(matchRequest);
     };
   }, [navigate, matchRequest]);
+
+  if (matchingFailed) {
+    return <Navigate to="/failed" />;
+  }
 
   return (
     <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-start items-center">

@@ -55,18 +55,18 @@ function SelectComplexityPage({ difficulties, setDifficulties }) {
         </div>
 
         <div className="flex justify-between w-full">
-          <Link to="/topic">
-            <button className="btn btn-secondary">
+          <Link to="/topic" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
               Back
             </button>
           </Link>
           {
             Object.values(difficulties).every(value => value === false) ?
-              <button className="btn btn-primary" disabled>
+              <button className="btn btn-primary className='flex-grow ml-2'" disabled>
                 Next
               </button> :
-              <Link to="/language" >
-                <button className="btn btn-primary">
+              <Link to="/language" className='flex-grow ml-2'>
+                <button className="btn btn-primary w-full">
                   Next
                 </button>
               </Link>

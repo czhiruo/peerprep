@@ -17,10 +17,10 @@ function MatchingFailedPage() {
 
         {/* Cancel Button */}
         <div className="flex flex-row w-full justify-between">
-          <Link to='/complexity'>
+          <Link to='/topic'>
             <button className="btn btn-secondary">
               Back
-            </button>    
+            </button>
           </Link>
           <Link to='/matching'>
             <button className="btn btn-primary">
