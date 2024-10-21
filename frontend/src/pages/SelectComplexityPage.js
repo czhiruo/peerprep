@@ -1,75 +1,76 @@
-import React, { useState } from 'react';
-import '.././index.css';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-function SelectComplexityPage() {
-  const [selectedDifficulties, setSelectedDifficulties] = useState({
-    easy: false,
-    medium: false,
-    hard: false,
-  });
-
+function SelectComplexityPage({ difficulties, setDifficulties }) {
   const toggleDifficulty = (difficulty) => {
-    setSelectedDifficulties((prev) => ({
+    setDifficulties((prev) => ({
       ...prev,
       [difficulty]: !prev[difficulty], // Toggle the selected state
     }));
   };
 
   return (
-    <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
-      <div className="flex-grow flex flex-col justify-start items-center gap-[30px]">
-
+    <div className="min-h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-start items-center gap-4">
         {/* Title Section */}
-        <div className="text-white text-[40px] font-bold text-center">
+        <div className="text-white text-4xl font-bold text-center">
           Select Difficulty
         </div>
 
-        {/* Difficulty Options Section */}
-        <div className="flex-grow flex flex-col justify-start items-center gap-[30px]">
-          <div 
+        {/* Difficulty Options */}
+        <div className="grid grid-cols-1 gap-2">
+          <div
             onClick={() => toggleDifficulty('easy')}
-            className={`self-stretch h-[80px] px-5 py-2.5 rounded-[20px]
-              border ${selectedDifficulties.easy ? 'border-[#39ff14] bg-[#39ff14]' : 'border-[#39ff14]'}
-              transition-all duration-300 ease-in-out
-              hover:border-[#39ff14] hover:shadow-md hover:shadow-[#39ff14] hover:scale-105 hover:transition-all cursor-pointer`}
+            className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
+              ${difficulties.easy ? 'bg-success' : ''} hover:scale-105`}
           >
-            <div className="text-white text-xl font-semibold font-['Inter'] leading-normal">Easy</div>
-            <div className="w-full h-[49px] text-white text-[15px] font-normal font-['Inter'] leading-[18px]">
+            <div className="text-white text-xl font-semibold">Easy</div>
+            <div className="text-white text-sm mt-2">
               Problems that focus on basic algorithms and data structures, often requiring simple logic and implementation.
             </div>
           </div>
 
-          <div 
+          <div
             onClick={() => toggleDifficulty('medium')}
-            className={`self-stretch h-[80px] px-5 py-2.5 rounded-[20px] 
-              border ${selectedDifficulties.medium ? 'border-[e3e300] bg-[#e3e300]' : 'border-[#e3e300]'}
-              transition-all duration-300 ease-in-out
-              hover:border-[#eaff00] hover:shadow-md hover:shadow-[#eaff00] hover:scale-105 hover:transition-all cursor-pointer`}
+            className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
+              ${difficulties.medium ? 'bg-warning' : ''} hover:scale-105`}
           >
-            <div className="text-white text-xl font-semibold font-['Inter'] leading-normal">Medium</div>
-            <div className="w-full h-[50px] text-white text-[15px] font-normal font-['Inter'] leading-[18px]">
+            <div className="text-white text-xl font-semibold">Medium</div>
+            <div className="text-white text-sm mt-2">
               Problems that require more complex logic, multiple data structures, or algorithmic optimizations.
             </div>
           </div>
 
-          <div 
+          <div
             onClick={() => toggleDifficulty('hard')}
-            className={`self-stretch h-[80px] px-5 py-2.5 rounded-[20px] 
-              border ${selectedDifficulties.hard ? 'border-[#ff0000] bg-[#ff0000]' : 'border-[#ff0000]'}
-              transition-all duration-300 ease-in-out
-              hover:border-[#ff0000] hover:shadow-md hover:shadow-[#ff0000] hover:scale-105 hover:transition-all cursor-pointer`}
+            className={`self-stretch p-3 border rounded-xl transition-all duration-300 ease-in-out cursor-pointer 
+              ${difficulties.hard ? 'bg-error' : ''} 
+              hover:shadow-lg hover:scale-105`}
           >
-            <div className="text-white text-xl font-semibold font-['Inter'] leading-normal">Hard</div>
-            <div className="w-full h-[49px] text-white text-[15px] font-normal font-['Inter'] leading-[18px]">
+            <div className="text-white text-xl font-semibold">Hard</div>
+            <div className="text-white text-sm mt-2">
               Problems that involve advanced algorithms, dynamic programming, or intricate mathematical insights, often with edge cases.
             </div>
           </div>
+        </div>
 
-          <button
-            className="w-full h-[60px] bg-[#282828] rounded-[20px] flex justify-center items-center"
-          >
-            <div className="text-white text-xl font-semibold font-['Inter'] leading-normal">Next</div>
-          </button>
+        <div className="flex justify-between w-full">
+          <Link to="/topic" className='flex-grow mr-2'>
+            <button className="btn btn-secondary w-full">
+              Back
+            </button>
+          </Link>
+          {
+            Object.values(difficulties).every(value => value === false) ?
+              <button className="btn btn-primary flex-grow ml-2" disabled>
+                Next
+              </button> :
+              <Link to="/language" className='flex-grow ml-2'>
+                <button className="btn btn-primary w-full">
+                  Next
+                </button>
+              </Link>
+          }
         </div>
       </div>
     </div>

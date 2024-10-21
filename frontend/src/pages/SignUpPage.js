@@ -8,36 +8,47 @@ function SignUpPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add logic for sign up (e.g., API call)
     console.log('Signing up with:', { email, username, password });
 
     if (password !== confirmPassword) {
       console.error('Passwords do not match');
-      // DO SOMETHING TO UI HERE
+      setError("Passwords do not match.");
+      setSuccess(null);
       return;
     }
 
     createUser(username, email, password)
       .then((user) => {
+        setSuccess("Signed up successfully");
+        setError(null);
         console.log('Signed up successfully:', user);
         window.location.href = '/'; // Redirect to login
       })
       .catch((error) => {
-        // DO SOMETHING TO UI HERE
+        setError("Error Signing Up");
+        setSuccess(null);
         console.error('Sign up failed:', error);
       });
   };
 
   return (
     <div className="h-[calc(100vh-65px)] w-full bg-neutral flex flex-col justify-center items-center">
-
-      <form onSubmit={handleSubmit} className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-3 pt-3 items-center">
+      <form
+        onSubmit={handleSubmit}
+        className="flex-grow flex flex-col w-full bg-[#1a1a1a] gap-3 pt-3 items-center"
+      >
         <h2 className="w-full text-center text-white text-4xl font-bold">
-            Sign Up
+          Sign Up
         </h2>
+
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
+
         {/* Email Input */}
         <div className="form-control flex flex-col w-full max-w-lg bg-transparent no-border items-center">
           <input
@@ -90,7 +101,7 @@ function SignUpPage() {
         <div className="flex justify-center items-center gap-2">
           <span className="text-white">Already have an account?</span>
           <span className="text-[#90a9fd] cursor-pointer hover:text-[#b0c4de] transition-colors">
-            <Link to="/" className='no-underline text-inherit'>
+            <Link to="/" className="no-underline text-inherit">
               Log In
             </Link>
           </span>
@@ -98,7 +109,10 @@ function SignUpPage() {
 
         {/* Submit Button */}
         <div className="flex justify-center w-full">
-          <button type="submit" className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]">
+          <button
+            type="submit"
+            className="btn btn-primary w-full max-w-lg bg-[#282828] hover:bg-[#404040]"
+          >
             Sign Up
           </button>
         </div>

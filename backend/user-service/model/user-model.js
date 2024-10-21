@@ -26,6 +26,24 @@ const UserModelSchema = new Schema({
     required: true,
     default: false,
   },
+  attemptedQuestions: [
+    {
+      questionId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+      },
+      attemptedAt: {
+        type: Date,
+        default: Date.now, // Automatically set to the current date/time
+      },
+    },
+  ],
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpiresIn: {
+    type: Date,
+  },
 });
 
 export default mongoose.model("UserModel", UserModelSchema);
