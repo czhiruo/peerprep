@@ -21,7 +21,7 @@ export function attemptMatch(matchRequest: MatchRequest): void {
 
     // Schedule partial match attempt after 20 seconds
     partialMatchTimeout = setTimeout(() => {
-        console.log('Step in Partial Match Timeout for user: ', matchRequest.userId);
+        //console.log('Step in Partial Match Timeout for user: ', matchRequest.userId);
         if (matchRequest.status === MatchStatus.Finding) {
             match = attemptPartialMatch(matchRequest);
             console.log('Attempt to find partial match for user: ', matchRequest.userId);
@@ -35,7 +35,7 @@ export function attemptMatch(matchRequest: MatchRequest): void {
 
     // Schedule match failure after 30 seconds
     failMatchTimeout = setTimeout(() => {        
-        console.log('Step in Fail Match Timeout for user: ', matchRequest.userId);
+        //console.log('Step in Fail Match Timeout for user: ', matchRequest.userId);
         if (matchRequest.status === MatchStatus.Finding) {
             console.log('Match timeout for user: ', matchRequest.userId);
             // Notify frontend about match failure

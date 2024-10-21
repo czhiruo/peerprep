@@ -41,11 +41,11 @@ export async function getMatchResult(user1: MatchRequest, user2: MatchRequest): 
         language: selectedLanguage,
     };
     
-    console.log('--------------------------[MATCHING RESULT]--------------------------');
-    console.log(`Matched ${user1.userId} with ${user2.userId}.`);
-    console.log(`[MATCH RESULT]: ${JSON.stringify(matchResult)}`);
-    console.log('---------------------------------------------------------------------');
-    console.log();
+    // console.log('--------------------------[MATCHING RESULT]--------------------------');
+    // console.log(`Matched ${user1.userId} with ${user2.userId}.`);
+    // console.log(`[MATCH RESULT]: ${JSON.stringify(matchResult)}`);
+    // console.log('---------------------------------------------------------------------');
+    // console.log();
     
     await sendMessage('matching-results', { 
         key: matchResult.userId,
@@ -69,8 +69,8 @@ export async function notifyMatchFailure(matchRequest: MatchRequest): Promise<vo
         }
       });
     // Replace with actual notification implementation
-    console.log('--------------------------[MATCH FAILURE]----------------------------');
-    console.log(`Notifying user ${matchRequest.userId} of match failure.`);
-    console.log('---------------------------------------------------------------------');
-    console.log();
+    // console.log('--------------------------[MATCH FAILURE]----------------------------');
+    // console.log(`Notifying user ${matchRequest.userId} of match failure.`);
+    // console.log('---------------------------------------------------------------------');
+    // console.log();
 }

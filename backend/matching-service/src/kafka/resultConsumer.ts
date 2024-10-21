@@ -20,15 +20,16 @@ export async function connectResultConsumer(
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
         if (topic === 'matching-results') {
-            console.log({
-                "[CONSUMER]":
-                topic,
-                partition,
-                key: message.key?.toString(), // Check for possible undefined
-                value: message.value?.toString(), // Check for possible undefined
-            });
+            // console.log({
+            //     "[CONSUMER]":
+            //     topic,
+            //     partition,
+            //     key: message.key?.toString(), // Check for possible undefined
+            //     value: message.value?.toString(), // Check for possible undefined
+            // });
             const matchResult = JSON.parse(message.value?.toString()!);
             
+            console.log();
             console.log("---------------------[MATCHING_RESULT_CONSUMER]----------------------")
             console.log(matchResult);
             console.log('---------------------------------------------------------------------');

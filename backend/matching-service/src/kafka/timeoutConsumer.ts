@@ -18,16 +18,17 @@ export async function connectTimeoutConsumer(
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-        console.log({
-            "[CONSUMER]":
-            topic,
-            partition,
-            key: message.key?.toString(), // Check for possible undefined
-            value: message.value?.toString(), // Check for possible undefined
-        });
+        // console.log({
+        //     "[CONSUMER]":
+        //     topic,
+        //     partition,
+        //     key: message.key?.toString(), // Check for possible undefined
+        //     value: message.value?.toString(), // Check for possible undefined
+        // });
         
         const timeoutUser = JSON.parse(message.value?.toString()!);
-        console.log("-----------------------[MATCH_TIMEOUT_CONSUMER]---- -----------------")
+        console.log();
+        console.log("-----------------------[MATCH_TIMEOUT_CONSUMER]----------------------");
         console.log(timeoutUser);
         console.log('---------------------------------------------------------------------');
         console.log();

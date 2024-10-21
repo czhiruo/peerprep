@@ -98,11 +98,11 @@ export class MatchingPools {
     }
 
     findMatchRequestInTopicPools(userId: string, topics: string[]): MatchRequest | null {
-        console.log(this.topicPools)
+        //console.log(this.topicPools)
         for (const topic of topics) {
             const pool = this.topicPools.get(topic);
             if (pool) {
-                for (const item of pool.getItems()) {  // Use getItems() to retrieve the array of items
+                for (const item of pool.toArray()) {  // Use getItems() to retrieve the array of items
                     if (item.userId === userId) {
                         return item;
                     }

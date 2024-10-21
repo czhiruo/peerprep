@@ -25,13 +25,13 @@ export async function connectRequestConsumer(
     await consumer.run({
       eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
         if (topic === 'matching-requests') {
-          console.log({
-            "[CONSUMER]":
-            topic,
-            partition,
-            key: message.key?.toString(), // Check for possible undefined
-            value: message.value?.toString(), // Check for possible undefined
-          });
+          // console.log({
+          //   "[CONSUMER]":
+          //   topic,
+          //   partition,
+          //   key: message.key?.toString(), // Check for possible undefined
+          //   value: message.value?.toString(), // Check for possible undefined
+          // });
           const matchRequestData: Partial<MatchRequest> = JSON.parse(
             message.value?.toString()!
           );
@@ -56,6 +56,7 @@ export async function connectRequestConsumer(
             requestTime: typeof matchRequestData.requestTime === 'number' ? matchRequestData.requestTime : Date.now(),
             status: MatchStatus.Finding,
           };
+          console.log();
           console.log("--------------------[MATCHING_REQUEST_CONSUMER]----------------------")
           console.log(matchRequest);
           console.log('---------------------------------------------------------------------');
