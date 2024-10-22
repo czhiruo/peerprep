@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { userLogout } from '../services/userService';
+import { userLogout, deleteUser } from '../services/userService';
 import { Link } from 'react-router-dom';
 import { getToken, verifyToken } from '../services/userService';
 
@@ -20,6 +20,12 @@ const Header = () => {
     }
   }, [])
 
+  const handleDeletion = () => {
+    const token = getToken();
+    deleteUser(userId, token);
+    window.location.href = "/login";
+  }
+
   const handleLogout = () => {
     userLogout();
     window.location.href = '/login';
@@ -33,14 +39,20 @@ const Header = () => {
         </Link>
       </div>
       {
-        userId ? <ProfilePhoto userId={userId} handleLogout={handleLogout}/> : <></>
+        userId ? <ProfilePhoto userId={userId} handleLogout={handleLogout} handleDeletion={handleDeletion}/>  : <></>
       }
     </div>
   )
 }
 
-const ProfilePhoto = ( {userId, handleLogout} ) => {
+const ProfilePhoto = ({ userId, handleLogout, handleDeletion }) => {
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const openDeleteModal = () => setShowDeleteModal(true);
+    const closeDeleteModal = () => setShowDeleteModal(false);
+  
   return (
+    <>
     <div className="dropdown dropdown-end">
       <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
@@ -57,10 +69,35 @@ const ProfilePhoto = ( {userId, handleLogout} ) => {
             History
           </Link>
           <a onClick={handleLogout} className='menu-item no-underline text-white hover:bg-gray-500'>Logout</a>
+          <a onClick={openDeleteModal} className='menu-item no-underline text-red-500 hover:bg-gray-500'> Delete Account </a>
         </li>
       </ul>
-    </div>
-  )
+      </div>
+      
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-[#1a1a1a] text-white p-6 rounded-md shadow-md max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Delete Account</h2>
+            <p className="mb-4">Are you sure you want to delete your account? This action is irreversible and all your history will be lost.</p>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={closeDeleteModal}
+                className="btn btn-secondary bg-gray-500 text-white px-4 py-2 rounded-md"
+              >
+                Back
+              </button>
+              <button
+                onClick={handleDeletion}
+                className="btn btn-danger bg-red-600 text-white px-4 py-2 rounded-md"
+              >
+                Delete Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default Header

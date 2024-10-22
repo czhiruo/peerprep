@@ -7,6 +7,7 @@ import QuestionDetails from './components/QuestionDetails';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import RequestResetPasswordPage from './pages/RequestResetPasswordPage';
+import AccountDeletedPage from './pages/AccountDeletedPage.js';
 import SignUpPage from './pages/SignUpPage';
 import SelectComplexityPage from './pages/SelectComplexityPage';
 import SelectLanguagePage from './pages/SelectLanguagePage';
@@ -48,6 +49,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<RequestResetPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/account-deleted" element={<AccountDeletedPage />} />
           <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />
           <Route path="/questions/add" element={<AdminRoute><AddQuestion /></AdminRoute>} />
           <Route path="/questions/edit/:id" element={<AdminRoute><EditQuestion /></AdminRoute>} />
