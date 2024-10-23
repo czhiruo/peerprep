@@ -47,6 +47,8 @@ export async function connectResultConsumer(
             if (socketId2) {
                 io.to(socketId2).emit('match-result', matchResult);
             }
+
+            sendMessage('collab-room', { key: 'room', value: [userId, matchedUserId] }); // FOR DEBUGGING ONLY
         
         }},        
     });
