@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { userLogout } from '../services/userService';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getToken, verifyToken } from '../services/userService';
 
 const Header = () => {
   const [userId, setUserId] = useState(null);
+
+  const location = useLocation();
 
   useEffect(() => {
     const token = getToken();
@@ -24,6 +26,10 @@ const Header = () => {
     userLogout();
     window.location.href = '/login';
   };
+
+  if (location.pathname === '/matching') {
+    return <></>
+  }
 
   return (
     <div className="w-full h-[65px] px-4 bg-[#282828] flex justify-between items-center">

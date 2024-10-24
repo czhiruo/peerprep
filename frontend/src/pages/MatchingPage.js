@@ -71,14 +71,14 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
         navigate('/failed');
       });
 
-      // Clean up socket listeners and cancel request if unmount
-      return () => {
-        if (!cancelled) {
-          socketService.sendMatchCancel(matchRequest);
-        }
-      };
+      // // Clean up socket listeners and cancel request if unmount
+      // return () => {
+      //   if (!cancelled) {
+      //     socketService.sendMatchCancel(matchRequest);
+      //   }
+      // };
     }
-  }, [username, difficulties, topics, languages, setMatchResult, navigate, cancelled]);
+  }, [username, difficulties, topics, languages, setMatchResult, navigate]);
 
   const baseAvatarUrl = "https://avatar.iran.liara.run/public";
 
@@ -95,7 +95,7 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
   };
 
   return (
-    <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-start items-center">
+    <div className="h-screen w-full bg-[#1a1a1a] flex flex-col justify-start items-center">
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-center gap-5">
         <div className="self-stretch text-center text-white text-3xl font-bold leading-tight">
@@ -124,11 +124,9 @@ function MatchingPage({ difficulties, topics, languages, setMatchResult }) {
         </div>
 
         {/* Cancel Button */}
-        <Link to='/language'>
-          <button className="btn btn-secondary">
-            Cancel
-          </button>
-        </Link>
+        <button className="btn btn-secondary" onClick={handleCancel}>
+          Cancel
+        </button>
       </main>
     </div>
   );
