@@ -28,6 +28,19 @@ services:
     networks:
       - peerprep-network
 
+  collab-service:
+    build: ./backend/collab-service
+    container_name: collab-backend
+    ports:
+      - "8888:8888"
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: "collab-code,collab-room"
+    depends_on:
+      - kafka
+    networks:
+      - peerprep-network
+
   frontend:
     build: ./frontend
     container_name: frontend
