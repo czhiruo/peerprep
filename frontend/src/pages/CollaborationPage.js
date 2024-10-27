@@ -27,9 +27,9 @@ function CollaborationPage() {
   Output: ["h","a","n","n","a","H"]
 
   **Constraints:**  
-  1 <= s.length <= 10^5  
-  s[i] is a printable ASCII character
-  
+    1. 1 <= s.length <= 10^5  
+    2. s[i] is a printable ASCII character  
+  &nbsp;  
   `;
 
   // Reference to the editor instance
@@ -50,24 +50,24 @@ function CollaborationPage() {
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
     theme: "vs-dark",
-    overviewRulerBorder: false,
   };
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-row justify-center items-center">
       {/* Question section on the left */}
-      <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 py-3">
+      <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
         <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
           {questionText}
         </ReactMarkdown>
       </div>
 
       {/* Editor section on the right */}
-      <div className="w-1/2 h-full flex border-0">
+      <div className="w-1/2 h-full flex">
         <Editor
           language="javascript"
           value={code}
           onChange={(newCode) => setCode(newCode)}
+          theme="vs-dark"
           options={editorOptions}
           onMount={handleEditorDidMount}
         />
