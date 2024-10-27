@@ -60,11 +60,14 @@ function CollaborationPage({ matchResult }) {
     setEditorLanguage(language);
   }, [language]);
 
+  const isRemoteChange = useRef(false);
+
   useEffect(() => {
     collabService.register(userId);
 
     collabService.onCodeChange((newCode) => {
       if (editorRef.current) {
+        isRemoteChange.current = true;
         editorRef.current.setValue(newCode);
       }
     });
@@ -76,7 +79,13 @@ function CollaborationPage({ matchResult }) {
   // Handle editor mount to access the Monaco editor instance
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+
     editor.onDidChangeModelContent(() => {
+      if (isRemoteChange.current) {
+        isRemoteChange.current = false;
+        return;
+      }
+      
       const changedCode = editor.getValue();
       setCode(changedCode);
       collabService.sendCode(changedCode);
