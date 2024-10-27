@@ -33,7 +33,7 @@ function App() {
     matchedUserId: "user456",
     topic: "String Manipulation",
     difficulty: "Medium",
-    language: "javascript", // or "Python", "Java", etc.
+    language: "JavaScript", // or "Python", "Java", etc (not case sensitive)
   });
 
   return (
