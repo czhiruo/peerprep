@@ -49,7 +49,7 @@ function App() {
           <Route path="/collaboration" element={<PrivateRoute><CollaborationPage /></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<CollaborationPage />} />
           <Route path="/reset" element={<RequestResetPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />

@@ -1,12 +1,36 @@
-// CollaborationPage.js
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Editor } from '@monaco-editor/react';
+import ReactMarkdown from 'react-markdown';
+import '.././index.css';
 
-// Initial setup for the collaboration editor with Monaco Editor
 function CollaborationPage() {
   // State for the code content in the editor
-  const [code, setCode] = useState(`// Start coding here\nfunction greet() {\n  console.log("Hello, World!");\n}`);
+  const [code, setCode] = useState(`// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`);
+
+  // Dummy question text to be displayed
+  const questionText = `
+  ### **Reverse A String**
+
+  **Question Category**: Two Pointers, String  
+  **Question Complexity**: Medium  
+
+  **Question Description**  
+  Write a function that reverses a string. The input string is given as an array of characters s.  
+  You must do this by modifying the input array in-place with O(1) extra memory.
+
+  **Example 0:**  
+  Input: s = ["h","e","l","l","o"]  
+  Output: ["o","l","l","e","h"]
+
+  **Example 1:**  
+  Input: s = ["H","a","n","n","a","h"]  
+  Output: ["h","a","n","n","a","H"]
+
+  **Constraints:**  
+  1 <= s.length <= 10^5  
+  s[i] is a printable ASCII character
+  
+  `;
 
   // Reference to the editor instance
   const editorRef = useRef(null);
@@ -14,12 +38,8 @@ function CollaborationPage() {
   // Handle editor mount to access the Monaco editor instance
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    console.log("Editor mounted successfully.");
-
-    // Potential place to add event listeners for collaborative editing
     editor.onDidChangeModelContent(() => {
-      const updatedCode = editor.getValue();
-      setCode(updatedCode);
+      setCode(editor.getValue());
       // TODO: Send updated code to backend for real-time collaboration
     });
   };
@@ -30,21 +50,30 @@ function CollaborationPage() {
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
     theme: "vs-dark",
+    overviewRulerBorder: false,
   };
 
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
-      <Editor
-        height="100%"
-        width="100%"
-        language="javascript"
-        value={code}
-        onChange={(newCode) => setCode(newCode)} // For local state changes
-        options={editorOptions}
-        onMount={handleEditorDidMount}
-      />
+    <div className="h-[calc(100vh-65px)] w-full flex flex-row justify-center items-center">
+      {/* Question section on the left */}
+      <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 py-3">
+        <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
+          {questionText}
+        </ReactMarkdown>
+      </div>
+
+      {/* Editor section on the right */}
+      <div className="w-1/2 h-full flex border-0">
+        <Editor
+          language="javascript"
+          value={code}
+          onChange={(newCode) => setCode(newCode)}
+          options={editorOptions}
+          onMount={handleEditorDidMount}
+        />
+      </div>
     </div>
   );
 }
 
-export default CollaborationPage;
+export default CollaborationPage; 
