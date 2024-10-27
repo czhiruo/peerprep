@@ -28,7 +28,13 @@ function App() {
     hard: false,
   });
   const [languages, setLanguages] = useState('');
-  const [matchResult, setMatchResult] = useState(null);
+  const [matchResult, setMatchResult] = useState({
+    userId: "user123",
+    matchedUserId: "user456",
+    topic: "String Manipulation",
+    difficulty: "Medium",
+    language: "javascript", // or "Python", "Java", etc.
+  });
 
   return (
     <Router>
@@ -46,10 +52,10 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
-          <Route path="/collaboration" element={<PrivateRoute><CollaborationPage /></PrivateRoute>} />
+          <Route path="/collaboration" element={<PrivateRoute><CollaborationPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/login" element={<CollaborationPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<RequestResetPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />

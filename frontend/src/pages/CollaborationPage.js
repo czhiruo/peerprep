@@ -1,18 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import ReactMarkdown from 'react-markdown';
 import '.././index.css';
 
-function CollaborationPage() {
+function CollaborationPage({ matchResult }) {
   // State for the code content in the editor
+  const { userId, matchedUserId, topic, difficulty, language } = matchResult;
   const [code, setCode] = useState(`// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`);
+  const [editorLanguage, setEditorLanguage] = useState(language || 'javascript');
 
   // Dummy question text to be displayed
   const questionText = `
   ### **Reverse A String**
 
-  **Question Category**: Two Pointers, String  
-  **Question Complexity**: Medium  
+  **Topic**: ${topic}  
+  **Complexity**: ${difficulty}  
+  **Language**: ${language}  
 
   **Question Description**  
   Write a function that reverses a string. The input string is given as an array of characters s.  
@@ -31,6 +34,11 @@ function CollaborationPage() {
     2. s[i] is a printable ASCII character  
   &nbsp;  
   `;
+
+  // Update editor language based on the question choice
+  useEffect(() => {
+    setEditorLanguage(language);
+  }, [language]);
 
   // Reference to the editor instance
   const editorRef = useRef(null);
@@ -64,7 +72,7 @@ function CollaborationPage() {
       {/* Editor section on the right */}
       <div className="w-1/2 h-full flex">
         <Editor
-          language="javascript"
+          language={editorLanguage}
           value={code}
           onChange={(newCode) => setCode(newCode)}
           theme="vs-dark"
