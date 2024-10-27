@@ -14,6 +14,7 @@ import SelectTopicPage from './pages/SelectTopicPage';
 import MatchingPage from './pages/MatchingPage';
 import MatchedPage from './pages/MatchedPage';
 import MatchingFailedPage from './pages/MatchingFailedPage';
+import CollaborationPage from './pages/CollaborationPage';
 import HistoryPage from './pages/HistoryPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
@@ -45,6 +46,7 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
+          <Route path="/collaboration" element={<PrivateRoute><CollaborationPage /></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
