@@ -5,8 +5,27 @@ import '.././index.css';
 
 function CollaborationPage({ matchResult }) {
   // State for the code content in the editor
-  const { userId, matchedUserId, topic, difficulty, language } = matchResult;
-  const [code, setCode] = useState(`// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`);
+  const { userId, matchedUserId, topic, difficulty, language: unformattedLanguage } = matchResult;
+  const language = unformattedLanguage.toLowerCase();
+
+  const getInitialCode = (language) => {
+    switch (language) {
+      case 'typescript':
+        return `// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`;
+      case 'python':
+        return `# Start coding here\ndef reverse_string(s):\n    # Your code here\n`;
+      case 'java':
+        return `// Start coding here\npublic class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`;
+      case 'cpp':
+        return `// Start coding here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // Your code here\n    return 0;\n}`;
+      case 'c':
+        return `// Start coding here\nusing System;\n\nclass Program {\n    static void Main() {\n        // Your code here\n    }\n}`;
+      default:
+        return `// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`; // Default to JavaScript
+    }
+  };
+
+  const [code, setCode] = useState(getInitialCode(language));
   const [editorLanguage, setEditorLanguage] = useState(language || 'javascript');
 
   // Dummy question text to be displayed
@@ -15,7 +34,7 @@ function CollaborationPage({ matchResult }) {
 
   **Topic**: ${topic}  
   **Complexity**: ${difficulty}  
-  **Language**: ${language}  
+  **Language**: ${unformattedLanguage}  
 
   **Question Description**  
   Write a function that reverses a string. The input string is given as an array of characters s.  
