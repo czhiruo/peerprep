@@ -44,8 +44,13 @@ export async function connectResultConsumer(
             if (socketId1) {
                 io.to(socketId1).emit('match-result', matchResult);
             }
+
+            const otherMatchResult = matchResult;
+            otherMatchResult.userId = matchedUserId;
+            otherMatchResult.matchedUserId = userId;
+
             if (socketId2) {
-                io.to(socketId2).emit('match-result', matchResult);
+                io.to(socketId2).emit('match-result', otherMatchResult);
             }
 
             sendMessage('collab-room', { key: 'room', value: [userId, matchedUserId] }); // FOR DEBUGGING ONLY

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
+import collabService from '../services/collabService';
 import ReactMarkdown from 'react-markdown';
 import '.././index.css';
 
@@ -59,15 +60,35 @@ function CollaborationPage({ matchResult }) {
     setEditorLanguage(language);
   }, [language]);
 
+  const isRemoteChange = useRef(false);
+
+  useEffect(() => {
+    collabService.register(userId);
+
+    collabService.onCodeChange((newCode) => {
+      if (editorRef.current) {
+        isRemoteChange.current = true;
+        editorRef.current.setValue(newCode);
+      }
+    });
+  }, [userId]);
+
   // Reference to the editor instance
   const editorRef = useRef(null);
 
   // Handle editor mount to access the Monaco editor instance
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+
     editor.onDidChangeModelContent(() => {
-      setCode(editor.getValue());
-      // TODO: Send updated code to backend for real-time collaboration
+      if (isRemoteChange.current) {
+        isRemoteChange.current = false;
+        return;
+      }
+      
+      const changedCode = editor.getValue();
+      setCode(changedCode);
+      collabService.sendCode(changedCode);
     });
   };
 
