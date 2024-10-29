@@ -3,6 +3,7 @@
 
 import { EachMessagePayload, Kafka } from "kafkajs";
 import { roomManager } from "../models/room";
+import { RoomTopicMessage } from "../types"
 
 const kafka = new Kafka({
   clientId: 'collab-room-consumer',
@@ -20,10 +21,12 @@ export async function connectRoomConsumer(): Promise<void> {
     eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
       if (topic != 'collab-room') return;
 
-      const users: string[] = JSON.parse(message.value?.toString()!);
-      console.log('Creating a room for users:', users);
+      // const users: string[] = JSON.parse(message.value?.toString()!);
+      const roomTopicMessage: RoomTopicMessage = JSON.parse(message.value?.toString()!);
+
+      console.log('Creating a room for users:', roomTopicMessage.users[0], roomTopicMessage.users[1]);
       
-      roomManager.createRoom(users);
+      const roomId = roomManager.createRoom(roomTopicMessage['users'], roomTopicMessage['question']);
     },
   });
 }
