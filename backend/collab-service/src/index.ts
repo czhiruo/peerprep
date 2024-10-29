@@ -7,6 +7,8 @@ import { Server } from 'socket.io';
 import { connectProducer, sendMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
+import { QuestionDetails } from './types';
+import { roomManager } from './models/room';
 
 const app = express();
 const userToSocketMap = new Map<string, string>();
@@ -38,6 +40,15 @@ io.on('connection', (socket) => {
     }
 
     await sendMessage('collab-code', { key: username, value: code });
+  });
+
+  socket.on('get-room-details', async (roomId: string, callback) => {
+    const room = roomManager.getRoom(roomId);
+    if (!room) {
+      callback({ success: false, error: `Room ${roomId} does not exist` });
+      return;
+    }
+    callback({ success: true, users: room.users, question: room.question, code: room.code, language: room.language });
   });
 
   // Remove socket ID from map when user disconnects

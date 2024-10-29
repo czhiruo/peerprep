@@ -21,7 +21,6 @@ export async function connectRoomConsumer(): Promise<void> {
     eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
       if (topic != 'collab-room') return;
 
-      // const users: string[] = JSON.parse(message.value?.toString()!);
       const roomTopicMessage: RoomTopicMessage = JSON.parse(message.value?.toString()!);
 
       console.log('Creating a room for users:', roomTopicMessage.users[0], roomTopicMessage.users[1]);

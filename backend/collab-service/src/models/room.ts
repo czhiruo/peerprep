@@ -9,12 +9,14 @@ class Room {
   public users: [string, string];
   public question: QuestionDetails;
   public code: string;
+  public language: string;
 
-  constructor(users: [string, string], question: QuestionDetails, code: string) {
+  constructor(users: [string, string], question: QuestionDetails, language: string) {
     this.roomId = randomUUID();
     this.users = users;
     this.question = question;
-    this.code = code;
+    this.code = getTemplate(language);
+    this.language = language;
   }
 
   public getOtherUser(username: string): string {
@@ -39,7 +41,7 @@ class RoomManager {
       return 'undefined';
     }
 
-    const room = new Room(users, question, getTemplate(language));
+    const room = new Room(users, question, language);
     this.roomIdToRooms.set(room.roomId, room);
     this.usersToRooms.set(users[0], room.roomId);
     this.usersToRooms.set(users[1], room.roomId);
@@ -91,13 +93,8 @@ class RoomManager {
     return this.usersToRooms.get(username) || 'undefined';
   }
 
-  public getQuestion(roomId: string): QuestionDetails {
-    const room = this.roomIdToRooms.get(roomId);
-    if (!room) {
-      throw new Error('Room does not exist');
-    }
-
-    return room.question;
+  public getRoom(roomId: string): Room | undefined {
+    return this.roomIdToRooms.get(roomId);
   }
 }
 

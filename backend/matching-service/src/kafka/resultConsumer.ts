@@ -53,7 +53,17 @@ export async function connectResultConsumer(
                 io.to(socketId2).emit('match-result', otherMatchResult);
             }
 
-            sendMessage('collab-room', { key: 'room', value: [userId, matchedUserId] }); // FOR DEBUGGING ONLY
+            sendMessage('collab-room', { key: 'room', value: {
+                users: [userId, matchedUserId],
+                question: {
+                    questionId: "1",
+                    questionTitle: "Test Question",
+                    questionDescription: "Test Description",
+                    questionCategory: ["Test"],
+                    questionComplexity: "Easy"
+                },
+                language: "python"
+            } }); // FOR DEBUGGING ONLY
         
         }},        
     });

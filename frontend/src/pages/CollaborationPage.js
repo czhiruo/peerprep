@@ -3,64 +3,59 @@ import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
 import ReactMarkdown from 'react-markdown';
 import debounce from 'lodash.debounce';
+import { useParams } from 'react-router-dom';
+import { getToken, verifyToken } from '../services/userService';
+import { useNavigate } from 'react-router-dom';
 import '.././index.css';
 
-function CollaborationPage({ matchResult }) {
-  const { userId, topic, difficulty, language: unformattedLanguage } = matchResult;
-  const language = unformattedLanguage.toLowerCase();
+function CollaborationPage() {
+  const navigate = useNavigate();
+  const { roomId } = useParams()
 
-  const getInitialCode = (language) => {
-    switch (language) {
-      case 'typescript':
-        return `// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`;
-      case 'python':
-        return `# Start coding here\ndef reverse_string(s):\n    # Your code here\n`;
-      case 'java':
-        return `// Start coding here\npublic class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`;
-      case 'cpp':
-        return `// Start coding here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // Your code here\n    return 0;\n}`;
-      case 'c':
-        return `// Start coding here\nusing System;\n\nclass Program {\n    static void Main() {\n        // Your code here\n    }\n}`;
-      default:
-        return `// Start coding here\nfunction reverseString(s) {\n  // Your code here\n}`; // Default to JavaScript
-    }
-  };
+  const editorRef = useRef(null); // Reference to the editor instance
+  const isRemoteChange = useRef(false); // Flag to prevent infinite loop, true if change to editor is from remote (other user)
+  const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
 
-  const [code, setCode] = useState(getInitialCode(language));
-  const [editorLanguage, setEditorLanguage] = useState(language || 'javascript');
+  const [code, setCode] = useState('');
+  const [question, setQuestion] = useState('');
+  const [language, setLanguage] = useState('javascript');
   const [isReadOnly, setIsReadOnly] = useState(false);
 
-  const questionText = `
-  ### **Reverse A String**
+  function formatQuestion(question) {
+    return `
+### **${question.questionTitle}**
 
-  **Topic**: ${topic}  
-  **Complexity**: ${difficulty}  
-  **Language**: ${unformattedLanguage}  
+**Topic**: ${question.questionCategory}  
+**Complexity**: ${question.questionComplexity}  
 
-  **Question Description**  
-  Write a function that reverses a string. The input string is given as an array of characters s.  
-  You must do this by modifying the input array in-place with O(1) extra memory.
-
-  **Example 0:**  
-  Input: s = ["h","e","l","l","o"]  
-  Output: ["o","l","l","e","h"]
-
-  **Example 1:**  
-  Input: s = ["H","a","n","n","a","h"]  
-  Output: ["h","a","n","n","a","H"]
-
-  **Constraints:**  
-    1. 1 <= s.length <= 10^5  
-    2. s[i] is a printable ASCII character  
-  &nbsp;  
-  `;
-
-  const isRemoteChange = useRef(false);
-  const timeoutRef = useRef(null);
+**Question Description**  
+${question.questionDescription}
+    `.trim();
+  }
 
   useEffect(() => {
-    collabService.register(userId);
+    const token = getToken();
+    collabService.getRoomDetails(roomId)
+      .then((room) => {
+        const users = room.users;
+        
+        // Verify token and register user to the room
+        verifyToken(token)
+          .then((data) => {
+            const username = data.data.username;
+            if (!users.includes(username)) {
+              navigate('/');
+            }
+            collabService.register(username);
+          });
+        
+        setQuestion(formatQuestion(room.question));
+        setCode(room.code);
+        setLanguage(room.language);
+      });
+  }, [navigate, roomId]);
 
+  useEffect(() => {
     // Listen for code changes from the matched user
     collabService.onCodeChange((newCode) => {
       if (editorRef.current) {
@@ -84,12 +79,11 @@ function CollaborationPage({ matchResult }) {
         editorRef.current.setPosition(cursorPosition);
       }
     });
-  }, [userId]);
-
-  const editorRef = useRef(null);
+  }, []);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+
     const debouncedContentChangeHandler = debounce(() => {
       if (isRemoteChange.current) {
         isRemoteChange.current = false;
@@ -99,11 +93,9 @@ function CollaborationPage({ matchResult }) {
       const changedCode = editor.getValue();
       setCode(changedCode);
       collabService.sendCode(changedCode);
-    }, 300); // Adjust debounce interval as needed
+    }, 300); // 300ms debounce time
   
     editor.onDidChangeModelContent(debouncedContentChangeHandler);
-
-    console.log('Editor mounted');
   };
 
   const editorOptions = {
@@ -117,7 +109,7 @@ function CollaborationPage({ matchResult }) {
     <div className="h-[calc(100vh-65px)] w-full flex flex-row justify-center items-center">
       <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
         <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
-          {questionText}
+          {question}
         </ReactMarkdown>
       </div>
 
@@ -130,7 +122,7 @@ function CollaborationPage({ matchResult }) {
         )}
 
         <Editor
-          language={editorLanguage}
+          language={language}
           value={code}
           onChange={(newCode) => setCode(newCode)}
           theme="vs-dark"
