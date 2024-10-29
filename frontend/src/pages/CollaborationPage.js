@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
 import ReactMarkdown from 'react-markdown';
+import debounce from 'lodash.debounce';
 import '.././index.css';
 
 function CollaborationPage({ matchResult }) {
@@ -67,6 +68,7 @@ function CollaborationPage({ matchResult }) {
   useEffect(() => {
     collabService.register(userId);
 
+    // Listen for code changes from the matched user
     collabService.onCodeChange((newCode) => {
       if (editorRef.current) {
         isRemoteChange.current = true;
@@ -100,16 +102,32 @@ function CollaborationPage({ matchResult }) {
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    editor.onDidChangeModelContent(() => {
+    // editor.onDidChangeModelContent(() => {
+    //   console.log(isRemoteChange.current);
+    //   if (isRemoteChange.current) {
+    //     isRemoteChange.current = false;
+    //     return;
+    //   }
+      
+    //   const changedCode = editor.getValue();
+    //   setCode(changedCode);
+    //   collabService.sendCode(changedCode);
+    // });
+
+    const debouncedContentChangeHandler = debounce(() => {
       if (isRemoteChange.current) {
         isRemoteChange.current = false;
         return;
       }
-      
+  
       const changedCode = editor.getValue();
       setCode(changedCode);
       collabService.sendCode(changedCode);
-    });
+    }, 300); // Adjust debounce interval as needed
+  
+    editor.onDidChangeModelContent(debouncedContentChangeHandler);
+
+    console.log('Editor mounted');
   };
 
   // Editor configuration options
