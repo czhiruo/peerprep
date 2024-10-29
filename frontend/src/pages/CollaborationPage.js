@@ -61,6 +61,8 @@ function CollaborationPage({ matchResult }) {
   }, [language]);
 
   const isRemoteChange = useRef(false);
+  // const [isReadOnly, setIsReadOnly] = useState(false);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     collabService.register(userId);
@@ -68,7 +70,25 @@ function CollaborationPage({ matchResult }) {
     collabService.onCodeChange((newCode) => {
       if (editorRef.current) {
         isRemoteChange.current = true;
+
+        editorRef.current.updateOptions({
+           readOnly: true,
+        });
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+          editorRef.current.updateOptions({ 
+            readOnly: false,
+          })
+        }, 1000);
+
+        // Without this, the cursor position will reset to the start of the editor
+        // Get the current cursor position before setting the new code
+        const cursorPosition = editorRef.current.getPosition();
+
         editorRef.current.setValue(newCode);
+
+        // Set the cursor position back to the original position
+        editorRef.current.setPosition(cursorPosition);
       }
     });
   }, [userId]);
