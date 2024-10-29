@@ -6,8 +6,7 @@ import debounce from 'lodash.debounce';
 import '.././index.css';
 
 function CollaborationPage({ matchResult }) {
-  // State for the code content in the editor
-  const { userId, matchedUserId, topic, difficulty, language: unformattedLanguage } = matchResult;
+  const { userId, topic, difficulty, language: unformattedLanguage } = matchResult;
   const language = unformattedLanguage.toLowerCase();
 
   const getInitialCode = (language) => {
@@ -29,8 +28,8 @@ function CollaborationPage({ matchResult }) {
 
   const [code, setCode] = useState(getInitialCode(language));
   const [editorLanguage, setEditorLanguage] = useState(language || 'javascript');
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
-  // Dummy question text to be displayed
   const questionText = `
   ### **Reverse A String**
 
@@ -56,13 +55,7 @@ function CollaborationPage({ matchResult }) {
   &nbsp;  
   `;
 
-  // Update editor language based on the question choice
-  useEffect(() => {
-    setEditorLanguage(language);
-  }, [language]);
-
   const isRemoteChange = useRef(false);
-  // const [isReadOnly, setIsReadOnly] = useState(false);
   const timeoutRef = useRef(null);
 
   useEffect(() => {
@@ -72,48 +65,31 @@ function CollaborationPage({ matchResult }) {
     collabService.onCodeChange((newCode) => {
       if (editorRef.current) {
         isRemoteChange.current = true;
+        setIsReadOnly(true); // Set read-only and display overlay
 
         editorRef.current.updateOptions({
-           readOnly: true,
+          readOnly: true,
         });
+
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
-          editorRef.current.updateOptions({ 
+          setIsReadOnly(false); // Remove read-only and hide overlay
+          editorRef.current.updateOptions({
             readOnly: false,
-          })
+          });
         }, 1000);
 
-        // Without this, the cursor position will reset to the start of the editor
-        // Get the current cursor position before setting the new code
         const cursorPosition = editorRef.current.getPosition();
-
         editorRef.current.setValue(newCode);
-
-        // Set the cursor position back to the original position
         editorRef.current.setPosition(cursorPosition);
       }
     });
   }, [userId]);
 
-  // Reference to the editor instance
   const editorRef = useRef(null);
 
-  // Handle editor mount to access the Monaco editor instance
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-
-    // editor.onDidChangeModelContent(() => {
-    //   console.log(isRemoteChange.current);
-    //   if (isRemoteChange.current) {
-    //     isRemoteChange.current = false;
-    //     return;
-    //   }
-      
-    //   const changedCode = editor.getValue();
-    //   setCode(changedCode);
-    //   collabService.sendCode(changedCode);
-    // });
-
     const debouncedContentChangeHandler = debounce(() => {
       if (isRemoteChange.current) {
         isRemoteChange.current = false;
@@ -130,7 +106,6 @@ function CollaborationPage({ matchResult }) {
     console.log('Editor mounted');
   };
 
-  // Editor configuration options
   const editorOptions = {
     fontSize: 16,
     minimap: { enabled: true },
@@ -140,15 +115,20 @@ function CollaborationPage({ matchResult }) {
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-row justify-center items-center">
-      {/* Question section on the left */}
       <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
         <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
           {questionText}
         </ReactMarkdown>
       </div>
 
-      {/* Editor section on the right */}
-      <div className="w-1/2 h-full flex">
+      <div className="w-1/2 h-full flex relative">
+        {/* Overlay that appears when editor is read-only */}
+        {isReadOnly && (
+          <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
+            <span className="text-white font-semibold">Other user is typing...</span>
+          </div>
+        )}
+
         <Editor
           language={editorLanguage}
           value={code}
@@ -162,4 +142,4 @@ function CollaborationPage({ matchResult }) {
   );
 }
 
-export default CollaborationPage; 
+export default CollaborationPage;
