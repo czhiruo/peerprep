@@ -2,16 +2,19 @@
 
 import { randomUUID } from "crypto";
 import { QuestionDetails } from "../types";
+import { getTemplate } from "../utils/codeTemplates";
 
 class Room {
   public roomId: string;
   public users: [string, string];
   public question: QuestionDetails;
+  public code: string;
 
-  constructor(users: [string, string], question: QuestionDetails) {
+  constructor(users: [string, string], question: QuestionDetails, code: string) {
     this.roomId = randomUUID();
     this.users = users;
     this.question = question;
+    this.code = code;
   }
 
   public getOtherUser(username: string): string {
@@ -28,14 +31,15 @@ class RoomManager {
   // Create a room with two users and question details
   public createRoom(
     users: [string, string],
-    question: QuestionDetails
+    question: QuestionDetails,
+    language: string
   ): string {
     if (this.usersToRooms.has(users[0]) || this.usersToRooms.has(users[1])) {
       console.log('One or both users are already in a room');
       return 'undefined';
     }
 
-    const room = new Room(users, question);
+    const room = new Room(users, question, getTemplate(language));
     this.roomIdToRooms.set(room.roomId, room);
     this.usersToRooms.set(users[0], room.roomId);
     this.usersToRooms.set(users[1], room.roomId);
@@ -72,6 +76,15 @@ class RoomManager {
     }
 
     return room.getOtherUser(username);
+  }
+
+  public updateCode(roomId: string, code: string): void {
+    const room = this.roomIdToRooms.get(roomId);
+    if (!room) {
+      throw new Error('Room does not exist');
+    }
+
+    room.code = code;
   }
 
   public getRoomId(username: string): string {

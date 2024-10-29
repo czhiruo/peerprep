@@ -26,7 +26,11 @@ export async function connectRoomConsumer(): Promise<void> {
 
       console.log('Creating a room for users:', roomTopicMessage.users[0], roomTopicMessage.users[1]);
       
-      const roomId = roomManager.createRoom(roomTopicMessage['users'], roomTopicMessage['question']);
+      const roomId = roomManager.createRoom(
+        roomTopicMessage['users'],
+        roomTopicMessage['question'],
+        roomTopicMessage['language']
+      );
     },
   });
 }

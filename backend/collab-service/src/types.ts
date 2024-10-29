@@ -1,6 +1,7 @@
 export interface RoomTopicMessage {
   users: [string, string]
   question: QuestionDetails
+  language: string
 }
 
 export interface QuestionDetails {
@@ -10,3 +11,4 @@ export interface QuestionDetails {
   questionCategory: string[];
   questionComplexity: string;
 }
+
