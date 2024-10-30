@@ -19,6 +19,19 @@ const collabService = {
       });
     });
   },
+
+  getRoomId: (username) => {
+    return new Promise((resolve, reject) => {
+      socket.emit('get-roomId-from-username', username, (response) => {
+        if (!response.success) {
+          console.error('Error getting room ID:', response.error);
+          reject(new Error(response.error));
+        } else {
+          resolve(response.roomId);
+        }
+      });
+    });
+  },
   
   sendCode: (code) => {
     socket.emit('code-change', code);

@@ -51,6 +51,15 @@ io.on('connection', (socket) => {
     callback({ success: true, users: room.users, question: room.question, code: room.code, language: room.language });
   });
 
+  socket.on('get-roomId-from-username', async (username: string, callback) => {
+    const roomId = roomManager.getRoomId(username);
+    if (!roomId) {
+      callback({ success: false, error: `User ${username} is not in any room` });
+      return;
+    }
+    callback({ success: true, roomId });
+  });
+
   // Remove socket ID from map when user disconnects
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);

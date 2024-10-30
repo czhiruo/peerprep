@@ -49,7 +49,8 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
-          <Route path="/room/:roomId" element={<PrivateRoute><CollaborationPage matchResult={matchResult} /></PrivateRoute>} />
+          <Route path="/room" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
+          <Route path="/room/:roomId" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />

@@ -34,26 +34,48 @@ ${question.questionDescription}
   }
 
   useEffect(() => {
-    const token = getToken();
-    collabService.getRoomDetails(roomId)
-      .then((room) => {
+    const initializeRoom = async () => {
+      const token = getToken();
+  
+      try {
+        const data = await verifyToken(token);
+        const username = data.data.username;
+
+        console.log("Username:", username);
+  
+        // If route is /room, redirect to room that user belongs to
+        if (!roomId) {
+          console.log("No room ID provided; fetching room ID...");
+          const fetchedRoomId = await collabService.getRoomId(username);
+          console.log("Fetched room ID:", fetchedRoomId);
+          navigate(`/room/${fetchedRoomId}`);
+          return; // Exit after navigation to prevent further execution
+        }
+  
+        const room = await collabService.getRoomDetails(roomId);
         const users = room.users;
-        
-        // Verify token and register user to the room
-        verifyToken(token)
-          .then((data) => {
-            const username = data.data.username;
-            if (!users.includes(username)) {
-              navigate('/');
-            }
-            collabService.register(username);
-          });
-        
+  
+        // Check if the user is part of the room; if not, redirect
+        if (!users.includes(username)) {
+          navigate('/');
+          return;
+        }
+  
+        // Register the user and set up room data
+        collabService.register(username);
         setQuestion(formatQuestion(room.question));
         setCode(room.code);
         setLanguage(room.language);
-      });
+  
+      } catch (error) {
+        console.error("Error initializing room:", error);
+        navigate('/'); // Navigate away on error (token or room retrieval failure)
+      }
+    };
+  
+    initializeRoom();
   }, [navigate, roomId]);
+  
 
   useEffect(() => {
     // Listen for code changes from the matched user
