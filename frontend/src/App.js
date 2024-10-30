@@ -39,10 +39,7 @@ function App() {
   return (
     <Router>
       <Header />
-      {/* Hide header if matching in progress
-      { useLocation().pathname !== '/matching' && <Header /> } */}
 
-      {/* Main Content */}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Navigate to='/topic' />} />
@@ -52,7 +49,8 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
-          <Route path="/collaboration" element={<PrivateRoute><CollaborationPage matchResult={matchResult} /></PrivateRoute>} />
+          <Route path="/room" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
+          <Route path="/room/:roomId" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />

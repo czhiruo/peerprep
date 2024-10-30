@@ -1,65 +1,100 @@
 // Class which manages the rooms and users in the rooms
 
 import { randomUUID } from "crypto";
+import { QuestionDetails } from "../types";
+import { getTemplate } from "../utils/codeTemplates";
 
+class Room {
+  public roomId: string;
+  public users: [string, string];
+  public question: QuestionDetails;
+  public code: string;
+  public language: string;
 
-
-class RoomManager {
-  // Maps from roomId to a set of usernames
-  private roomsToUsers: Map<string, Set<string>> = new Map();
-  // Maps from a username to a roomId
-  private usersToRooms: Map<string, string> = new Map();
-
-  // Create a room containing the usernames
-  public createRoom(usernames: string[]): void {
-    if (usernames.length != 2) {
-      console.log('Invalid number of users');
-      return;      
-    }
-
-    const roomId = randomUUID();
-    this.roomsToUsers.set(roomId, new Set(usernames));
-    usernames.forEach((username) => {
-      this.usersToRooms.set(username, roomId);
-    });
-
-    console.log('Room created:', roomId);
+  constructor(users: [string, string], question: QuestionDetails, language: string) {
+    this.roomId = randomUUID();
+    this.users = users;
+    this.question = question;
+    this.code = getTemplate(language);
+    this.language = language;
   }
 
-  // Remove a room
+  public getOtherUser(username: string): string {
+    return this.users[0] === username ? this.users[1] : this.users[0];
+  }
+}
+
+class RoomManager {
+  // Maps roomId to rooms
+  private roomIdToRooms: Map<string, Room> = new Map();
+  // Maps username to roomIds
+  private usersToRooms: Map<string, string> = new Map();
+
+  // Create a room with two users and question details
+  public createRoom(
+    users: [string, string],
+    question: QuestionDetails,
+    language: string
+  ): string {
+    if (this.usersToRooms.has(users[0]) || this.usersToRooms.has(users[1])) {
+      console.log('One or both users are already in a room');
+      return 'undefined';
+    }
+
+    const room = new Room(users, question, language);
+    this.roomIdToRooms.set(room.roomId, room);
+    this.usersToRooms.set(users[0], room.roomId);
+    this.usersToRooms.set(users[1], room.roomId);
+
+    console.log('Room created:', room.roomId);
+
+    return room.roomId;
+  }
+
+  // Remove a room by roomId
   public removeRoom(roomId: string): void {
-    const usernames = this.roomsToUsers.get(roomId);
-    if (!usernames) {
+    const room = this.roomIdToRooms.get(roomId);
+    if (!room) {
       console.log('Room does not exist');
       return;
     }
 
-    usernames.forEach((username) => {
-      this.usersToRooms.delete(username);
+    room.users.forEach((user) => {
+      this.usersToRooms.delete(user);
     });
-    this.roomsToUsers.delete(roomId);
+    this.roomIdToRooms.delete(roomId);  
   }
 
+  // Get the other user in the room
   public getOtherUser(username: string): string {
     const roomId = this.usersToRooms.get(username);
     if (!roomId) {
       throw new Error('User not in a room');
     }
 
-    const usernames = this.roomsToUsers.get(roomId);
-    if (!usernames) {
+    const room = this.roomIdToRooms.get(roomId);
+    if (!room) {
       throw new Error('Room does not exist');
     }
 
-    return Array.from(usernames).find((user) => user !== username) || 'undefined';
+    return room.getOtherUser(username);
+  }
+
+  public updateCode(roomId: string, code: string): void {
+    const room = this.roomIdToRooms.get(roomId);
+    if (!room) {
+      throw new Error('Room does not exist');
+    }
+
+    room.code = code;
   }
 
   public getRoomId(username: string): string {
     return this.usersToRooms.get(username) || 'undefined';
   }
 
-  public getUsersInRoom(roomId: string): Set<string> {
-    return this.roomsToUsers.get(roomId) || new Set();
+  public getRoom(roomId: string): Room | undefined {
+    return this.roomIdToRooms.get(roomId);
   }
 }
 

@@ -24,6 +24,10 @@ export async function connectCodeConsumer(
             
             const username = message.key?.toString()!;
             const code: string = JSON.parse(message.value?.toString()!);
+
+            const roomId = roomManager.getRoomId(username);
+            roomManager.updateCode(roomId, code);
+
             const otherUser = roomManager.getOtherUser(username);
             const otherUserSocketId = userSocketMap.get(otherUser);
 
