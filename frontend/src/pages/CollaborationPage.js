@@ -49,8 +49,9 @@ ${question.questionDescription}
           const fetchedRoomId = await collabService.getRoomId(username);
           console.log("Fetched room ID:", fetchedRoomId);
           navigate(`/room/${fetchedRoomId}`);
-          return; // Exit after navigation to prevent further execution
+          return;
         }
+        
   
         const room = await collabService.getRoomDetails(roomId);
         const users = room.users;
@@ -60,16 +61,15 @@ ${question.questionDescription}
           navigate('/');
           return;
         }
-  
-        // Register the user and set up room data
-        collabService.register(username);
+
+        await collabService.register(username);
+
         setQuestion(formatQuestion(room.question));
         setCode(room.code);
         setLanguage(room.language);
-  
       } catch (error) {
         console.error("Error initializing room:", error);
-        navigate('/'); // Navigate away on error (token or room retrieval failure)
+        navigate('/');
       }
     };
   

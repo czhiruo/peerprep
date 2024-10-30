@@ -4,7 +4,16 @@ const socket = io('http://localhost:8888');
 
 const collabService = {
   register: (username) => {
-    socket.emit('register', username);
+    return new Promise((resolve, reject) => {
+      socket.emit('register', username, (response) => {
+        if (!response.success) {
+          console.error('Error registering user:', response.error);
+          reject(new Error(response.error));
+        } else {
+          resolve(response);
+        }
+      });
+    });
   },
 
   getRoomDetails: (roomId) => {

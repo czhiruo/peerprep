@@ -26,10 +26,16 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
   console.log('A user connected to socket:', socket.id);
 
-  socket.on('register', (userId: string) => {
+  socket.on('register', (userId: string, callback) => {
+    if (userToSocketMap.has(userId)) {
+      console.log('User already registered:', userId);
+      callback({ success: false, error: `User ${userId} is already registered` });
+      return;
+    }
     userToSocketMap.set(userId, socket.id);
     socketToUserMap.set(socket.id, userId);
-    console.log(`User registered: ${userId} with socket ID: ${socket.id}`);
+    console.log('User registered:', userId);
+    callback({ success: true });
   });
 
   socket.on('code-change', async (code: string) => {
