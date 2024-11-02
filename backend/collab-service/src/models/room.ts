@@ -3,98 +3,113 @@
 import { randomUUID } from "crypto";
 import { QuestionDetails } from "../types";
 import { getTemplate } from "../utils/codeTemplates";
+import redis from "../redisClient";
 
 class Room {
-  public roomId: string;
   public users: [string, string];
   public question: QuestionDetails;
   public code: string;
   public language: string;
 
   constructor(users: [string, string], question: QuestionDetails, language: string) {
-    this.roomId = randomUUID();
     this.users = users;
     this.question = question;
     this.code = getTemplate(language);
     this.language = language;
   }
-
-  public getOtherUser(username: string): string {
-    return this.users[0] === username ? this.users[1] : this.users[0];
-  }
 }
 
 class RoomManager {
-  // Maps roomId to rooms
-  private roomIdToRooms: Map<string, Room> = new Map();
-  // Maps username to roomIds
-  private usersToRooms: Map<string, string> = new Map();
+  private roomIdToRoomsKey = 'roomIdToRooms';
+  private usersToRoomsKey = 'usersToRooms';
 
   // Create a room with two users and question details
-  public createRoom(
+  public async createRoom(
     users: [string, string],
     question: QuestionDetails,
     language: string
-  ): string {
-    if (this.usersToRooms.has(users[0]) || this.usersToRooms.has(users[1])) {
-      console.log('One or both users are already in a room');
-      return 'undefined';
+  ): Promise<string> {
+    // Check if any of the users are already in a room
+    const user1Room = await redis.hget(this.usersToRoomsKey, users[0]);
+    const user2Room = await redis.hget(this.usersToRoomsKey, users[1]);
+    if (user1Room || user2Room) {
+      throw new Error(`User ${user1Room ? users[0] : users[1]} is already in a room`);
     }
 
+    const roomId = randomUUID();
     const room = new Room(users, question, language);
-    this.roomIdToRooms.set(room.roomId, room);
-    this.usersToRooms.set(users[0], room.roomId);
-    this.usersToRooms.set(users[1], room.roomId);
 
-    console.log('Room created:', room.roomId);
+    await redis.hset(this.roomIdToRoomsKey, roomId, JSON.stringify(room));
+    await redis.hset(this.usersToRoomsKey, users[0], roomId);
+    await redis.hset(this.usersToRoomsKey, users[1], roomId);
 
-    return room.roomId;
+    console.log('Room created:', roomId);
+
+    return roomId;
   }
 
   // Remove a room by roomId
-  public removeRoom(roomId: string): void {
-    const room = this.roomIdToRooms.get(roomId);
-    if (!room) {
+  public async removeRoom(roomId: string): Promise<void> {
+    const roomData = await redis.hget(this.roomIdToRoomsKey, roomId);
+    if (!roomData) {
       console.log('Room does not exist');
       return;
-    }
+    } 
 
-    room.users.forEach((user) => {
-      this.usersToRooms.delete(user);
-    });
-    this.roomIdToRooms.delete(roomId);  
+    const room: Room = JSON.parse(roomData);
+    for (const user of room.users) {
+      await redis.hdel(this.usersToRoomsKey, user);
+    }
+    await redis.hdel(this.roomIdToRoomsKey, roomId);
   }
 
   // Get the other user in the room
-  public getOtherUser(username: string): string {
-    const roomId = this.usersToRooms.get(username);
+  public async getOtherUser(username: string): Promise<string> {
+    const roomId = await redis.hget(this.usersToRoomsKey, username);
     if (!roomId) {
       throw new Error('User not in a room');
     }
 
-    const room = this.roomIdToRooms.get(roomId);
-    if (!room) {
+    const roomData = await redis.hget(this.roomIdToRoomsKey, roomId);
+    if (!roomData) {
       throw new Error('Room does not exist');
     }
 
-    return room.getOtherUser(username);
+    const room: Room = JSON.parse(roomData);
+    if (room.users[0] === username) {
+      return room.users[1];
+    } else if (room.users[1] === username) {
+      return room.users[0];
+    } else {
+      throw new Error('User not in the room');
+    }
   }
 
-  public updateCode(roomId: string, code: string): void {
-    const room = this.roomIdToRooms.get(roomId);
-    if (!room) {
+  // Update the code in the room
+  public async updateCode(roomId: string, code: string): Promise<void> {
+    const roomData = await redis.hget(this.roomIdToRoomsKey, roomId);
+    if (!roomData) {
       throw new Error('Room does not exist');
     }
 
+    const room: Room = JSON.parse(roomData);
     room.code = code;
+    await redis.hset(this.roomIdToRoomsKey, roomId, JSON.stringify(room));
   }
 
-  public getRoomId(username: string): string {
-    return this.usersToRooms.get(username) || 'undefined';
+  // Get roomId from username
+  public async getRoomId(username: string): Promise<string | null> {
+    return await redis.hget(this.usersToRoomsKey, username);
   }
 
-  public getRoom(roomId: string): Room | undefined {
-    return this.roomIdToRooms.get(roomId);
+  // Get room details by roomId
+  public async getRoom(roomId: string): Promise<Room | null> {
+    const roomData = await redis.hget(this.roomIdToRoomsKey, roomId);
+    if (!roomData) {
+      return null;
+    }
+
+    return JSON.parse(roomData);
   }
 }
 
