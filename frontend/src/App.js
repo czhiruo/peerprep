@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
-import AddQuestion from './components/AddQuestion';
-import EditQuestion from './components/EditQuestion';
+import AddQuestion from './pages/AddQuestionPage';
+import EditQuestion from './pages/EditQuestionPage';
 import QuestionDetails from './components/QuestionDetails';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
