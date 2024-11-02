@@ -2,6 +2,7 @@
 
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { roomManager } from '../models/room';
+import redis from '../redisClient';
 
 const kafka = new Kafka({
     clientId: 'collab-code-consumer',
@@ -10,9 +11,10 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'collab-code-group' });
 
+const usersToSocketsKey = 'usersToSockets';
+
 export async function connectCodeConsumer(
   io: any,
-  userSocketMap: Map<string, string>
 ): Promise<void> {
     await consumer.connect();
     console.log('Code consumer connected');
@@ -25,17 +27,19 @@ export async function connectCodeConsumer(
             const username = message.key?.toString()!;
             const code: string = JSON.parse(message.value?.toString()!);
 
-            const roomId = roomManager.getRoomId(username);
-            roomManager.updateCode(roomId, code);
+            const roomId = await roomManager.getRoomId(username);
+            if (!roomId) {
+                console.log('User not in a room');
+                return;
+            }
+            await roomManager.updateCode(roomId, code);
 
-            const otherUser = roomManager.getOtherUser(username);
-            const otherUserSocketId = userSocketMap.get(otherUser);
-
-            console.log(`Received code change from ${username}`);
+            const otherUser = await roomManager.getOtherUser(username);
+            const otherUserSocketId = await redis.hget(usersToSocketsKey, otherUser);
 
             // Send the code change to the other user
             if (otherUserSocketId) {
-                console.log(`Sending code change to ${otherUser}`);
+                console.log(`Sending: ${username} -> ${otherUser}`);
                 io.to(otherUserSocketId).emit('code-change', code);
             }
         },

@@ -13,11 +13,10 @@ export async function connectProducer(): Promise<void> {
 }
 
 export async function sendMessage(topic: string, message: { key: string; value: any }): Promise<void> {
-    const result = await producer.send({
+    await producer.send({
         topic,
         messages: [{ key: message.key, value: JSON.stringify(message.value) }],
     });
-    // console.log(`Sent message: ${JSON.stringify(result)}`);
 }
 
 export async function disconnectProducer(): Promise<void> {
