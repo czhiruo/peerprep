@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { getData, updateData, addData } from '../services/questionService';
 import './QuestionForm.css';
+import TabbedDescriptionBox from './TabbedDescriptionBox';
 
 const QuestionForm = ({ questionId }) => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const QuestionForm = ({ questionId }) => {
     category: [],
     complexity: '',
   });
+  const [mode, setMode] = useState('write');
 
     useEffect(() => {
       if (questionId) {
@@ -85,18 +87,6 @@ const handleChange = (e) => {
             placeholder="Enter the title of the question"
           />
         </Form.Group>
-        <Form.Group controlId="formDescription" className="mt-3">
-          <Form.Label>Question Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            name="description"
-            value={question.description}
-            onChange={handleChange}
-            required
-            placeholder="Describe the question in detail"
-          />
-        </Form.Group>
         <Form.Group controlId="formCategory" className="mt-3">
           <Form.Label>Question Category</Form.Label>
           <Form.Control
@@ -123,7 +113,16 @@ const handleChange = (e) => {
             <option value="hard">Hard</option>
           </Form.Control>
         </Form.Group>
-        <Button variant="primary" type="submit" className="mt-3">
+        <Form.Group controlId="formDescription" className="mt-3">
+          <Form.Label>Question Description</Form.Label>        
+          <TabbedDescriptionBox 
+            selectedTab={mode} 
+            setSelectedTab={setMode}
+            text={question.description}
+            handleChange={handleChange}
+          />
+        </Form.Group>
+        <Button variant="primary" type="submit" className="mt-3 custom-button">
           {questionId ? 'Update Question' : 'Add Question'}
         </Button>
       </Form>
