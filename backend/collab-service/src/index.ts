@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
   socket.on('code-change', async (code: string) => {
     const username = await redis.hget(socketsToUsersKey, socket.id);
     if (!username) {
-      console.log('User not registered');
+      console.log('User not registered, cannot send code change');
       return;
     }
 
@@ -71,19 +71,47 @@ io.on('connection', (socket) => {
   });
 
   // Remove socket ID from map when user disconnects
-  socket.on('disconnect', () => {
-    redis.hget(socketsToUsersKey, socket.id)
-      .then((userId) => {
-        if (userId) {
-          redis.hdel(socketsToUsersKey, socket.id);
-          redis.hdel(usersToSocketsKey, userId);
-          console.log('User removed:', userId);
+  socket.on('disconnect', async () => {
+    handleDisconnect(socket.id);
+  });
 
-          
-        }
-      });
+  socket.on('disconnect-collab', async () => {
+    handleDisconnect(socket.id);
   });
 });
+
+async function handleDisconnect(id: string) {
+  const username = await redis.hget(socketsToUsersKey, id);
+    if (!username) {
+      console.log('User not registered, cannot disconnect');
+      return;
+    }
+
+    const roomId = await roomManager.getRoomId(username);
+    if (!roomId) {
+      console.log('User not in a room');
+      return;
+    }
+
+    const otherUser = await roomManager.getOtherUser(username);
+    const otherUserSocketId = await redis.hget(usersToSocketsKey, otherUser);
+    if (!otherUserSocketId) {
+      // Other user is not connected, remove the room
+      console.log('Other user not connected, removing room');
+      await roomManager.removeRoom(roomId);
+      console.log('Room removed:', roomId);
+    }
+
+    // Remove user from Redis
+    redis.hdel(usersToSocketsKey, username);
+    redis.hdel(socketsToUsersKey, id);
+    console.log(`${username} disconnected`);
+
+    // Send disconnect message to other user
+    if (otherUserSocketId) {
+      io.to(otherUserSocketId).emit('other-user-disconnect');
+    }
+}
 
 const startServer = async () => {
   try {

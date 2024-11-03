@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { getToken, verifyToken } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
 import '.././index.css';
+import DisconnectAlert from '../components/DisconnectAlert';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ function CollaborationPage() {
   const [question, setQuestion] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [isReadOnly, setIsReadOnly] = useState(false);
+  const [isGettingKickedOut, setIsGettingKickedOut] = useState(false);
 
   function formatQuestion(question) {
     return `
@@ -103,6 +105,24 @@ ${question.questionDescription}
     });
   }, []);
 
+  // Kick user out if other user disconnects
+  useEffect(() => {
+    collabService.onOtherUserDisconnect(() => {
+      setIsGettingKickedOut(true);
+
+      // Redirect to home page after 5 seconds
+      setTimeout(() => {
+        navigate('/');
+      }, 5000);
+    });
+  }, [navigate]);
+
+  useEffect(() => {
+    return () => {
+      collabService.disconnect();
+    };
+  }, []);
+
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
 
@@ -152,6 +172,8 @@ ${question.questionDescription}
           onMount={handleEditorDidMount}
         />
       </div>
+
+      {isGettingKickedOut && <DisconnectAlert />}
     </div>
   );
 }
