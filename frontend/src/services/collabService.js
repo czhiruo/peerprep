@@ -51,6 +51,12 @@ const collabService = {
       callback(code);
     });
   },
+
+  onOtherUserDisconnect: (callback) => {
+    socket.on('other-user-disconnect', () => {
+      callback();
+    });
+  },
 };
 
 export default collabService;

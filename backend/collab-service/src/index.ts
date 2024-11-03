@@ -7,7 +7,7 @@ import { Server } from 'socket.io';
 import { connectProducer, sendMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
-import { roomManager } from './models/room';
+import { roomManager } from './services/roomManager';
 import redis from './redisClient';
 
 const app = express();
@@ -78,6 +78,8 @@ io.on('connection', (socket) => {
           redis.hdel(socketsToUsersKey, socket.id);
           redis.hdel(usersToSocketsKey, userId);
           console.log('User removed:', userId);
+
+          
         }
       });
   });
