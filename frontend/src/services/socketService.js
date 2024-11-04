@@ -48,6 +48,10 @@ const socketService = {
     socket.emit('collab-room-data', collabRoomData);
   },
 
+  onCollabRoom: (callback) => {
+    socket.on('open-collab-room', callback);
+  },
+
   // sendRematchNotification: (rematchData) => {
   //   socket.emit('rematch-notification', rematchData);
   // },

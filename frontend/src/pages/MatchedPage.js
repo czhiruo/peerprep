@@ -31,10 +31,6 @@ function MatchedPage({ matchResult }) {
       }
   });
 
-    // Clean up the listener on unmount
-    return () => {
-      socketService.offAcceptanceUpdate();
-    };
   }, [matchedUserId]);
 
   useEffect(() => {
@@ -56,6 +52,14 @@ function MatchedPage({ matchResult }) {
       }, 3000);
     }
   }, [matchedUserAcceptance, userAcceptance, navigate]);
+
+  // useEffect(() => {
+  //   socketService.onCollabRoom((data) => {
+  //     console.log("Received 'open-collab-room' event:", data);
+  //     // Navigate to the collaboration room or update the UI as needed
+  //     navigate('/room');
+  //   });
+  // }, [navigate]);
 
   const handleAccept = () => {
     console.log("Accepting match");
@@ -87,7 +91,7 @@ function MatchedPage({ matchResult }) {
     navigate('/matching');
   };
 
-
+  
   return (
     <div className="h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-start items-center">
       {/* Main Content */}

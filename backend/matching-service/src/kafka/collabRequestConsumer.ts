@@ -1,4 +1,5 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import { sendMessage } from './producer';
 
 const kafka = new Kafka({
     clientId: 'collab-request-consumer',
@@ -25,11 +26,18 @@ export async function connectCollabRequestConsumer(
         console.log(collabRoomData);
         console.log('---------------------------------------------------------------------');
         console.log();
+        sendMessage('generate-question', { key: 'generate-question', value: {
+            userId1: userId1,
+            userId2: userId2,
+            interestTopic: interestTopic,
+            difficulty: difficulty,
+            language: language
+        }});
         }
     });
 }
 
-export async function disconnectRoomOpenConsumer(): Promise<void> {
+export async function disconnectCollabRequestConsumer(): Promise<void> {
     await consumer.disconnect();
-    console.log('Room Open Consumer disconnected');
+    console.log('Collab Request Consumer disconnected');
 }
