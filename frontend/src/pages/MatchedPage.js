@@ -75,7 +75,7 @@ function MatchedPage({ matchResult }) {
     const collabRoomData = {
       userId1: userId,
       userId2: matchedUserId,
-      topic: topic,
+      interestTopic: topic,
       difficulty: difficulty,
       language: language,
     }

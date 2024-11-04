@@ -84,8 +84,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('collab-room-data', async (collabData) => {
-    const { userId1, userId2, topic, difficulty, language } = collabData;
-    await sendMessage('collab-request', { key: userId1, value: { userId1, userId2, topic, difficulty, language } });
+    const { userId1, userId2, interestTopic, difficulty, language } = collabData;
+    await sendMessage('collab-request', { key: userId1, value: { userId1, userId2, interestTopic, difficulty, language } });
   });
 
   // Handle disconnections

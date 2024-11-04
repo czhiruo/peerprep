@@ -21,6 +21,7 @@ export async function connectCollabRequestConsumer(
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
         const collabRoomData = JSON.parse(message.value?.toString()!);
         const { userId1, userId2, interestTopic, difficulty, language } = collabRoomData;
+        console.log('interestedTopic = ', interestTopic);
         console.log();
         console.log("-----------------------[COLLAB_REQUEST_CONSUMER]----------------------");
         console.log(collabRoomData);
