@@ -72,7 +72,14 @@ io.on('connection', (socket) => {
 
   // Remove socket ID from map when user disconnects
   socket.on('disconnect', async () => {
-    handleDisconnect(socket.id);
+    // handleDisconnect(socket.id);
+    const username = await redis.hget(socketsToUsersKey, socket.id);
+    if (!username) {
+      console.log('User not registered, cannot disconnect');
+      return;
+    }
+    redis.hdel(usersToSocketsKey, username);
+    redis.hdel(socketsToUsersKey, socket.id);
   });
 
   socket.on('disconnect-collab', async () => {
