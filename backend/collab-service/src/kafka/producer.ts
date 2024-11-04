@@ -13,14 +13,11 @@ export async function connectProducer(): Promise<void> {
 }
 
 export async function sendMessage(topic: string, message: { key: string; value: any }): Promise<void> {
-    await producer.send({
+    const result = await producer.send({
         topic,
         messages: [{ key: message.key, value: JSON.stringify(message.value) }],
     });
-<<<<<<< HEAD
     console.log(`Sent message: ${JSON.stringify(result)}`);
-=======
->>>>>>> upstream/collab-service
 }
 
 export async function disconnectProducer(): Promise<void> {

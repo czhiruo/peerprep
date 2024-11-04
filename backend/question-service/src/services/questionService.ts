@@ -39,7 +39,6 @@ export async function getQuestionsByFilter(categories?: string[], difficulties?:
   const collection = db.collection('questions');
 
   const filter: { [key: string]: any } = {};
-  
   if (categories) {
       filter['question.questionCategory'] = { 
         $elemMatch: {
@@ -73,7 +72,7 @@ export async function getQuestionsByFilter(categories?: string[], difficulties?:
 // Function to convert raw data to Question[]
 export function convertToQuestions(rawData: any[]): Question[] {
   return rawData.map(data => ({
-    questionId: new ObjectId(data.id), // Assuming `id` is the ObjectId
+    questionId: data.id, // Assuming `id` is the ObjectId
     questionTitle: data.title,
     questionDescription: data.desc,
     questionCategory: data.c,

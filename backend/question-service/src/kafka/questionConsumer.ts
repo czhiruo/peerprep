@@ -1,7 +1,7 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { sendMessage } from './producer.js';
 import { convertToQuestions, getQuestionsByFilter, getRandomQuestion } from '../services/questionService.js';
-import { Question } from '../models/question.js';
+import { Difficulty, Question } from '../models/question.js';
 
 const kafka = new Kafka({
     clientId: 'generate-question-consumer',
@@ -21,26 +21,25 @@ export async function connectQuestionConsumer(
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-            console.log("Hello from question consumer.")
             const collabRequest = JSON.parse(message.value?.toString()!);
-            console.log("collabRequest = ", collabRequest)
             const { userId1, userId2, interestTopic, difficulty, language } = collabRequest;
-            console.log('userId1 = ', userId1);
-            console.log('userId2 = ', userId2);
-            console.log('interestTopic = ', interestTopic);
-            console.log('difficulty = ', difficulty);
-            console.log('language = ', language);
-            const filters = await getQuestionsByFilter(interestTopic, difficulty) || [];
-            console.log('filers = ', filters);
+            const topics = [interestTopic];
+            const difficultyEnum: Difficulty = difficulty as Difficulty;
+            const difficulties = [difficultyEnum];
+            const filters = await getQuestionsByFilter(topics, difficulties) || [];
             const questions: Question[] = convertToQuestions(filters);
-            console.log('questions = ', questions);
             const question = getRandomQuestion(questions);
-            console.log('question = ', question);
             if (question) {
                 console.log("Hello, sending data to collab room.");
                 sendMessage('collab-room', { key: 'room', value: {
                     users: [userId1, userId2],
-                    question: question, 
+                    question: {
+                        questionId: question.questionId.toString(),
+                        questionTitle: question.questionTitle,
+                        questionDescription: question.questionDescription,
+                        questionCategory: question.questionCategory,
+                        questionComplexity: question.questionComplexity
+                    },
                     language: language
                 }});
             // const socketId1 = userSocketMap.get(userId1);
@@ -55,7 +54,8 @@ export async function connectQuestionConsumer(
             
             console.log();
             console.log("---------------------[QUESTION_CONSUMER]----------------------")
-            console.log(collabRequest);
+            console.log('userId1 = ', userId1);
+            console.log('userId2 = ', userId2);
             console.log(question);
             console.log(language);
             console.log('---------------------------------------------------------------------');
