@@ -56,7 +56,7 @@ export async function connectResultConsumer(
             sendMessage('collab-room', { key: 'room', value: {
                 users: [userId, matchedUserId],
                 question: {
-                    questionId: "1",
+                    questionId: "66f972f1b1b5f85b969c0c9f",
                     questionTitle: "Test Question",
                     questionDescription: "Test Description",
                     questionCategory: ["Test"],

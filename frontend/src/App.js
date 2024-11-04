@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
 import AddQuestion from './components/AddQuestion';
 import EditQuestion from './components/EditQuestion';
