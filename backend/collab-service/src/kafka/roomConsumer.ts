@@ -30,6 +30,7 @@ export async function connectRoomConsumer(): Promise<void> {
         roomTopicMessage['question'],
         roomTopicMessage['language']
       );
+      
     },
   });
 }
