@@ -54,12 +54,13 @@ ${question.questionDescription}
         // If route is /room, redirect to room that user belongs to
         if (!roomId) {
           console.log("No room ID provided; fetching room ID...");
-          const fetchedRoomId = await collabService.getRoomId(username);
+          const fetchedRoomId = await fetchRoomIdWithRetry(username);
           console.log("Fetched room ID:", fetchedRoomId);
           navigate(`/room/${fetchedRoomId}`);
           return;
         }
         
+
   
         const room = await collabService.getRoomDetails(roomId);
         const users = room.users;
@@ -209,6 +210,27 @@ ${question.questionDescription}
       )}
     </div>
   );
+}
+
+async function fetchRoomIdWithRetry(username, maxRetries = 3, delayMs = 500) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+      try {
+          // Try to fetch the room ID
+          const fetchedRoomId = await collabService.getRoomId(username);
+          return fetchedRoomId; // Exit function if successful
+      } catch (error) {
+          attempt++;
+          console.log(`Attempt ${attempt} failed: ${error.message}`);
+          
+          if (attempt >= maxRetries) {
+              throw new Error(`Failed to fetch room ID after ${maxRetries} attempts`);
+          }
+
+          // Optionally add a delay before retrying
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+  }
 }
 
 export default CollaborationPage;
