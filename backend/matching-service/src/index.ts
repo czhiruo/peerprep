@@ -13,7 +13,6 @@ import { adminInit } from './kafka/admin';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import redis from 'redis';
 
 const app = express();
 app.use(cors());
@@ -24,7 +23,7 @@ const kafkaBrokers = process.env.KAFKA_BROKERS
   ? process.env.KAFKA_BROKERS.split(',') 
   : ['kafka:9092'];
 
-const redisClient = redis.createClient();
+
 
 // create HTTP server
 const httpServer = createServer(app);
