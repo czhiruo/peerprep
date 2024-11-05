@@ -1,4 +1,5 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import redis from '../redisClient';
 
 const kafka = new Kafka({
     clientId: 'match-rejected-consumer',
@@ -7,10 +8,7 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'match-rejected-group' });
 
-export async function connectMatchRejectedConsumer(
-    io: any,
-    userSocketMap: Map<string, string>
-): Promise<void> { 
+export async function connectMatchRejectedConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Match Rejected Consumer connected');
 
@@ -18,23 +16,22 @@ export async function connectMatchRejectedConsumer(
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-        const matchRejectedData = JSON.parse(message.value?.toString()!);
-        const { userId, matchedUserId } = matchRejectedData;
-        const socketId = userSocketMap.get(matchedUserId);
-        if (socketId) {
-            console.log('inside match reject socket, Telling matched user, acceptance update')
-            io.to(socketId).emit('matched-user-acceptance-update', {
-                userId: userId,
-                isAccepted: false
-            });
-        }
-        console.log();
-        console.log("-----------------------[MATCH_REJECTED_CONSUMER]----------------------");
-        console.log(matchRejectedData);
-        console.log('userId:', userId);
-        console.log('matchedUserId:', matchedUserId);
-        console.log('---------------------------------------------------------------------');
-        console.log();
+            const matchRejectedData = JSON.parse(message.value?.toString()!);
+            const { userId, matchedUserId } = matchRejectedData;
+            const socketId = await redis.hget('usersToSockets', matchedUserId);
+            if (socketId) {
+                io.to(socketId).emit('matched-user-acceptance-update', {
+                    userId: userId,
+                    isAccepted: false
+                });
+            }
+            console.log();
+            console.log("-----------------------[MATCH_REJECTED_CONSUMER]----------------------");
+            console.log(matchRejectedData);
+            console.log('userId:', userId);
+            console.log('matchedUserId:', matchedUserId);
+            console.log('---------------------------------------------------------------------');
+            console.log();
 
         }
     });

@@ -9,10 +9,7 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'collab-request-group' });
 
-export async function connectCollabRequestConsumer(
-    io: any,
-    userSocketMap: Map<string, string>
-): Promise<void> { 
+export async function connectCollabRequestConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Collab Request Consumer connected');
 
