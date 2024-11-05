@@ -12,7 +12,6 @@ def solution():
   # Your code here
 `;
 export const JAVA_TEMPLATE = `
-// Start coding here
 public class Main {
   public static void main(String[] args) {
     // Your code here

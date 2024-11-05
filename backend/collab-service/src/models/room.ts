@@ -10,6 +10,8 @@ export default class Room {
   public language: string;
 
   constructor(users: [string, string], question: QuestionDetails, language: string) {
+    language = language.toLowerCase();
+
     this.users = users;
     this.question = question;
     this.code = getTemplate(language);
