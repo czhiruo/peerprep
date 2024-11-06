@@ -1,5 +1,5 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
-import { roomManager } from '../models/room';
+import { roomManager } from '../services/roomManager';
 import redis from '../redisClient';
 
 const kafka = new Kafka({

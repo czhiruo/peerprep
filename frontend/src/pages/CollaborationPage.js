@@ -109,10 +109,18 @@ ${question.questionDescription}
       }
     });
 
-    // Listen for chat messages
-    collabService.onChatMessage((data) => {
+    // Listen for chat messages only once
+    const handleChatMessage = (data) => {
       setChatMessages((prevMessages) => [...prevMessages, { sender: data.sender, message: data.message }]);
-    });
+    };
+
+    // Register the listener for chat messages
+    collabService.onChatMessage(handleChatMessage);
+
+    return () => {
+      // Remove the listener on component unmount
+      collabService.offChatMessage(handleChatMessage);
+    };
   }, []);
 
   // Kick user out if other user disconnects

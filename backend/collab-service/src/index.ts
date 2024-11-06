@@ -7,8 +7,8 @@ import { Server } from 'socket.io';
 import { connectProducer, sendMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
-import { connectChatConsumer } from './kafka/chatConsumer'; // Import the new chat consumer
-import { roomManager } from './models/room';
+import { connectChatConsumer } from './kafka/chatConsumer';
+import { roomManager } from './services/roomManager';
 import redis from './redisClient';
 
 const app = express();
@@ -80,6 +80,10 @@ io.on('connection', (socket) => {
     }
     redis.hdel(usersToSocketsKey, username);
     redis.hdel(socketsToUsersKey, socket.id);
+  });
+
+  socket.on('disconnect-collab', async () => {
+    handleDisconnect(socket.id);
   });
 
   // New event handler for chat messages
