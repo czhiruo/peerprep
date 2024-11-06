@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { connectProducer, sendMessage } from './kafka/producer';
+import { connectProducer, sendCodeMessage, sendChatMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
 import { connectChatConsumer } from './kafka/chatConsumer';
@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    await sendMessage('collab-code', { key: username, value: code });
+    await sendCodeMessage('collab-code', { key: username, value: code });
   });
 
   socket.on('get-room-details', async (roomId: string, callback) => {
@@ -95,7 +95,7 @@ io.on('connection', (socket) => {
     }
 
     // Send the chat message to Kafka
-    await sendMessage('collab-chat', { key: username, value: message });
+    await sendChatMessage('collab-chat', { key: username, value: message });
   });
 });
 
