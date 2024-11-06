@@ -183,6 +183,7 @@ ${question.questionDescription}
         <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
           {question}
         </ReactMarkdown>
+    
       </div>
 
       <div className="w-1/2 h-full flex relative">

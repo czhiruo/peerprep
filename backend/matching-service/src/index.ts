@@ -42,13 +42,13 @@ const socketsToUsersKey = 'matchingService-socketsToUsers';
 
 
 io.on('connection', (socket) => {
-  console.log(`[ Matching-Service ] A user connected to socket [${socket.id}]`);
+  console.log(`A user connected to socket [${socket.id}]`);
 
   // Register user with their socket ID
   socket.on('register', async (userId: string) => {  
     await redis.hset(usersToSocketsKey, userId, socket.id);
     await redis.hset(socketsToUsersKey, socket.id, userId);
-    console.log(`[ Matching-Service ] User [${userId}] registered with socket ID [${socket.id}]`);
+    console.log(`User [${userId}] registered with socket ID [${socket.id}]`);
     
   });
 
@@ -93,9 +93,9 @@ io.on('connection', (socket) => {
   // clean up the userSocketMap when a client disconnects
   socket.on('disconnect', async () => {
     const userId = await redis.hget(socketsToUsersKey, socket.id);
-    console.log(`[ Matching-Service ] User [${userId}] disconnected with socket ID [${socket.id}]`);
+    console.log(`User [${userId}] disconnected with socket ID [${socket.id}]`);
     if (!userId) {
-      console.log(`[ Matching-Service ] User [${userId}] not registered, cannot disconnect`);
+      console.log(`User [${userId}] not registered, cannot disconnect`);
     }
     if (userId) {
       await redis.hdel(usersToSocketsKey, userId);

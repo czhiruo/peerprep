@@ -30,3 +30,25 @@ button {
   border-radius: 0.5rem; /* Rounded corners */
   margin-right: 0.5em; /* Space between badges */
 }
+
+/* themes.css */
+.light-theme {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --card-bg-color: #f8f9fa;
+}
+
+.dark-theme {
+  --bg-color: #1e1e1e;
+  --text-color: #ffffff;
+  --card-bg-color: #2c2c2c;
+}
+
+.theme-container {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.theme-card {
+  background-color: var(--card-bg-color);
+}
