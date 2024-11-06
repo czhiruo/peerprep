@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { connectProducer, sendMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
+import { connectChatConsumer } from './kafka/chatConsumer'; // Import the new chat consumer
 import { roomManager } from './models/room';
 import redis from './redisClient';
 
@@ -23,7 +24,6 @@ const io = new Server(httpServer, {
 
 const usersToSocketsKey = 'usersToSockets';
 const socketsToUsersKey = 'socketsToUsers';
-
 
 io.on('connection', (socket) => {
   console.log('A user connected to socket:', socket.id);
@@ -81,6 +81,18 @@ io.on('connection', (socket) => {
         }
       });
   });
+
+  // New event handler for chat messages
+  socket.on('chat-message', async (message: string) => {
+    const username = await redis.hget(socketsToUsersKey, socket.id);
+    if (!username) {
+      console.log('User not registered');
+      return;
+    }
+
+    // Send the chat message to Kafka
+    await sendMessage('collab-chat', { key: username, value: message });
+  });
 });
 
 const startServer = async () => {
@@ -89,6 +101,7 @@ const startServer = async () => {
 
     await connectRoomConsumer();
     await connectCodeConsumer(io);
+    await connectChatConsumer(io); // Connect the new chat consumer
 
     const PORT = 8888;
     httpServer.listen(PORT, () => {

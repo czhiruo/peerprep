@@ -41,7 +41,7 @@ const collabService = {
       });
     });
   },
-  
+
   sendCode: (code) => {
     socket.emit('code-change', code);
   },
@@ -49,6 +49,18 @@ const collabService = {
   onCodeChange: (callback) => {
     socket.on('code-change', (code) => {
       callback(code);
+    });
+  },
+
+  // New method to send chat messages
+  sendChatMessage: (message) => {
+    socket.emit('chat-message', message);
+  },
+
+  // New method to receive chat messages
+  onChatMessage: (callback) => {
+    socket.on('chat-message', (data) => {
+      callback(data);
     });
   },
 };
