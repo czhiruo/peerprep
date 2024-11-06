@@ -7,7 +7,8 @@ const kafka = new Kafka({
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'match-timeout-group' });
-const usersToSocketsKey = 'usersToSockets';
+
+const usersToSocketsKey = 'matchingService-usersToSockets';
 
 export async function connectTimeoutConsumer(io: any): Promise<void> { 
     await consumer.connect();

@@ -43,45 +43,22 @@ export async function connectCancellationConsumer(io: any): Promise<void> {
           };
             
           const userId = canceledMatchRequest.userId;
-          const matchRequestKey = `matchRequest:${userId}`;
+          const matchRequest = matchingPools.findMatchRequestInTopicPools(userId, canceledMatchRequest.topics)!;
 
-          // Retrieve the match request from Redis
-          const matchRequestJson = await redis.get(matchRequestKey);
-          if (matchRequestJson) {
-              const matchRequest = JSON.parse(matchRequestJson);
-              if (matchRequest) {
-                  // Remove the match request from Redis
-                  await redis.del(matchRequestKey);
-                  matchRequest.status = MatchStatus.Cancelled;
-                  console.log();
-                  console.log("-----------------------[CANCEL_MATCH_CONSUMER]-----------------------");
-                  console.log(matchRequest);
-                  console.log('---------------------------------------------------------------------');
-                  console.log();
-              }
-          } else {
+          //console.log(matchRequest);
+          if (matchRequest) {
+              matchingPools.removeMatchRequest(matchRequest);
+              matchRequest.status = MatchStatus.Cancelled;
               console.log();
-              console.log('Cancelling on non-existent match request');
-          }
+              console.log("-----------------------[CANCEL_MATCH_CONSUMER]-----------------------")
+              console.log(matchRequest);
+              console.log('---------------------------------------------------------------------');
+              console.log();
+          } else {
+            console.log();
+            //console.log('Cancelling on non-existent match request');
+          }          
 
-          // const userId = canceledMatchRequest.userId;
-          // // console.log(canceledMatchRequest)
-          // // console.log(canceledMatchRequest.topics)
-          // const matchRequest = matchingPools.findMatchRequestInTopicPools(userId, canceledMatchRequest.topics)!;
-  
-          // //console.log(matchRequest);
-          // if (matchRequest) {
-          //     matchingPools.removeMatchRequest(matchRequest);
-          //     matchRequest.status = MatchStatus.Cancelled;
-          //     console.log();
-          //     console.log("-----------------------[CANCEL_MATCH_CONSUMER]-----------------------")
-          //     console.log(matchRequest);
-          //     console.log('---------------------------------------------------------------------');
-          //     console.log();
-          // } else {
-          //   console.log();
-          //   //console.log('Cancelling on non-existent match request');
-          // }          
         },
     });
 }

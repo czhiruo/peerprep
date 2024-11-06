@@ -8,6 +8,8 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'match-accepted-group' });
 
+const usersToSocketsKey = 'matchingService-usersToSockets';
+
 export async function connectMatchAcceptedConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Match Accepted Consumer connected');
@@ -19,7 +21,7 @@ export async function connectMatchAcceptedConsumer(io: any): Promise<void> {
             const matchAcceptedData = JSON.parse(message.value?.toString()!);
             const { userId, matchedUserId } = matchAcceptedData;
 
-            const socketId = await redis.hget('usersToSockets', matchedUserId);
+            const socketId = await redis.hget(usersToSocketsKey, matchedUserId);
             if (socketId) {
                 io.to(socketId).emit('matched-user-acceptance-update', {
                     userId: userId,

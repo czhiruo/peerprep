@@ -9,6 +9,8 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'matching-results-group' });
 
+const usersToSocketsKey = 'matchingService-usersToSockets';
+
 export async function connectResultConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Result Consumer connected');
@@ -26,14 +28,17 @@ export async function connectResultConsumer(io: any): Promise<void> {
             console.log('---------------------------------------------------------------------');
             console.log();
 
+            // userId = user02
             const { userId, matchedUserId } = matchResult;
-            const socketId1 = await redis.hget('usersToSockets', userId);
-            const socketId2 = await redis.hget('usersToSockets', matchedUserId);
+            const socketId1 = await redis.hget(usersToSocketsKey, userId);
+            const socketId2 = await redis.hget(usersToSocketsKey, matchedUserId);
+            console.log("")
    
-
             console.log(`Sending match result to ${userId} and ${matchedUserId}`);
+            console.log(`SocketId of userId = ${socketId1} and SocketId of matchedUserId = ${socketId2}`);
 
             if (socketId1) {
+                console.log(`If it is socketId1 = ${socketId1}`);
                 io.to(socketId1).emit('match-result', matchResult);
             }
 
@@ -42,6 +47,7 @@ export async function connectResultConsumer(io: any): Promise<void> {
             otherMatchResult.matchedUserId = userId;
 
             if (socketId2) {
+                console.log(`If it is sockerId2 = ${socketId2}`);
                 io.to(socketId2).emit('match-result', otherMatchResult);
             }
             

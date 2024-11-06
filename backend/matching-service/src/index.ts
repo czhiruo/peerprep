@@ -37,26 +37,19 @@ const io = new Server(httpServer, {
 
 // Map to store the user ID and socket ID
 // enables the server to send messages to specific users
-const usersToSocketsKey = 'usersToSockets';
-const socketsToUsersKey = 'socketsToUsers';
+const usersToSocketsKey = 'matchingService-usersToSockets';
+const socketsToUsersKey = 'matchingService-socketsToUsers';
 
 
 io.on('connection', (socket) => {
-  console.log('A user connected to socket:', socket.id);
+  console.log(`[ Matching-Service ] A user connected to socket [${socket.id}]`);
 
   // Register user with their socket ID
-  socket.on('register', async (userId: string, callback) => {
-    const existingSocketId = await redis.hget(usersToSocketsKey, userId);
-    if (existingSocketId) {
-      console.log('User already registered:', userId);
-      callback({ success: false, error: `User ${userId} is already registered` });
-      return;
-    }
-  
+  socket.on('register', async (userId: string) => {  
     await redis.hset(usersToSocketsKey, userId, socket.id);
     await redis.hset(socketsToUsersKey, socket.id, userId);
-    console.log('User registered:', userId);
-    callback({ success: true });
+    console.log(`[ Matching-Service ] User [${userId}] registered with socket ID [${socket.id}]`);
+    
   });
 
   // Handle matching requests
@@ -99,10 +92,10 @@ io.on('connection', (socket) => {
   // Handle disconnections
   // clean up the userSocketMap when a client disconnects
   socket.on('disconnect', async () => {
-    console.log('User disconnected:', socket.id);
     const userId = await redis.hget(socketsToUsersKey, socket.id);
+    console.log(`[ Matching-Service ] User [${userId}] disconnected with socket ID [${socket.id}]`);
     if (!userId) {
-      console.log("User not registered, cannot disconnect");
+      console.log(`[ Matching-Service ] User [${userId}] not registered, cannot disconnect`);
     }
     if (userId) {
       await redis.hdel(usersToSocketsKey, userId);

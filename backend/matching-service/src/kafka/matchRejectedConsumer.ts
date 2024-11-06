@@ -8,6 +8,8 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'match-rejected-group' });
 
+const usersToSocketsKey = 'matchingService-usersToSockets';
+
 export async function connectMatchRejectedConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Match Rejected Consumer connected');
@@ -18,7 +20,7 @@ export async function connectMatchRejectedConsumer(io: any): Promise<void> {
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
             const matchRejectedData = JSON.parse(message.value?.toString()!);
             const { userId, matchedUserId } = matchRejectedData;
-            const socketId = await redis.hget('usersToSockets', matchedUserId);
+            const socketId = await redis.hget(usersToSocketsKey, matchedUserId);
             if (socketId) {
                 io.to(socketId).emit('matched-user-acceptance-update', {
                     userId: userId,
