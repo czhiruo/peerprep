@@ -18,6 +18,7 @@ function CollaborationPage() {
   const isRemoteChange = useRef(false); // Flag to prevent infinite loop, true if change to editor is from remote (other user)
   const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
   const countdownRef = useRef(null); // Timeout reference for the countdown when user gets kicked out
+  const messagesEndRef = useRef(null); // Reference to the end of the chat messages
 
   const [code, setCode] = useState('');
   const [question, setQuestion] = useState('');
@@ -29,6 +30,7 @@ function CollaborationPage() {
   const [userId, setUserId] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [currentUsername, setCurrentUsername] = useState('');
 
   function formatQuestion(question) {
     return `
@@ -50,6 +52,7 @@ ${question.questionDescription}
         const data = await verifyToken(token);
         const username = data.data.username;
         setUserId(data.data.id);
+        setCurrentUsername(username);
 
         console.log("Username:", username);
 
@@ -110,10 +113,23 @@ ${question.questionDescription}
     });
 
     // Listen for chat messages
-    collabService.onChatMessage((data) => {
+    const handleChatMessage = (data) => {
       setChatMessages((prevMessages) => [...prevMessages, { sender: data.sender, message: data.message }]);
-    });
+    };
+
+    collabService.onChatMessage(handleChatMessage);
+
+    return () => {
+      collabService.offChatMessage(handleChatMessage);
+    };
   }, []);
+
+  // Auto-scroll to the bottom when new messages are added
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
 
   // Kick user out if other user disconnects
   useEffect(() => {
@@ -215,19 +231,27 @@ ${question.questionDescription}
 
       {/* Chatbox at the bottom */}
       <div className="h-1/4 w-full border-t border-gray-700 flex flex-col bg-gray-800">
-        <div className="flex-grow overflow-y-auto p-3">
+        <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
-            <div key={index} className={`mb-2 ${msg.sender === 'You' ? 'text-right' : 'text-left'}`}>
-              <span className="text-sm text-white font-semibold">{msg.sender}:</span>
-              <p className="text-base text-white">{msg.message}</p>
+            <div key={index} className={`flex flex-col mb-2 ${msg.sender === 'You' ? 'items-end' : 'items-start'}`}>
+              <div className={`text-sm font-semibold text-white ${msg.sender === 'You' ? 'text-right' : 'text-left'}`}>
+                {msg.sender}
+              </div>
+              <div
+                className={`max-w-md p-2 rounded-lg break-words ${msg.sender === 'You' ? 'bg-blue-600 text-white text-right' : 'bg-gray-700 text-white'
+                  }`}
+              >
+                <p>{msg.message}</p>
+              </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         <div className="p-3 border-t border-gray-700">
           <div className="flex">
             <input
               type="text"
-              className="flex-grow bg-gray-900 text-white p-2 rounded-l-md focus:outline-none"
+              className="input input-bordered w-full bg-white text-black rounded-l-full rounded-r-full"
               placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
@@ -238,7 +262,7 @@ ${question.questionDescription}
               }}
             />
             <button
-              className="bg-blue-600 text-white p-2 rounded-r-md"
+              className="btn btn-primary ml-2 rounded-l-full rounded-r-full"
               onClick={handleSendMessage}
             >
               Send

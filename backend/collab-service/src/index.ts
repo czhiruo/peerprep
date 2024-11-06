@@ -4,11 +4,11 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { connectProducer, sendMessage } from './kafka/producer';
+import { connectProducer, sendCodeMessage, sendChatMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
-import { connectChatConsumer } from './kafka/chatConsumer'; // Import the new chat consumer
-import { roomManager } from './models/room';
+import { connectChatConsumer } from './kafka/chatConsumer';
+import { roomManager } from './services/roomManager';
 import redis from './redisClient';
 
 const app = express();
@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    await sendMessage('collab-code', { key: username, value: code });
+    await sendCodeMessage('collab-code', { key: username, value: code });
   });
 
   socket.on('get-room-details', async (roomId: string, callback) => {
@@ -82,6 +82,10 @@ io.on('connection', (socket) => {
     redis.hdel(socketsToUsersKey, socket.id);
   });
 
+  socket.on('disconnect-collab', async () => {
+    handleDisconnect(socket.id);
+  });
+
   // New event handler for chat messages
   socket.on('chat-message', async (message: string) => {
     const username = await redis.hget(socketsToUsersKey, socket.id);
@@ -91,7 +95,7 @@ io.on('connection', (socket) => {
     }
 
     // Send the chat message to Kafka
-    await sendMessage('collab-chat', { key: username, value: message });
+    await sendChatMessage('collab-chat', { key: username, value: message });
   });
 });
 

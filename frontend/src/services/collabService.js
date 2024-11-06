@@ -2,6 +2,10 @@ import io from 'socket.io-client';
 
 const socket = io('http://localhost:8888');
 
+const chatMessageCallbacks = new Set();
+
+let chatListenerAdded = false; // Flag to prevent duplicate listeners
+
 const collabService = {
   register: (username) => {
     return new Promise((resolve, reject) => {
@@ -62,16 +66,22 @@ const collabService = {
     });
   },
 
-  // New method to send chat messages
-  sendChatMessage: (message) => {
-    socket.emit('chat-message', message);
+  onChatMessage: (callback) => {
+    if (!chatListenerAdded) {
+      socket.on('chat-message', (data) => {
+        chatMessageCallbacks.forEach((cb) => cb(data));
+      });
+      chatListenerAdded = true;
+    }
+    chatMessageCallbacks.add(callback); // Add to the Set
   },
 
-  // New method to receive chat messages
-  onChatMessage: (callback) => {
-    socket.on('chat-message', (data) => {
-      callback(data);
-    });
+  offChatMessage: (callback) => {
+    chatMessageCallbacks.delete(callback); // Remove specific callback
+  },
+
+  sendChatMessage: (message) => {
+    socket.emit('chat-message', message);
   },
 };
 
