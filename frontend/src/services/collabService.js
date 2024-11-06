@@ -16,6 +16,10 @@ const collabService = {
     });
   },
 
+  disconnect: (username) => {
+    socket.emit('disconnect-collab');
+  },
+
   getRoomDetails: (roomId) => {
     return new Promise((resolve, reject) => {
       socket.emit('get-room-details', roomId, (response) => {
@@ -49,6 +53,12 @@ const collabService = {
   onCodeChange: (callback) => {
     socket.on('code-change', (code) => {
       callback(code);
+    });
+  },
+
+  onOtherUserDisconnect: (callback) => {
+    socket.on('other-user-disconnect', () => {
+      callback();
     });
   },
 

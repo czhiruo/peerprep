@@ -2,8 +2,8 @@
 // Creates a room with the two given users.
 
 import { EachMessagePayload, Kafka } from "kafkajs";
-import { roomManager } from "../models/room";
 import { RoomTopicMessage } from "../types"
+import { roomManager } from "../services/roomManager";
 
 const kafka = new Kafka({
   clientId: 'collab-room-consumer',
@@ -30,6 +30,7 @@ export async function connectRoomConsumer(): Promise<void> {
         roomTopicMessage['question'],
         roomTopicMessage['language']
       );
+      
     },
   });
 }

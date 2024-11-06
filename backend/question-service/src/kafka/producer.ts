@@ -1,7 +1,7 @@
 import { Kafka, Producer } from 'kafkajs';
 
 const kafka = new Kafka({
-    clientId: 'collab-service-producer',
+    clientId: 'question-service-producer',
     brokers: ['kafka:9092'],
 });
 
@@ -9,7 +9,7 @@ const producer: Producer = kafka.producer();
 
 export async function connectProducer(): Promise<void> {
     await producer.connect();    
-    console.log('Producer connected');
+    console.log('Question Producer connected');
 }
 
 export async function sendMessage(topic: string, message: { key: string; value: any }): Promise<void> {

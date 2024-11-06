@@ -6,22 +6,27 @@ import debounce from 'lodash.debounce';
 import { useParams } from 'react-router-dom';
 import { getToken, verifyToken } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
+import { addAttemptedQuestion } from '../services/userService';
 import '.././index.css';
+import DisconnectAlert from '../components/DisconnectAlert';
 
 function CollaborationPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
 
-  const editorRef = useRef(null);
-  const isRemoteChange = useRef(false);
-  const timeoutRef = useRef(null);
+  const editorRef = useRef(null); // Reference to the editor instance
+  const isRemoteChange = useRef(false); // Flag to prevent infinite loop, true if change to editor is from remote (other user)
+  const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
+  const countdownRef = useRef(null); // Timeout reference for the countdown when user gets kicked out
 
   const [code, setCode] = useState('');
   const [question, setQuestion] = useState('');
+  const [questionId, setQuestionId] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [isReadOnly, setIsReadOnly] = useState(false);
-
-  // Chat state
+  const [isGettingKickedOut, setIsGettingKickedOut] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [userId, setUserId] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
@@ -44,12 +49,13 @@ ${question.questionDescription}
       try {
         const data = await verifyToken(token);
         const username = data.data.username;
+        setUserId(data.data.id);
 
         console.log("Username:", username);
 
         if (!roomId) {
           console.log("No room ID provided; fetching room ID...");
-          const fetchedRoomId = await collabService.getRoomId(username);
+          const fetchedRoomId = await fetchRoomIdWithRetry(username);
           console.log("Fetched room ID:", fetchedRoomId);
           navigate(`/room/${fetchedRoomId}`);
           return;
@@ -66,6 +72,7 @@ ${question.questionDescription}
         await collabService.register(username);
 
         setQuestion(formatQuestion(room.question));
+        setQuestionId(room.question.questionId);
         setCode(room.code);
         setLanguage(room.language);
       } catch (error) {
@@ -107,6 +114,46 @@ ${question.questionDescription}
       setChatMessages((prevMessages) => [...prevMessages, { sender: data.sender, message: data.message }]);
     });
   }, []);
+
+  // Kick user out if other user disconnects
+  useEffect(() => {
+    collabService.onOtherUserDisconnect(() => {
+      setIsGettingKickedOut(true);
+      setCountdown(10);
+
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+
+      // Start countdown timer
+      countdownRef.current = setInterval(() => {
+        setCountdown(prevCount => {
+          if (prevCount === 1) {
+            clearInterval(countdownRef.current);
+            navigate('/'); // Redirect when countdown reaches zero
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
+      return () => {
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+        }
+      };
+
+    });
+  }, [navigate]);
+
+  // On navigating away
+  useEffect(() => {
+    return async () => {
+      if (userId && questionId) {
+        collabService.disconnect();
+        console.log("Adding attempted question:", questionId);
+        await addAttemptedQuestion(userId, questionId);
+      }
+    };
+  }, [questionId, userId]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -199,8 +246,35 @@ ${question.questionDescription}
           </div>
         </div>
       </div>
+
+      {isGettingKickedOut && (
+        <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 z-50">
+          <DisconnectAlert text={`Other user disconnected! Redirecting to home page in ${countdown}s...`} />
+        </div>
+      )}
     </div>
   );
+}
+
+async function fetchRoomIdWithRetry(username, maxRetries = 3, delayMs = 500) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    try {
+      // Try to fetch the room ID
+      const fetchedRoomId = await collabService.getRoomId(username);
+      return fetchedRoomId; // Exit function if successful
+    } catch (error) {
+      attempt++;
+      console.log(`Attempt ${attempt} failed: ${error.message}`);
+
+      if (attempt >= maxRetries) {
+        throw new Error(`Failed to fetch room ID after ${maxRetries} attempts`);
+      }
+
+      // Optionally add a delay before retrying
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
 }
 
 export default CollaborationPage;
