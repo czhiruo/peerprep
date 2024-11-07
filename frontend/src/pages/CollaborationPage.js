@@ -211,6 +211,15 @@ ${question.questionDescription}
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
+      <div className="bg-[#1e1e1e] flex text-white">
+        <button
+          className="btn btn-sm bg-error ml-2 text-white font-semibold"
+          onClick={() => navigate('/')}
+        >
+          Exit Room
+        </button>
+      </div>
+
       <div className="flex flex-row flex-grow">
         <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
           <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
