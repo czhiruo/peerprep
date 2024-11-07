@@ -58,7 +58,7 @@ export function getTemplate(language: string): string {
       return JAVA_TEMPLATE;
     case 'cpp':
       return CPP_TEMPLATE;
-    case 'csharp': // Assuming 'csharp' for C#
+    case 'c#':
       return CSHARP_TEMPLATE;
     case 'c':
       return C_TEMPLATE;
