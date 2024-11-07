@@ -6,6 +6,11 @@ import { Difficulty, Question } from '../models/question.js';
 const kafka = new Kafka({
     clientId: 'generate-question-consumer',
     brokers: ['kafka:9092'],
+    retry: {
+      retries: 10,  // Increase retry count here
+      initialRetryTime: 3000,  // Time (in ms) before the first retry
+      factor: 0.2,  // Factor by which the retry time increases after each attempt
+    },
 });
 
 const consumer: Consumer = kafka.consumer({ groupId: 'generate-question-group' });

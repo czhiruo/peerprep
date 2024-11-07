@@ -8,6 +8,11 @@ import { roomManager } from "../services/roomManager";
 const kafka = new Kafka({
   clientId: 'collab-room-consumer',
   brokers: ['kafka:9092'],
+  retry: {
+    retries: 10,  // Increase retry count here
+    initialRetryTime: 3000,  // Time (in ms) before the first retry
+    factor: 0.2,  // Factor by which the retry time increases after each attempt
+  },
 })
 
 const consumer = kafka.consumer({ groupId: 'collab-room-group' });
