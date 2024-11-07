@@ -1,4 +1,4 @@
-import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import { Kafka, Consumer, EachMessagePayload, logLevel } from 'kafkajs';
 import { sendMessage } from './producer.js';
 import { convertToQuestions, getQuestionsByFilter, getRandomQuestion } from '../services/questionService.js';
 import { Difficulty, Question } from '../models/question.js';
@@ -6,6 +6,7 @@ import { Difficulty, Question } from '../models/question.js';
 const kafka = new Kafka({
     clientId: 'generate-question-consumer',
     brokers: ['kafka:9092'],
+    logLevel: logLevel.ERROR,
     retry: {
       retries: 10,  // Increase retry count here
       initialRetryTime: 3000,  // Time (in ms) before the first retry

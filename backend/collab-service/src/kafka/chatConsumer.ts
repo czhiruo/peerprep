@@ -1,10 +1,11 @@
-import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import { Kafka, Consumer, EachMessagePayload, logLevel } from 'kafkajs';
 import { roomManager } from '../services/roomManager';
 import redis from '../redisClient';
 
 const kafka = new Kafka({
   clientId: 'collab-chat-consumer',
   brokers: ['kafka:9092'],
+  logLevel: logLevel.ERROR,
   retry: {
     retries: 10,  // Increase retry count here
     initialRetryTime: 3000,  // Time (in ms) before the first retry

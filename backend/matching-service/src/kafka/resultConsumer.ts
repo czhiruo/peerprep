@@ -1,10 +1,11 @@
-import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
+import { Kafka, Consumer, EachMessagePayload, logLevel } from 'kafkajs';
 import { sendMessage } from './producer';
 import redis from '../redisClient';
 
 const kafka = new Kafka({
     clientId: 'matching-results-consumer',
     brokers: ['kafka:9092'],
+    logLevel: logLevel.ERROR,
     retry: {
       retries: 10,  // Increase retry count here
       initialRetryTime: 3000,  // Time (in ms) before the first retry
