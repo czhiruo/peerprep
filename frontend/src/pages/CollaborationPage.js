@@ -162,13 +162,20 @@ ${question.questionDescription}
 
   // On navigating away
   useEffect(() => {
-    return async () => {
+    const handleDisconnect = async () => {
       if (userId && questionId) {
         collabService.disconnect();
         console.log("Adding attempted question:", questionId);
         await addAttemptedQuestion(userId, questionId);
       }
-    };
+    }
+
+    window.addEventListener('beforeunload', handleDisconnect); // For page refresh
+
+    return async () => {
+      window.removeEventListener('beforeunload', handleDisconnect);
+      handleDisconnect(); // For component unmount (navigating away)
+    }
   }, [questionId, userId]);
 
   const handleEditorDidMount = (editor, monaco) => {
