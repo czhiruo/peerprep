@@ -1,5 +1,6 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { sendMessage } from './producer';
+import redis from '../redisClient';
 
 const kafka = new Kafka({
     clientId: 'matching-results-consumer',
@@ -8,10 +9,9 @@ const kafka = new Kafka({
 
 const consumer: Consumer = kafka.consumer({ groupId: 'matching-results-group' });
 
-export async function connectResultConsumer(
-    io: any,
-    userSocketMap: Map<string, string>
-): Promise<void> { 
+const usersToSocketsKey = 'matchingService-usersToSockets';
+
+export async function connectResultConsumer(io: any): Promise<void> { 
     await consumer.connect();
     console.log('Result Consumer connected');
 
@@ -20,13 +20,6 @@ export async function connectResultConsumer(
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
         if (topic === 'matching-results') {
-            // console.log({
-            //     "[CONSUMER]":
-            //     topic,
-            //     partition,
-            //     key: message.key?.toString(), // Check for possible undefined
-            //     value: message.value?.toString(), // Check for possible undefined
-            // });
             const matchResult = JSON.parse(message.value?.toString()!);
             
             console.log();
@@ -35,13 +28,17 @@ export async function connectResultConsumer(
             console.log('---------------------------------------------------------------------');
             console.log();
 
+            // userId = user02
             const { userId, matchedUserId } = matchResult;
-            const socketId1 = userSocketMap.get(userId);
-            const socketId2 = userSocketMap.get(matchedUserId);
-
+            const socketId1 = await redis.hget(usersToSocketsKey, userId);
+            const socketId2 = await redis.hget(usersToSocketsKey, matchedUserId);
+            console.log("")
+   
             console.log(`Sending match result to ${userId} and ${matchedUserId}`);
+            console.log(`SocketId of userId = ${socketId1} and SocketId of matchedUserId = ${socketId2}`);
 
             if (socketId1) {
+                console.log(`If it is socketId1 = ${socketId1}`);
                 io.to(socketId1).emit('match-result', matchResult);
             }
 
@@ -50,9 +47,10 @@ export async function connectResultConsumer(
             otherMatchResult.matchedUserId = userId;
 
             if (socketId2) {
+                console.log(`If it is sockerId2 = ${socketId2}`);
                 io.to(socketId2).emit('match-result', otherMatchResult);
             }
-
+            
             // sendMessage('collab-room', { key: 'room', value: {
             //     users: [userId, matchedUserId],
             //     question: {
