@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import QuestionList from './components/QuestionList';
-import AddQuestion from './components/AddQuestion';
-import EditQuestion from './components/EditQuestion';
-import QuestionDetails from './components/QuestionDetails';
+import AddQuestion from './pages/AddQuestionPage';
+import EditQuestion from './pages/EditQuestionPage';
 import LoginPage from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import RequestResetPasswordPage from './pages/RequestResetPasswordPage';
@@ -14,10 +13,12 @@ import SelectTopicPage from './pages/SelectTopicPage';
 import MatchingPage from './pages/MatchingPage';
 import MatchedPage from './pages/MatchedPage';
 import MatchingFailedPage from './pages/MatchingFailedPage';
+import CollaborationPage from './pages/CollaborationPage';
 import HistoryPage from './pages/HistoryPage';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
+import QuestionDetailsPage from './pages/QuestionDetailsPage';
 
 function App() {
   const [topics, setTopics] = useState([]);
@@ -27,15 +28,18 @@ function App() {
     hard: false,
   });
   const [languages, setLanguages] = useState('');
-  const [matchResult, setMatchResult] = useState(null);
+  const [matchResult, setMatchResult] = useState({
+    userId: "user123",
+    matchedUserId: "user456",
+    topic: "String Manipulation",
+    difficulty: "Medium",
+    language: "JavaScript", // or "Python", "Java", etc (not case sensitive)
+  });
 
   return (
     <Router>
       <Header />
-      {/* Hide header if matching in progress
-      { useLocation().pathname !== '/matching' && <Header /> } */}
 
-      {/* Main Content */}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Navigate to='/topic' />} />
@@ -45,6 +49,8 @@ function App() {
           <Route path="/matching" element={<PrivateRoute><MatchingPage difficulties={difficulties} topics={topics} languages={languages} setMatchResult={setMatchResult} /></PrivateRoute>} />
           <Route path="/matched" element={<PrivateRoute><MatchedPage matchResult={matchResult} /></PrivateRoute>} />
           <Route path="/failed" element={<PrivateRoute><MatchingFailedPage /></PrivateRoute>} />
+          <Route path="/room" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
+          <Route path="/room/:roomId" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -53,7 +59,7 @@ function App() {
           <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />
           <Route path="/questions/add" element={<AdminRoute><AddQuestion /></AdminRoute>} />
           <Route path="/questions/edit/:id" element={<AdminRoute><EditQuestion /></AdminRoute>} />
-          <Route path="/questions/:id" element={<AdminRoute><QuestionDetails /></AdminRoute>} />
+          <Route path="/questions/:id" element={<AdminRoute><QuestionDetailsPage /></AdminRoute>} />
         </Routes>
       </main>
     </Router>

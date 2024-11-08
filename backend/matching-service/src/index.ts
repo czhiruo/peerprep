@@ -6,10 +6,14 @@ import { connectRequestConsumer } from './kafka/requestConsumer';
 import { connectResultConsumer } from './kafka/resultConsumer';
 import { connectTimeoutConsumer } from './kafka/timeoutConsumer';
 import { connectCancellationConsumer } from './kafka/cancellationConsumer';
+import { connectCollabRequestConsumer } from './kafka/collabRequestConsumer';
+import { connectMatchAcceptedConsumer } from './kafka/matchAcceptedConsumer';
+import { connectMatchRejectedConsumer } from './kafka/matchRejectedConsumer';
 import { adminInit } from './kafka/admin';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import redis from './redisClient';
 
 const app = express();
 app.use(cors());
@@ -33,22 +37,23 @@ const io = new Server(httpServer, {
 
 // Map to store the user ID and socket ID
 // enables the server to send messages to specific users
-const userSocketMap = new Map<string, string>();
+const usersToSocketsKey = 'matchingService-usersToSockets';
+const socketsToUsersKey = 'matchingService-socketsToUsers';
+
 
 io.on('connection', (socket) => {
-  console.log('A user connected to socket:', socket.id);
+  console.log(`A user connected to socket [${socket.id}]`);
 
   // Register user with their socket ID
-  socket.on('register', (userId: string) => {
-    userSocketMap.set(userId, socket.id);
-    console.log(`User registered: ${userId} with socket ID: ${socket.id}`);
+  socket.on('register', async (userId: string) => {  
+    await redis.hset(usersToSocketsKey, userId, socket.id);
+    await redis.hset(socketsToUsersKey, socket.id, userId);
+    console.log(`User [${userId}] registered with socket ID [${socket.id}]`);
+    
   });
 
   // Handle matching requests
   socket.on('matching-request', async (matchRequest: MatchRequest) => {
-    // Process the matching request
-    // For example, send it to Kafka topic 'matching-requests'
-    // You'll need to implement sendMessage in your producer
     await sendMessage('matching-requests', { key: matchRequest.userId, value: matchRequest});
   });
 
@@ -57,16 +62,44 @@ io.on('connection', (socket) => {
     await sendMessage('match-canceled', { key: matchRequest.userId, value: matchRequest});
   });
 
+  socket.on('acceptance-status', async (acceptanceStatus) => {
+    const { userId, isAccepted, matchedUserId } = acceptanceStatus;
+
+    console.log();
+    console.log('----------------------inside acceptance-status socket-----------------------')
+    console.log('testing userId = ', userId);
+    console.log('testing isAccepted = ', isAccepted);
+    console.log('testing matchedUserId = ', matchedUserId);
+
+    console.log('testing acceptance.userId = ', acceptanceStatus.userId);
+    console.log('testing acceptance.isAccepted = ', acceptanceStatus.isAccepted);
+    console.log('testing acceptance.matchedUserId = ', acceptanceStatus.matchedUserId);
+    console.log('----------------------------------------------------------------------------')
+    console.log();
+
+    if (acceptanceStatus.isAccepted) {
+      await sendMessage('match-accepted', { key: acceptanceStatus.userId, value: { userId, matchedUserId } });
+    } else {
+      await sendMessage('match-rejected', { key: acceptanceStatus.userId, value: { userId, matchedUserId } });
+    }
+  });
+
+  socket.on('collab-room-data', async (collabData) => {
+    const { userId1, userId2, interestTopic, difficulty, language } = collabData;
+    await sendMessage('collab-request', { key: userId1, value: { userId1, userId2, interestTopic, difficulty, language } });
+  });
+
   // Handle disconnections
   // clean up the userSocketMap when a client disconnects
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-    // Remove user from the map
-    for (const [userId, sId] of userSocketMap.entries()) {
-      if (sId === socket.id) {
-        userSocketMap.delete(userId);
-        break;
-      }
+  socket.on('disconnect', async () => {
+    const userId = await redis.hget(socketsToUsersKey, socket.id);
+    console.log(`User [${userId}] disconnected with socket ID [${socket.id}]`);
+    if (!userId) {
+      console.log(`User [${userId}] not registered, cannot disconnect`);
+    }
+    if (userId) {
+      await redis.hdel(usersToSocketsKey, userId);
+      await redis.hdel(socketsToUsersKey, socket.id);
     }
   });
 });
@@ -79,10 +112,13 @@ const startServer = async () => {
     await connectProducer();
 
     // Start the Kafka consumers and matching service
-    await connectRequestConsumer(io, userSocketMap);
-    await connectResultConsumer(io, userSocketMap);
-    await connectCancellationConsumer(io, userSocketMap);
-    await connectTimeoutConsumer(io, userSocketMap);
+    await connectRequestConsumer(io);
+    await connectResultConsumer(io);
+    await connectCancellationConsumer(io);
+    await connectTimeoutConsumer(io);
+    await connectCollabRequestConsumer(io);
+    await connectMatchAcceptedConsumer(io);
+    await connectMatchRejectedConsumer(io);
   
     // Start the WebSocket server
     const PORT = 8081;
