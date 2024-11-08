@@ -5,7 +5,7 @@ import { getToken, verifyToken } from '../services/userService';
 
 const Header = () => {
   const [userId, setUserId] = useState(null);
-
+  const [username, setUsername] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -14,6 +14,7 @@ const Header = () => {
       verifyToken(token)
         .then((data) => {
           setUserId(data.data.id);
+          setUsername(data.data.username);
         })
         .catch(() => {
           userLogout();
@@ -39,15 +40,16 @@ const Header = () => {
         </Link>
       </div>
       {
-        userId ? <ProfilePhoto userId={userId} handleLogout={handleLogout}/> : <></>
+        userId ? <ProfilePhoto userId={userId} username={username} handleLogout={handleLogout} /> : <></>
       }
     </div>
   )
 }
 
-const ProfilePhoto = ( {userId, handleLogout} ) => {
+const ProfilePhoto = ({ userId, username, handleLogout }) => {
   return (
     <div className="dropdown dropdown-end">
+      <span className="text-white px-2">{username}</span>
       <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
           {/* Replace the src with the path to your avatar image */}
