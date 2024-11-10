@@ -38,3 +38,5 @@ instance/
 # Database
 *.db
 *.sqlite3
+
+service-account-key.json
