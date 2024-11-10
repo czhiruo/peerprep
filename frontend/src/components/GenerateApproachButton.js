@@ -7,10 +7,11 @@ import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 function GenerateApproachButton() {
 
     const [isOpen, setIsOpen] = useState(false);
-    const closeModal = () => setIsOpen(false);
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState('');
-
+    
+    const closeModal = () => setIsOpen(false);
+    
     const handleGenerateApproach = async () => {
         setIsLoading(true);
         setIsOpen(true);         

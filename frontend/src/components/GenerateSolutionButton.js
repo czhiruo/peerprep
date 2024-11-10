@@ -1,45 +1,64 @@
 import { useState } from 'react';
-import { LightBulbIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import {  CheckCircleIcon, CheckIcon, DocumentDuplicateIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-function GenerateHintButton() {
+function GenerateSolutionButton( { language, questionDescription }) {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [response, setResponse] = useState('');
-    
+    const [response, setResponse] = useState('');    
+    const [copied, setCopied] = useState(false);
+    const [selectedLanguage, setSelectedLanguage] = useState(language);
+
     const closeModal = () => setIsOpen(false);
 
-    const handleGenerateHint = async () => {
+    const handleGenerateSolution = async () => {
         setIsLoading(true);
-        setIsOpen(true);        
+        setIsOpen(true);
+        
         try {
-            const res = await fetch('http://localhost:5000/code/hints', {
+            console.log(`language pass in = ${language}`);
+            console.log(`SelectedLanguage = ${selectedLanguage}`);
+            const res = await fetch('http://localhost:5000/code/solution', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ problem: "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1. Given n, calculate F(n)." })
+                body: JSON.stringify({ 
+                    problem: questionDescription,
+                    language: selectedLanguage
+                })
             });
             const data = await res.json();
-            setResponse(data.hints);
+            setResponse(data.solution);
         } catch (error) {
             console.error('Error:', error);
-            setResponse('Error generating hint. Please try again.');
+            setResponse('Error generating solution. Please try again.');
         } finally {
             setIsLoading(false);
         }
     };
+
+    const handleCopy = async () => {
+        try {
+          await navigator.clipboard.writeText(response); // Use the Clipboard API
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
+        } catch (err) {
+          console.error('Failed to copy: ', err); // Log any errors
+        }
+    };
+    
     
     return(
         <div>
             {/* Button to open the modal */}
             <button
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleGenerateHint}
-            >Show Hint
+                onClick={handleGenerateSolution}
+            >Show Solution
             </button>
 
             {/* Modal */}
@@ -48,8 +67,8 @@ function GenerateHintButton() {
                     <div className="bg-white p-8 rounded-lg shadow-lg w-[40rem]">
                         <div className='flex justify-between align-middle'> 
                             <div className='flex gap-2 align-middle'>
-                                <LightBulbIcon className="w-6 h-6 " />
-                                <h3 className="font-bold text-xl leading-6">Hint</h3>
+                                <CheckCircleIcon className="w-6 h-6 " />
+                                <h3 className="font-bold text-xl leading-6">Solution</h3>
                             </div>
                             <div class="text-gray-500 hover:text-gray-800"
                                 onClick={closeModal}>
@@ -57,16 +76,28 @@ function GenerateHintButton() {
                             </div>
                         </div>
                        
-                        <p className="m-0 pt-2 text-gray-400 text-sm">Hint to solve the question</p>
-                        <p className="m-0 text-gray-400 text-sm"><strong>Note:</strong> The hints provided below is generated using Vertex AI</p>
+                        <p className="m-0 pt-2 text-gray-400 text-sm">Show solution for the question</p>
+                        <p className="m-0 text-gray-400 text-sm"><strong>Note:</strong> The solution provided below is generated using Vertex AI. While efforts are made to ensure accuracy, please verify the information independently, as the generated content may not always be correct.</p>
                         <div className='py-4 prose prose-slate max-w-none'>
                             {isLoading ? (
                                     <div className="flex items-center justify-center mt-4">
                                         <span className="loading loading-spinner loading-md"></span>
-                                        <span className="ml-2">Generating hint for the question...</span>
+                                        <span className="ml-2">Generating solution for the question...</span>
                                     </div>
                                 ) : (
-                                    <div>
+                                    <div className='text-sm flex flex-col space-y-0 space-x-0'>
+                                        <div className='flex items-center justify-between'>
+                                            <span className='pl-1 text-gray-800 font-semibold text-based'>{language}</span>
+                                            <div className="copy-button cursor-pointer bg-gray-200 p-2 rounded-md border" 
+                                                onClick={handleCopy} role="button">
+                                                {copied ? (
+                                                    <CheckIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <DocumentDuplicateIcon className="h-4 w-4" />
+                                                
+                                                )}
+                                            </div>   
+                                        </div> 
                                         <ReactMarkdown
                                             components={{
                                                 // Headers
@@ -148,4 +179,4 @@ function GenerateHintButton() {
     )
 }
 
-export default GenerateHintButton;
+export default GenerateSolutionButton;
