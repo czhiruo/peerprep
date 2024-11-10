@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import GenerateHintButton from '../components/GenerateHintButton';
 
 function SelectTopicPage({ topics, setTopics }) {
   const topicList = [
@@ -22,12 +23,23 @@ function SelectTopicPage({ topics, setTopics }) {
     });
   };
 
+
+
   return (
     <div className="min-h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
       <div className="flex flex-col justify-start items-center gap-10">
         <div className="text-white text-4xl font-bold text-center leading-tight">
           Select Topic(s)
         </div>
+
+
+     
+      <GenerateHintButton />
+
+
+
+
+
 
         {/* Topic Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
