@@ -55,6 +55,14 @@ class PromptManager:
         The script should be able to run as-in any {language} IDE or environment, and should handle user input. 
         """
 
+        # Template for translation of code
+        self.code_translation_template = """
+        Translate the following code from {source_lang} to {target_lang}:
+        
+        Original code:
+        {code}
+        """
+
     
     def format_code_hint(self, problem):
         return self.code_hint_template.format(problem=problem)
@@ -67,5 +75,9 @@ class PromptManager:
             problem=problem,
             language=language
         )
-    
-  
+    def format_code_translation(self, code, source_lang, target_lang):
+        return self.code_translation_template.format(
+            code=code,
+            source_lang=source_lang,
+            target_lang=target_lang
+        )

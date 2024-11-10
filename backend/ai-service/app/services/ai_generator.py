@@ -41,3 +41,12 @@ class AIGenerator:
             prompt,
             generation_config=self.config.CODE_SOLUTION_CONFIG
         )
+
+    def generate_code_translation(self, code, source_lang, target_lang):
+        prompt = self.prompt_manager.format_code_translation(
+            code, source_lang, target_lang
+        )
+        return self.model.generate_content(
+            prompt,
+            generation_config=self.config.CODE_TRANSLATION_CONFIG
+        )
