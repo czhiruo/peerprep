@@ -43,7 +43,6 @@ function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Navigate to='/topic' />} />
-          {/* <Route path="/" element={<Navigate to='/room' />} /> */}
           <Route path="/topic" element={<PrivateRoute><SelectTopicPage topics={topics} setTopics={setTopics} /></PrivateRoute>} />
           <Route path="/complexity" element={<PrivateRoute><SelectComplexityPage difficulties={difficulties} setDifficulties={setDifficulties} /></PrivateRoute>} />
           <Route path="/language" element={<PrivateRoute><SelectLanguagePage languages={languages} setLanguages={setLanguages} /></PrivateRoute>} />
@@ -55,7 +54,6 @@ function App() {
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
-          {/* <Route path="/login" element={<CollaborationPage />} /> */}
           <Route path="/reset" element={<RequestResetPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/questions" element={<AdminRoute><QuestionList /></AdminRoute>} />

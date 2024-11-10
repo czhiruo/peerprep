@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import GenerateHintButton from '../components/GenerateHintButton';
-import GenerateApproachButton from '../components/GenerateApproachButton';
-import GenerateSolutionButton from '../components/GenerateSolutionButton';
 
 function SelectTopicPage({ topics, setTopics }) {
   const topicList = [
@@ -25,28 +22,12 @@ function SelectTopicPage({ topics, setTopics }) {
     });
   };
 
-
-  const language = 'python';
-
-  const question = "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1. Given n, calculate F(n)." 
-           
   return (
     <div className="min-h-[calc(100vh-65px)] w-full bg-[#1a1a1a] flex flex-col justify-center items-center">
       <div className="flex flex-col justify-start items-center gap-10">
         <div className="text-white text-4xl font-bold text-center leading-tight">
           Select Topic(s)
         </div>
-
-
-     
-      <GenerateHintButton />
-      <GenerateApproachButton />
-      <GenerateSolutionButton language={language} questionDescription={question}/>
-
-
-
-
-
 
         {/* Topic Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
