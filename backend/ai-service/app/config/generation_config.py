@@ -21,3 +21,9 @@ class GenerationConfig:
             "max_output_tokens": 1024,
         }
         
+        self.CODE_TRANSLATION_CONFIG = {
+            "temperature": 0.5,  # Balance between creativity and accuracy
+            "top_p": 0.95,
+            "top_k": 30,
+            "max_output_tokens": 1024,
+        }

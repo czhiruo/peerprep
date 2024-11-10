@@ -59,3 +59,17 @@ def get_code_solution():
         return jsonify({"solution": response.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/code/translate', methods=['POST'])
+def translate_code():
+    try:
+        data = request.json
+        code = data.get('code')
+        source_lang = data.get('source_lang')
+        target_lang = data.get('target_lang')
+        response = generator.generate_code_translation(
+            code, source_lang, target_lang
+        )
+        return jsonify({"translated_code": response.text})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
