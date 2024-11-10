@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import GenerateHintButton from '../components/GenerateHintButton';
+import GenerateApproachButton from '../components/GenerateApproachButton';
 
 function SelectTopicPage({ topics, setTopics }) {
   const topicList = [
@@ -35,6 +36,7 @@ function SelectTopicPage({ topics, setTopics }) {
 
      
       <GenerateHintButton />
+      <GenerateApproachButton />
 
 
 

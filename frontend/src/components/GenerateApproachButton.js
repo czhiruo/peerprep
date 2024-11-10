@@ -4,18 +4,18 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-function GenerateHintButton() {
+function GenerateApproachButton() {
 
     const [isOpen, setIsOpen] = useState(false);
     const closeModal = () => setIsOpen(false);
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState('');
 
-    const handleGenerateHint = async () => {
+    const handleGenerateApproach = async () => {
         setIsLoading(true);
-        setIsOpen(true);        
+        setIsOpen(true);         
         try {
-            const res = await fetch('http://localhost:5000/code/hints', {
+            const res = await fetch('http://localhost:5000/code/approach', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -23,10 +23,10 @@ function GenerateHintButton() {
                 body: JSON.stringify({ problem: "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2), for n > 1. Given n, calculate F(n)." })
             });
             const data = await res.json();
-            setResponse(data.hints);
+            setResponse(data.approach);
         } catch (error) {
             console.error('Error:', error);
-            setResponse('Error generating hint. Please try again.');
+            setResponse('Error generating approach. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -37,8 +37,8 @@ function GenerateHintButton() {
             {/* Button to open the modal */}
             <button
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleGenerateHint}
-            >Show Hint
+                onClick={handleGenerateApproach}
+            >Show Approach
             </button>
 
             {/* Modal */}
@@ -48,7 +48,7 @@ function GenerateHintButton() {
                         <div className='flex justify-between align-middle'> 
                             <div className='flex gap-2 align-middle'>
                                 <LightBulbIcon className="w-6 h-6 " />
-                                <h3 className="font-bold text-xl leading-6">Hint</h3>
+                                <h3 className="font-bold text-xl leading-6">Approach</h3>
                             </div>
                             <div class="text-gray-500 hover:text-gray-800"
                                 onClick={closeModal}>
@@ -56,13 +56,13 @@ function GenerateHintButton() {
                             </div>
                         </div>
                        
-                        <p className="m-0 pt-2 text-gray-400 text-sm">Hint to solve the question</p>
-                        <p className="m-0 text-gray-400 text-sm"><strong>Note:</strong> The hints provided below is generated using Vertex AI</p>
+                        <p className="m-0 pt-2 text-gray-400 text-sm">Step-by-step approach to solve the question</p>
+                        <p className="m-0 text-gray-400 text-sm"><strong>Note:</strong> The approach provided below is generated using Vertex AI</p>
                         <div className='py-4 prose prose-slate max-w-none'>
                             {isLoading ? (
                                     <div className="flex items-center justify-center mt-4">
                                         <span className="loading loading-spinner loading-md"></span>
-                                        <span className="ml-2">Generating hint for the question...</span>
+                                        <span className="ml-2">Generating approach to solve the question...</span>
                                     </div>
                                 ) : (
                                     <div>
@@ -147,4 +147,4 @@ function GenerateHintButton() {
     )
 }
 
-export default GenerateHintButton;
+export default GenerateApproachButton;
