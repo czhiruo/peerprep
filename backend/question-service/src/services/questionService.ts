@@ -22,7 +22,7 @@ export async function getQuestionById(questionId: ObjectId) {
       return null;
     }
 
-    console.log(question)
+    console.log(`Retrieving question by ID in questionService \n${question}`)
 
     return {
       "id": question._id,

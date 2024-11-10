@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
-import ReactMarkdown from 'react-markdown';
 import debounce from 'lodash.debounce';
 import { useParams } from 'react-router-dom';
 import { getToken, verifyToken } from '../services/userService';
@@ -9,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { addAttemptedQuestion } from '../services/userService';
 import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
+import QuestionDisplay from '../components/QuestionDisplay';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -19,9 +19,16 @@ function CollaborationPage() {
   const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
   const countdownRef = useRef(null); // Timeout reference for the countdown when user gets kicked out
   const messagesEndRef = useRef(null); // Reference to the end of the chat messages
+  
+  const example_question = {
+    questionTitle: "Question Title",
+    questionCategory: ["Algorithms", "Strings"],
+    questionComplexity: "easy",
+    questionDescription:  "The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from 0 and 1. That is, F(0) = 0, F(1) = 1,F(n) = F(n - 1) + F(n - 2), for n > 1. Given n, calculate F(n). "
+  };
 
   const [code, setCode] = useState('');
-  const [question, setQuestion] = useState('');
+  const [questionObject, setQuestionObject] = useState(example_question);
   const [questionId, setQuestionId] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [isReadOnly, setIsReadOnly] = useState(false);
@@ -32,17 +39,7 @@ function CollaborationPage() {
   const [newMessage, setNewMessage] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
 
-  function formatQuestion(question) {
-    return `
-### **${question.questionTitle}**
-
-**Topic**: ${question.questionCategory}  
-**Complexity**: ${question.questionComplexity}  
-
-**Question Description**  
-${question.questionDescription}
-    `.trim();
-  }
+  
 
   useEffect(() => {
     const initializeRoom = async () => {
@@ -74,7 +71,8 @@ ${question.questionDescription}
 
         await collabService.register(username);
 
-        setQuestion(formatQuestion(room.question));
+       
+        setQuestionObject(room.question);
         setQuestionId(room.question.questionId);
         setCode(room.code);
         setLanguage(room.language);
@@ -211,26 +209,18 @@ ${question.questionDescription}
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
-      <div className="bg-[#1e1e1e] flex text-white">
-        <button
-          className="btn btn-sm bg-error ml-2 text-white font-semibold"
-          onClick={() => navigate('/')}
-        >
-          Exit Room
-        </button>
-      </div>
-
       <div className="flex flex-row flex-grow">
-        <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
-          <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
-            {question}
-          </ReactMarkdown>
+        <div className="w-1/2 bg-[#1e1e1e] flex text-white  overflow-y-auto px-3 border-r-2 border-black">
+          <QuestionDisplay language={language} question={questionObject} />
         </div>
 
-        <div className="w-1/2 h-full flex relative">
+        <div className="w-1/2 flex relative">
           {isReadOnly && (
-            <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
-              <span className="text-white font-semibold">Other user is typing...</span>
+            <div>
+              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
+                <span className="text-white font-semibold">Other user is typing...</span>
+              </div>
+              
             </div>
           )}
 
@@ -246,7 +236,7 @@ ${question.questionDescription}
       </div>
 
       {/* Chatbox at the bottom */}
-      <div className="h-1/4 w-full border-t border-gray-700 flex flex-col bg-gray-800">
+      <div className="h-1/3 w-full border-t border-gray-700 flex flex-col bg-gray-800">
         <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
             <div key={index} className={`flex flex-col mb-2 ${msg.sender === 'You' ? 'items-end' : 'items-start'}`}>

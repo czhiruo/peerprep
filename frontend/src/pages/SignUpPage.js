@@ -13,7 +13,7 @@ function SignUpPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Signing up with:', { email, username, password });
+    console.log('Signing up with:', { email, username });
 
     if (password !== confirmPassword) {
       console.error('Passwords do not match');
