@@ -46,7 +46,7 @@ function GenerateSolutionButton( { language, questionDescription }) {
 
     const handleCopy = async () => {
         try {
-          await navigator.clipboard.writeText(response); // Use the Clipboard API
+          await navigator.clipboard.writeText(extractCode(response)); // Use the Clipboard API
           setCopied(true);
           setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
         } catch (err) {
