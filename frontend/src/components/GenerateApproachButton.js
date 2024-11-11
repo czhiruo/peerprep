@@ -17,7 +17,7 @@ function GenerateApproachButton() {
         setIsLoading(true);
         setIsOpen(true);         
         try {
-            const res = await fetch('http://localhost:5000/code/approach', {
+            const res = await fetch('http://localhost:5001/code/approach', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -17,8 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json"
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
+# Make port 5001 available to the world outside this container
+EXPOSE 5001
 
 # Run app.py when the container launches
 CMD ["python", "run.py"]

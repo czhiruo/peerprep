@@ -24,7 +24,7 @@ function GenerateSolutionButton( { language, questionDescription }) {
       try {
         console.log(`language pass in = ${language}`);
         console.log(`SelectedLanguage = ${selectedLanguage}`);
-        const res = await fetch("http://localhost:5000/code/solution", {
+        const res = await fetch("http://localhost:5001/code/solution", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -63,7 +63,7 @@ function GenerateSolutionButton( { language, questionDescription }) {
           );
           console.log(`code to translate = ${response}`);
           try {
-            const res = await fetch("http://localhost:5000/code/translate", {
+            const res = await fetch("http://localhost:5001/code/translate", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

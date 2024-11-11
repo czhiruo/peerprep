@@ -3,14 +3,12 @@ import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
 import debounce from 'lodash.debounce';
 import { useParams } from 'react-router-dom';
-import { getToken, verifyToken } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
-import { addAttemptedQuestion } from '../services/userService';
 import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
 import QuestionDisplay from '../components/QuestionDisplay';
 import { languages } from "../commons/constants";
-import { extractCode } from "../commons/utils";
+import { initializeRoom, translateCode, handleChatMessage, handleDisconnect, handleCodeChange, handleOtherUserDisconnect } from '../controllers/collabController';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -46,88 +44,35 @@ function CollaborationPage() {
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [editorLanguage, setEditorLanguage] = useState("javascript");
 
-  useEffect(() => {
-    const initializeRoom = async () => {
-      const token = getToken();
-
-      try {
-        const data = await verifyToken(token);
-        const username = data.data.username;
-        setUserId(data.data.id);
-        setCurrentUsername(username);
-
-        console.log("Username:", currentUsername);
-
-        if (!roomId) {
-          console.log("No room ID provided; fetching room ID...");
-          const fetchedRoomId = await fetchRoomIdWithRetry(username);
-          console.log("Fetched room ID:", fetchedRoomId);
-          navigate(`/room/${fetchedRoomId}`);
-          return;
-        }
-
-        const room = await collabService.getRoomDetails(roomId);
-        const users = room.users;
-
-        if (!users.includes(username)) {
-          navigate("/");
-          return;
-        }
-
-        await collabService.register(username);
-
-        setQuestionObject(room.question);
-        setQuestionId(room.question.questionId);
-        setCode(room.code);
-        setLanguage(room.language);
-      } catch (error) {
-        console.error("Error initializing room:", error);
-        navigate("/");
-      }
-    };
-
-    initializeRoom();
-  }, [navigate, roomId]);
 
   useEffect(() => {
-    // Listen for code changes from the matched user
+    const setters = {
+      setUserId,
+      setCurrentUsername,
+      setQuestionObject,
+      setQuestionId,
+      setCode,
+      setLanguage,
+      setIsReadOnly,
+      setIsGettingKickedOut,
+      setCountdown,
+      setResponse
+    }
+
     collabService.onCodeChange((newCode) => {
-      if (editorRef.current) {
-        isRemoteChange.current = true;
-        setIsReadOnly(true);
-
-        editorRef.current.updateOptions({
-          readOnly: true,
-        });
-
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          setIsReadOnly(false);
-          editorRef.current.updateOptions({
-            readOnly: false,
-          });
-        }, 1000);
-
-        const cursorPosition = editorRef.current.getPosition();
-        editorRef.current.setValue(newCode);
-        editorRef.current.setPosition(cursorPosition);
-      }
+      handleCodeChange(setters, newCode, editorRef, timeoutRef, isRemoteChange)
     });
 
-    // Listen for chat messages
-    const handleChatMessage = (data) => {
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: data.sender, message: data.message },
-      ]);
-    };
-
-    collabService.onChatMessage(handleChatMessage);
+    collabService.onChatMessage((data) => handleChatMessage(data));
+    
+    collabService.onOtherUserDisconnect(() => handleOtherUserDisconnect(setters, countdownRef, navigate));
+    
+    initializeRoom(setters, roomId, navigate);
 
     return () => {
       collabService.offChatMessage(handleChatMessage);
     };
-  }, []);
+  }, [navigate, roomId]);
 
   // Auto-scroll to the bottom when new messages are added
   useEffect(() => {
@@ -136,49 +81,13 @@ function CollaborationPage() {
     }
   }, [chatMessages]);
 
-  // Kick user out if other user disconnects
-  useEffect(() => {
-    collabService.onOtherUserDisconnect(() => {
-      setIsGettingKickedOut(true);
-      setCountdown(10);
-
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
-
-      // Start countdown timer
-      countdownRef.current = setInterval(() => {
-        setCountdown((prevCount) => {
-          if (prevCount === 1) {
-            clearInterval(countdownRef.current);
-            navigate("/"); // Redirect when countdown reaches zero
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-      return () => {
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-        }
-      };
-    });
-  }, [navigate]);
-
   // On navigating away
   useEffect(() => {
-    const handleDisconnect = async () => {
-      if (userId && questionId) {
-        collabService.disconnect();
-        console.log("Adding attempted question:", questionId);
-        await addAttemptedQuestion(userId, questionId);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleDisconnect); // For page refresh
+    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId)); // For page refresh
 
     return async () => {
-      window.removeEventListener("beforeunload", handleDisconnect);
-      handleDisconnect(); // For component unmount (navigating away)
+      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId));
+      handleDisconnect(userId, questionId); // For component unmount (navigating away)
     };
   }, [questionId, userId]);
 
@@ -222,32 +131,7 @@ function CollaborationPage() {
 
   const handleLanguageChange = async (event) => {
     const newLanguage = event.target.value;
-    const newLanguageEditor = event.target.value;
-    console.log(`target_language -> new language = ${newLanguage}`);
-    console.log(`source_language -> selecteLanguage = ${selectedLanguage}`);
-    console.log(`code to translate = ${code}`);
-    try {
-      const res = await fetch("http://localhost:5000/code/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: code,
-          source_lang: selectedLanguage,
-          target_lang: newLanguage,
-        }),
-      });
-      const data = await res.json();
-      setSelectedLanguage(newLanguage);
-      setEditorLanguage(newLanguageEditor);
-      console.log(
-        `after language change, selecteLanguage = ${selectedLanguage}`
-      );
-      setCode(extractCode(data.translated_code));
-    } catch (error) {
-      console.error("Error translating:", error);
-    }
+    translateCode(code, selectedLanguage, newLanguage, setCode, setSelectedLanguage, setEditorLanguage);
   };
 
   return (
@@ -361,27 +245,6 @@ function CollaborationPage() {
       )}
     </div>
   );
-}
-
-async function fetchRoomIdWithRetry(username, maxRetries = 3, delayMs = 500) {
-  let attempt = 0;
-  while (attempt < maxRetries) {
-    try {
-      // Try to fetch the room ID
-      const fetchedRoomId = await collabService.getRoomId(username);
-      return fetchedRoomId; // Exit function if successful
-    } catch (error) {
-      attempt++;
-      console.log(`Attempt ${attempt} failed: ${error.message}`);
-
-      if (attempt >= maxRetries) {
-        throw new Error(`Failed to fetch room ID after ${maxRetries} attempts`);
-      }
-
-      // Optionally add a delay before retrying
-      await new Promise(resolve => setTimeout(resolve, delayMs));
-    }
-  }
 }
 
 export default CollaborationPage;
