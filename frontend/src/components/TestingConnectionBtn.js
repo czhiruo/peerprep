@@ -14,7 +14,7 @@ function TestingConnectionBtn() {
         setLoading(true);
         setIsOpen(true);
         try {
-          const response = await fetch('http://localhost:5000/get-message');
+          const response = await fetch('http://localhost:5001/get-message');
           const data = await response.json();
           setMessage(data.message);
           console.log('Received message:', data.message);
