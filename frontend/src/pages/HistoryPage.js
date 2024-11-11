@@ -1,70 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAttemptedQuestions } from '../services/userService';
-import { getData } from '../services/questionService';
+import { loadHistoryData } from '../controllers/historyController';
 
 function HistoryComponent() {
   const { userId } = useParams();
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    
-    // Get the components
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-  
-    // Format as "YYYY-MM-DD, HH:MM"
-    return `${year}-${month}-${day}, ${hours}:${minutes}`;
-  };
-
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        // Retrieve questionId and attemptedAt from the user service
-        const { data } = await getAttemptedQuestions(userId);
-        // format of questionPartialInfo: [{ questionId, attemptedAt }, ...]
-        const questionPartialInfo = data.attemptedQuestions;
-        
-        // Clear previous questions to avoid duplicates
-        setQuestions([]);
+    const setters = {
+      setLoading,
+      setQuestions
+    }
 
-        for (const partialInfo of questionPartialInfo) {
-          const question = {};
-
-          // Retrieve question title, difficulty, and topics from the question service
-          const questionData = await getData(`/${partialInfo.questionId}`);
-          if (questionData) {
-            question.title = questionData.title;
-            question.difficulty = capitalizeFirstLetter(questionData.d);
-            question.topics = questionData.c;
-          } else {
-            question.title = "Unknown";
-            question.difficulty = "Unknown";
-            question.topics = ["Unknown"];
-          }
-
-          question.attemptedAt = formatDate(partialInfo.attemptedAt);
-          question.questionId = partialInfo.questionId;
-          
-          setQuestions((prevQuestions) => [...prevQuestions, question]);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHistory();
+    loadHistoryData(setters, userId);
   }, [userId]);
 
   if (loading) {
@@ -110,11 +59,19 @@ function HistoryComponent() {
 };
 
 function HistoryRow({ questionId, title, difficulty, topics, attemptTime }) {
+  const difficultyColorMap = {
+    easy: 'text-[#1a8754]',
+    medium: 'text-[#ffc008]',
+    hard: 'text-[#ff403f]',
+  }
+
+  const difficultyColor = difficultyColorMap[difficulty.toLowerCase()];
+
   return (
     <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
     <div className="text-white text-xs text-center">{ questionId }</div>
     <div className="text-white text-xs text-center">{ title }</div>
-    <div className="text-[#f9ff00] text-xs text-center">{ difficulty }</div>
+    <div className={`${difficultyColor} text-xs text-center`}>{ difficulty }</div>
     <div className="flex justify-center">
       { topics.map((topic) => (
         <span key={ topic } className="badge badge-secondary">{ topic }</span>

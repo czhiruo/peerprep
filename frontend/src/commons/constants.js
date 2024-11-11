@@ -8,6 +8,12 @@ export const languages = [
   { code: "typescript", name: "TypeScript" },
 ];
 
+export const difficultyColor = {
+  easy: '#1A8754',
+  medium: '#FFC008',
+  hard: '#FF403F',
+}
+
 export const getLanguageNameFromCode = (code) => {
   const language = languages.find((lang) => lang.code === code);
   return language ? language.name : code;
