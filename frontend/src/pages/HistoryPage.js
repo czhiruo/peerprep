@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { loadHistoryData } from '../controllers/historyController';
 
 function HistoryComponent() {
   const { userId } = useParams();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
+  const [page, setPage] = useState(1);
+  const questionsPerPage = 10;
 
   useEffect(() => {
     const setters = {
@@ -13,8 +16,18 @@ function HistoryComponent() {
       setQuestions
     }
 
-    loadHistoryData(setters, userId);
-  }, [userId]);
+    const queryParams = new URLSearchParams(location.search);
+    const pageParam = parseInt(queryParams.get('p'), 10);
+    
+    // If p is not given, default to 1
+    const currentPage = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+    setPage(currentPage);
+
+    const start = (currentPage - 1) * questionsPerPage;
+    const end = start + questionsPerPage;
+
+    loadHistoryData(setters, userId, start, end);
+  }, [userId, location.search]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -35,7 +48,7 @@ function HistoryComponent() {
       </div>
       <div className="flex flex-col w-full">
         <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] bg-white/5 h-10">
-          <div className="text-white text-xs font-semibold text-center">Question Number</div>
+          <div className="text-white text-xs font-semibold text-center">Question No.</div>
           <div className="text-white text-xs font-semibold text-center">Title</div>
           <div className="text-white text-xs font-semibold text-center">Difficulty</div>
           <div className="text-white text-xs font-semibold text-center">Topics</div>
@@ -45,7 +58,7 @@ function HistoryComponent() {
         { questions.map((question) => (
           <HistoryRow
             key={ question._id }
-            questionId={ question.questionId }
+            index={ question.index }
             title={ question.title }
             difficulty={ question.difficulty }
             topics={ question.topics }
@@ -58,21 +71,22 @@ function HistoryComponent() {
   );
 };
 
-function HistoryRow({ questionId, title, difficulty, topics, attemptTime }) {
+function HistoryRow({ index, title, difficulty, topics, attemptTime }) {
   const difficultyColorMap = {
     easy: 'text-[#1a8754]',
     medium: 'text-[#ffc008]',
     hard: 'text-[#ff403f]',
+    default: 'text-white'
   }
 
-  const difficultyColor = difficultyColorMap[difficulty.toLowerCase()];
+  const difficultyColor = difficultyColorMap[difficulty.toLowerCase()] || difficultyColorMap.default;
 
   return (
-    <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
-    <div className="text-white text-xs text-center">{ questionId }</div>
+  <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
+    <div className="text-white text-xs text-center">{ index }</div>
     <div className="text-white text-xs text-center">{ title }</div>
     <div className={`${difficultyColor} text-xs text-center`}>{ difficulty }</div>
-    <div className="flex justify-center">
+    <div className="flex justify-center space-x-2">
       { topics.map((topic) => (
         <span key={ topic } className="badge badge-secondary">{ topic }</span>
       )) }
