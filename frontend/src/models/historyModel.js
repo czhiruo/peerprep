@@ -41,5 +41,8 @@ export const fetchHistory = async (userId, start, end) => {
     questions.push(question);
   }
 
-  return questions
+  return {
+    questions,
+    totalQuestions: data.attemptedQuestions.length,
+  }
 }

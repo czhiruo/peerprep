@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { loadHistoryData } from '../controllers/historyController';
 
 function HistoryComponent() {
   const { userId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
+  const [numPages, setNumPages] = useState(1);
   const [page, setPage] = useState(1);
   const questionsPerPage = 10;
 
@@ -26,8 +28,19 @@ function HistoryComponent() {
     const start = (currentPage - 1) * questionsPerPage;
     const end = start + questionsPerPage;
 
-    loadHistoryData(setters, userId, start, end);
-  }, [userId, location.search]);
+    setLoading(true)
+    loadHistoryData(setters, userId, start, end)
+      .then(({ questions, totalQuestions }) => {
+        setQuestions(questions);
+        setNumPages(Math.ceil(totalQuestions / questionsPerPage));
+      })
+      .catch((error) => {
+        console.error("Failed to load history data:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [userId, location.search, questions.length]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -56,16 +69,28 @@ function HistoryComponent() {
         </div>
 
         { questions.map((question) => (
-          <HistoryRow
-            key={ question._id }
-            index={ question.index }
-            title={ question.title }
-            difficulty={ question.difficulty }
-            topics={ question.topics }
-            attemptTime={ question.attemptedAt }
-          />
-        )) }
+            <HistoryRow
+              key={ question._id }
+              index={ question.index }
+              title={ question.title }
+              difficulty={ question.difficulty }
+              topics={ question.topics }
+              attemptTime={ question.attemptedAt }
+            />
+          ))}
+      </div>
 
+      {/* Pagination */}
+      <div className="join">
+        {Array.from({ length: numPages }, (_, i) => (
+          <button
+            key={i}
+            className={`join-item btn ${page === i + 1 ? 'btn-active text-primary' : 'text-white'}`}
+            onClick={() => navigate(`?p=${i + 1}`)}
+          >
+            {i + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
