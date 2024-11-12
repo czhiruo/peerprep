@@ -1,17 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import GenerateHintButton from "./GenerateHintButton";
-import GenerateApproachButton from "./GenerateApproachButton";
-import GenerateSolutionButton from "./GenerateSolutionButton";
 import {
   Cog6ToothIcon,
   TagIcon,
 } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
-import { ExitButton } from "./ExitButton";
 
-function QuestionDisplay({ language, question }) {
-  const navigate = useNavigate();
-
+function HistoryQuestionDisplay({ question }) {
   const colorSets = [
     { bg: "bg-blue-100", text: "text-blue-800", ring: "ring-blue-600/10" },
     {
@@ -81,7 +74,6 @@ function QuestionDisplay({ language, question }) {
               );
             })()}
           </div>
-          <ExitButton navigate={navigate}/>
         </div>
 
             <div className="flex items-center mb-4">
@@ -101,17 +93,6 @@ function QuestionDisplay({ language, question }) {
                     })}
                 </span>
               </div>
-              
-            <div className="flex gap-3 mb-8">
-              <GenerateHintButton />
-              <GenerateApproachButton />
-              <GenerateSolutionButton 
-                language={language} 
-                questionDescription={question.questionDescription} 
-              />
-            </div>
-          
-            
             <div className="text-white text-sm max-h-[29.5rem] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
                 <ReactMarkdown>{question.questionDescription}</ReactMarkdown>
             </div>
@@ -120,4 +101,4 @@ function QuestionDisplay({ language, question }) {
     )
 }
 
-export default QuestionDisplay;
+export default HistoryQuestionDisplay;

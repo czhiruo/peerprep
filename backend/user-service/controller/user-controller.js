@@ -13,6 +13,7 @@ import {
   addAttemptedQuestion as _addAttemptedQuestion,
   getAttemptedQuestions as _getAttemptedQuestions,
   getAttemptedQuestionById as _getAttemptedQuestionById,
+  doesRoomIdExistForUser
 } from "../model/repository.js";
 
 const questionServiceUrl = process.env.QUESTION_SERVICE_BASE_URL;
@@ -186,7 +187,7 @@ export async function getAttemptedQuestions(req, res) {
 export async function addAttemptedQuestion(req, res) {
   try {
     const userId = req.params.id;
-    const { questionId, code, language } = req.body;
+    const { questionId, roomId, code, language } = req.body;
     if (!isValidObjectId(userId)) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
@@ -204,8 +205,13 @@ export async function addAttemptedQuestion(req, res) {
     if (!questionExists) {
       return res.status(404).json({ message: `Question ${questionId} does not exist in repository` });
     }
+    
+    const roomIdExistsForUser = await doesRoomIdExistForUser(userId, roomId);
+    if (roomIdExistsForUser) {
+      return res.status(409).json({ message: `Room ID ${roomId} already exists for user ${userId}` });
+    }
 
-    const updatedUser = await _addAttemptedQuestion(userId, questionId, code, language);
+    const updatedUser = await _addAttemptedQuestion(userId, questionId, roomId, code, language);
     return res.status(200).json({
       message: `Added attempted question for user ${userId}`,
       data: formatUserResponse(updatedUser),

@@ -36,6 +36,10 @@ const UserModelSchema = new Schema({
         type: Date,
         default: Date.now, // Automatically set to the current date/time
       },
+      roomId: {
+        type: String,
+        required: true,
+      },
       code: {
         type: String,
         required: true,

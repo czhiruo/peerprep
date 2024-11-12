@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import '.././index.css';
 import QuestionDisplay from '../components/QuestionDisplay';
 import { getHistoryDetails } from '../controllers/historyCodeRoomController';
+import HistoryQuestionDisplay from '../components/HistoryQuestionDisplay';
 
 function HistoryCodeRoomPage() {
   const { userId, attemptId } = useParams();
@@ -51,10 +52,8 @@ function HistoryCodeRoomPage() {
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
       <div className="flex flex-row flex-grow h-2/3 bg-red-200">
         <div className="w-1/2 bg-[#1e1e1e] flex text-white overflow-y-auto px-3 border-r-2 border-black">
-          <QuestionDisplay
-            language={language}
+          <HistoryQuestionDisplay
             question={questionObject}
-            showAIButtons={false}
           />
         </div>
 

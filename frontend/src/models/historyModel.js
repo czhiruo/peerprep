@@ -5,14 +5,16 @@ import { capitalizeFirstLetter, formatDate } from "../commons/utils";
 export const fetchHistory = async (userId, start, end) => {
   // Retrieve questionId and attemptedAt from the user service
   const { data } = await getAttemptedQuestions(userId);
+  const allQuestions = data.attemptedQuestions.reverse(); // Show latest question first
   // format of questionPartialInfo: [{ questionId, attemptedAt }, ...]
-  const questionPartialInfo = data.attemptedQuestions.slice(start, end);
+  const questionPartialInfo = allQuestions.slice(start, end);
   
   const questions = []
   for (let i = 0; i < questionPartialInfo.length; i++) {
     const partialInfo = questionPartialInfo[i];
     const question = {
       index: start + i + 1,
+      attemptId: partialInfo._id,
     };
 
     // Retrieve question title, difficulty, and topics from the question service

@@ -92,13 +92,14 @@ export async function getAttemptedQuestions(userId) {
   return UserModel.findById(userId, "attemptedQuestions");
 }
 
-export async function addAttemptedQuestion(userId, questionId, code, language) {
+export async function addAttemptedQuestion(userId, questionId, roomId, code, language) {
   return UserModel.findByIdAndUpdate(
     userId,
     {
       $push: {
         attemptedQuestions: {
           questionId,
+          roomId,
           language,
           code
         },
@@ -116,4 +117,9 @@ export async function getAttemptedQuestionById(userId, attemptId) {
     },
     { "attemptedQuestions.$": 1 }
   );
+}
+
+export async function doesRoomIdExistForUser(userId, roomId) {
+  const user = await UserModel.findOne({ _id: userId, "attemptedQuestions.roomId": roomId });
+  return user !== null;
 }

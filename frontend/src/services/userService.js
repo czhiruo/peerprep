@@ -214,10 +214,10 @@ const getAttemptedQuestions = async (userId) => {
   }
 }
 
-const addAttemptedQuestion = async (userId, questionId, code, language) => {
+const addAttemptedQuestion = async (userId, questionId, roomId, code, language) => {
   try {
     console.log(`adding attempted question with code: ${code}`);
-    const response = await api.post(`/users/${userId}/attempts`, { questionId, code, language }, {
+    const response = await api.post(`/users/${userId}/attempts`, { questionId, roomId, code, language }, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },

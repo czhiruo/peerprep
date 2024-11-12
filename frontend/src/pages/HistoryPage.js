@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { loadHistoryData } from '../controllers/historyController';
 import LoadingPage from './LoadingPage';
+import { Link } from 'react-router-dom';
 
 function HistoryComponent() {
   const { userId } = useParams();
@@ -69,16 +70,20 @@ function HistoryComponent() {
           <div className="text-white text-xs font-semibold text-center">Date/Time of Attempt</div>
         </div>
 
-        { questions.map((question) => (
-            <HistoryRow
-              key={ question._id }
-              index={ question.index }
-              title={ question.title }
-              difficulty={ question.difficulty }
-              topics={ question.topics }
-              attemptTime={ question.attemptedAt }
-            />
-          ))}
+        {questions.map((question) => (
+            <Link to={`${location.pathname}/${question.attemptId}`}>
+              <button className='btn w-full'>
+                <HistoryRow
+                  key={question._id}
+                  index={question.index}
+                  title={question.title}
+                  difficulty={question.difficulty}
+                  topics={question.topics}
+                  attemptTime={question.attemptedAt}
+                />
+              </button>
+            </Link>
+        ))}
       </div>
 
       {/* Pagination */}
@@ -108,17 +113,17 @@ function HistoryRow({ index, title, difficulty, topics, attemptTime }) {
   const difficultyColor = difficultyColorMap[difficulty.toLowerCase()] || difficultyColorMap.default;
 
   return (
-  <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
-    <div className="text-white text-xs text-center">{ index }</div>
-    <div className="text-white text-xs text-center">{ title }</div>
-    <div className={`${difficultyColor} text-xs text-center`}>{ difficulty }</div>
-    <div className="flex justify-center space-x-2">
-      { topics.map((topic) => (
-        <span key={ topic } className="badge badge-secondary">{ topic }</span>
-      )) }
+    <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
+      <div className="text-white text-xs text-center">{ index }</div>
+      <div className="text-white text-xs text-center">{ title }</div>
+      <div className={`${difficultyColor} text-xs text-center`}>{ difficulty }</div>
+      <div className="flex justify-center space-x-2">
+        { topics.map((topic) => (
+          <span key={ topic } className="badge badge-secondary">{ topic }</span>
+        )) }
+      </div>
+      <div className="text-white text-xs text-center">{ attemptTime }</div>
     </div>
-    <div className="text-white text-xs text-center">{ attemptTime }</div>
-  </div>
   )
 }
 
