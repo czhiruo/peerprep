@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { loadHistoryData } from '../controllers/historyController';
+import LoadingPage from './LoadingPage';
 
 function HistoryComponent() {
   const { userId } = useParams();
@@ -43,7 +44,7 @@ function HistoryComponent() {
   }, [userId, location.search, questions.length]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingPage />;
   }
 
   return (

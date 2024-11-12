@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { getToken, isUserAdmin, verifyToken } from '../services/userService';
+import LoadingPage from '../pages/LoadingPage';
 
 // This component will check if the user logged in is an admin
 // Either renders the protected component or redirects them to the login page.
@@ -44,7 +45,7 @@ const AdminRoute = ({ children }) => {
   }, []); // Empty dependency array to run only once on component mount
 
   if (loading) {
-    return <div>Loading...</div>; // Replace with a loading spinner if desired
+    return <LoadingPage />;
   }
 
   if (!isAuthenticated || !isAdmin) {
