@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import AvatarDisplay from '../components/AvatarDisplay';
 import LoadingDots from '../components/LoadingDots';
-import socketService from '../services/socketService'; // WebSocket service
+import socketService from '../services/socketService'; 
 import { getToken, verifyToken } from '../services/userService';
 
 function MatchingPage({ difficulties, topics, languages, setMatchResult }) {

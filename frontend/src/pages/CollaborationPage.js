@@ -19,6 +19,7 @@ function CollaborationPage() {
   const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
   const countdownRef = useRef(null); // Timeout reference for the countdown when user gets kicked out
   const messagesEndRef = useRef(null); // Reference to the end of the chat messages
+  const codeRef = useRef(""); // Reference to the code
 
   // Testing Data
   const example_question = {
@@ -29,7 +30,6 @@ function CollaborationPage() {
       "Given an integer `n`, calculate the `nth` Fibonacci number `F(n)`. \n \n The Fibonacci sequence is defined as follows: \n- `F(0) = 0` \n- `F(1) = 1` \n- `F(n) = F(n-1) + F(n-2) for n > 1`\n ",
   };
 
-  const [code, setCode] = useState("");
   const [questionObject, setQuestionObject] = useState(example_question);
   const [questionId, setQuestionId] = useState("");
   const [language, setLanguage] = useState("javascript");
@@ -51,8 +51,8 @@ function CollaborationPage() {
       setCurrentUsername,
       setQuestionObject,
       setQuestionId,
-      setCode,
       setLanguage,
+      setEditorLanguage,
       setIsReadOnly,
       setIsGettingKickedOut,
       setCountdown,
@@ -67,7 +67,7 @@ function CollaborationPage() {
     
     collabService.onOtherUserDisconnect(() => handleOtherUserDisconnect(setters, countdownRef, navigate));
     
-    initializeRoom(setters, roomId, navigate);
+    initializeRoom(setters, roomId, codeRef, navigate);
 
     return () => {
       collabService.offChatMessage(handleChatMessage);
@@ -83,13 +83,13 @@ function CollaborationPage() {
 
   // On navigating away
   useEffect(() => {
-    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId)); // For page refresh
+    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId, roomId, codeRef.current, language)); // For page refresh
 
     return async () => {
-      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId));
-      handleDisconnect(userId, questionId); // For component unmount (navigating away)
+      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId, roomId, codeRef.current, language));
+      handleDisconnect(userId, questionId, roomId, codeRef.current, language); // For component unmount (navigating away)
     };
-  }, [questionId, userId]);
+  }, [questionId, userId, language, roomId]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -101,7 +101,7 @@ function CollaborationPage() {
       }
 
       const changedCode = editor.getValue();
-      setCode(changedCode);
+      codeRef.current = changedCode;
       collabService.sendCode(changedCode);
     }, 300);
 
@@ -131,7 +131,7 @@ function CollaborationPage() {
 
   const handleLanguageChange = async (event) => {
     const newLanguage = event.target.value;
-    translateCode(code, selectedLanguage, newLanguage, setCode, setSelectedLanguage, setEditorLanguage);
+    translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
   };
 
   return (
@@ -172,8 +172,8 @@ function CollaborationPage() {
             <Editor
               className="h-full text-sm"
               language={editorLanguage}
-              value={code}
-              onChange={(newCode) => setCode(newCode)}
+              value={codeRef.current}
+              onChange={(newCode) => codeRef.current = newCode}
               theme="vs-dark"
               options={editorOptions}
               onMount={handleEditorDidMount}
@@ -239,7 +239,7 @@ function CollaborationPage() {
       {isGettingKickedOut && (
         <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 z-50">
           <DisconnectAlert
-            text={`Other user disconnected! Redirecting to home page in ${countdown}s...`}
+            text={`Other user disconnected! Saving changes and redirecting in ${countdown}s...`}
           />
         </div>
       )}

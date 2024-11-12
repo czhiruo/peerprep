@@ -3,7 +3,7 @@ import collabService from '../services/collabService';
 import { translateCodeService } from '../services/aiService';
 import { addAttemptedQuestion, getToken, verifyToken } from '../services/userService';
 
-export const initializeRoom = async (setters, roomId, navigate) => {
+export const initializeRoom = async (setters, roomId, codeRef, navigate) => {
   const token = getToken();
 
   try {
@@ -29,8 +29,10 @@ export const initializeRoom = async (setters, roomId, navigate) => {
     await collabService.register(username);
     setters.setQuestionObject(room.question);
     setters.setQuestionId(room.question.questionId);
-    setters.setCode(room.code);
     setters.setLanguage(room.language);
+    setters.setEditorLanguage(room.language);
+
+    codeRef.current = room.code;
   } catch (error) {
     console.error("Error initializing room:", error);
     navigate('/');
@@ -87,22 +89,22 @@ export const handleChatMessage = (setters, data) => {
   ]);
 };
 
-export const handleDisconnect = async (userId, questionId) => {
+export const handleDisconnect = async (userId, questionId, roomId, code, language) => {
   if (userId && questionId) {
     collabService.disconnect();
     console.log("Adding attempted question:", questionId);
-    await addAttemptedQuestion(userId, questionId);
+    await addAttemptedQuestion(userId, questionId, roomId, code, language);
   }
 }
 
-export async function translateCode(setters, code, sourceLang, targetLang) {
-  const translatedCode = await translateCodeService(code, sourceLang, targetLang);
-  setters.setCode(translatedCode);
+export async function translateCode(setters, codeRef, sourceLang, targetLang) {
+  const translatedCode = await translateCodeService(codeRef.current, sourceLang, targetLang);
+  codeRef.current = translatedCode;
   setters.setSelectedLanguage(targetLang);
   setters.setEditorLanguage(targetLang);
 }
 
-async function fetchRoomIdWithRetry(username, maxRetries = 3, delayMs = 500) {
+async function fetchRoomIdWithRetry(username, maxRetries = 5, delayMs = 1000) {
   let attempt = 0;
   while (attempt < maxRetries) {
     try {
