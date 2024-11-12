@@ -87,11 +87,11 @@ export const handleChatMessage = (setters, data) => {
   ]);
 };
 
-export const handleDisconnect = async (userId, questionId) => {
+export const handleDisconnect = async (userId, questionId, code, language) => {
   if (userId && questionId) {
     collabService.disconnect();
     console.log("Adding attempted question:", questionId);
-    await addAttemptedQuestion(userId, questionId);
+    await addAttemptedQuestion(userId, questionId, code, language);
   }
 }
 

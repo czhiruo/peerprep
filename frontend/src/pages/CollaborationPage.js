@@ -83,13 +83,13 @@ function CollaborationPage() {
 
   // On navigating away
   useEffect(() => {
-    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId)); // For page refresh
+    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId, code, language)); // For page refresh
 
     return async () => {
-      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId));
+      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId, code, language));
       handleDisconnect(userId, questionId); // For component unmount (navigating away)
     };
-  }, [questionId, userId]);
+  }, [questionId, userId, code, language]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -141,6 +141,7 @@ function CollaborationPage() {
           <QuestionDisplay
             language={selectedLanguage}
             question={questionObject}
+            showAIButtons={true}
           />
         </div>
 

@@ -19,6 +19,7 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Header from './components/Header';
 import QuestionDetailsPage from './pages/QuestionDetailsPage';
+import HistoryCodeRoomPage from './pages/HistoryCodeRoomPage';
 
 function App() {
   const [topics, setTopics] = useState([]);
@@ -52,6 +53,7 @@ function App() {
           <Route path="/room" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
           <Route path="/room/:roomId" element={<PrivateRoute><CollaborationPage/></PrivateRoute>} />
           <Route path="/user/:userId/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
+          <Route path="/user/:userId/history/:attemptId" element={<PrivateRoute><HistoryCodeRoomPage /></PrivateRoute>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reset" element={<RequestResetPasswordPage />} />

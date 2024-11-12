@@ -11,8 +11,8 @@ import {
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
   addAttemptedQuestion as _addAttemptedQuestion,
-  deleteAttemptedQuestion as _deleteAttemptedQuestion,
   getAttemptedQuestions as _getAttemptedQuestions,
+  getAttemptedQuestionById as _getAttemptedQuestionById,
 } from "../model/repository.js";
 
 const questionServiceUrl = process.env.QUESTION_SERVICE_BASE_URL;
@@ -186,7 +186,7 @@ export async function getAttemptedQuestions(req, res) {
 export async function addAttemptedQuestion(req, res) {
   try {
     const userId = req.params.id;
-    const { questionId } = req.body;
+    const { questionId, code, language } = req.body;
     if (!isValidObjectId(userId)) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
@@ -205,7 +205,7 @@ export async function addAttemptedQuestion(req, res) {
       return res.status(404).json({ message: `Question ${questionId} does not exist in repository` });
     }
 
-    const updatedUser = await _addAttemptedQuestion(userId, questionId);
+    const updatedUser = await _addAttemptedQuestion(userId, questionId, code, language);
     return res.status(200).json({
       message: `Added attempted question for user ${userId}`,
       data: formatUserResponse(updatedUser),
@@ -216,10 +216,10 @@ export async function addAttemptedQuestion(req, res) {
   }
 }
 
-export async function deleteAttemptedQuestion(req, res) {
+export async function getAttemptedQuestionById(req, res) {
   try {
     const userId = req.params.id;
-    const questionId = req.params.questionId;
+    const attemptId = req.params.attemptId;
     if (!isValidObjectId(userId)) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
@@ -228,30 +228,22 @@ export async function deleteAttemptedQuestion(req, res) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
 
-    if (!isValidObjectId(questionId)) {
-      return res.status(404).json({ message: `Question ${questionId} not found` });
+    if (!isValidObjectId(attemptId)) {
+      return res.status(404).json({ message: `Attempt ${attemptId} not found` });
     }
 
-    // Check if the question exists from question service.
-    const questionExists = await fetch(`${questionServiceUrl}/${questionId}`).then((res) => res.ok);
-    if (!questionExists) {
-      return res.status(404).json({ message: `Question ${questionId} does not exist in repository` });
+    const attemptedQuestion = await _getAttemptedQuestionById(userId, attemptId);
+    if (!attemptedQuestion) {
+      return res.status(404).json({ message: `Attempted question ${attemptId} not found for user ${userId}` });
     }
 
-    // Check if question is in user's attempted questions.
-    const hasAttempted = user.attemptedQuestions.some((q) => q.questionId.toString() === questionId);
-    if (!hasAttempted) {
-      return res.status(404).json({ message: `Question ${questionId} not found in user's attempted questions` });
-    }
-
-    const updatedUser = await _deleteAttemptedQuestion(userId, questionId);
     return res.status(200).json({
-      message: `Deleted attempted question for user ${userId}`,
-      data: formatUserResponse(updatedUser),
+      message: `Found attempted question for user ${userId}`,
+      data: attemptedQuestion,
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when deleting attempted question!" });
+    return res.status(500).json({ message: "Unknown error when getting attempted question!" });
   }
 }
 

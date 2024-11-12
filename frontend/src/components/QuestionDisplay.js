@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
 
-function QuestionDisplay({ language, question }) {
+function QuestionDisplay({ language, question, showAIButtons }) {
   const navigate = useNavigate();
 
   const colorSets = [
@@ -110,11 +110,16 @@ function QuestionDisplay({ language, question }) {
                 </span>
               </div>
               
-            <div className='flex gap-3 mb-8'>
-                <GenerateHintButton />
-                <GenerateApproachButton />
-                <GenerateSolutionButton language={language} questionDescription={question.questionDescription}/>
-            </div>
+              {showAIButtons && (
+                <div className="flex gap-3 mb-8">
+                  <GenerateHintButton />
+                  <GenerateApproachButton />
+                  <GenerateSolutionButton 
+                    language={language} 
+                    questionDescription={question.questionDescription} 
+                  />
+                </div>
+              )}
             
             <div className="text-white text-sm max-h-[29.5rem] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
                 <ReactMarkdown>{question.questionDescription}</ReactMarkdown>
