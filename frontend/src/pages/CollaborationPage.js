@@ -1,3 +1,5 @@
+// CollaborationPage.js
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
@@ -8,7 +10,17 @@ import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
 import QuestionDisplay from '../components/QuestionDisplay';
 import { languages } from "../commons/constants";
-import { initializeRoom, translateCode, handleChatMessage, handleDisconnect, handleCodeChange, handleOtherUserDisconnect } from '../controllers/collabController';
+import { 
+  initializeRoom, 
+  translateCode, 
+  handleChatMessage, 
+  handleDisconnect, 
+  handleCodeChange, 
+  handleOtherUserDisconnect 
+} from '../controllers/collabController';
+
+// Import icons from react-icons
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -27,7 +39,7 @@ function CollaborationPage() {
     questionCategory: ["Algorithms", "Strings"],
     questionComplexity: "easy",
     questionDescription:
-      "Given an integer `n`, calculate the `nth` Fibonacci number `F(n)`. \n \n The Fibonacci sequence is defined as follows: \n- `F(0) = 0` \n- `F(1) = 1` \n- `F(n) = F(n-1) + F(n-2) for n > 1`\n ",
+      "Given an integer n, calculate the nth Fibonacci number F(n). \n \n The Fibonacci sequence is defined as follows: \n- F(0) = 0 \n- F(1) = 1 \n- F(n) = F(n-1) + F(n-2) for n > 1\n ",
   };
 
   const [questionObject, setQuestionObject] = useState(example_question);
@@ -44,8 +56,15 @@ function CollaborationPage() {
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [editorLanguage, setEditorLanguage] = useState("javascript");
 
-  // Theme state: 'light' or 'dark'
-  const [theme, setTheme] = useState('dark'); // Default to dark mode
+  // **Theme State**
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    // If no preference, use system preference
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
     const setters = {
@@ -65,7 +84,7 @@ function CollaborationPage() {
       handleCodeChange(setters, newCode, editorRef, timeoutRef, isRemoteChange)
     });
 
-    collabService.onChatMessage((data) => handleChatMessage(data));
+    collabService.onChatMessage((data) => handleChatMessage(data, setChatMessages));
     
     collabService.onOtherUserDisconnect(() => handleOtherUserDisconnect(setters, countdownRef, navigate));
     
@@ -85,24 +104,14 @@ function CollaborationPage() {
 
   // On navigating away
   useEffect(() => {
-    const handleBeforeUnload = () => handleDisconnect(userId, questionId, roomId, codeRef.current, language);
-    window.addEventListener("beforeunload", handleBeforeUnload); // For page refresh
+    const beforeUnloadHandler = () => handleDisconnect(userId, questionId, roomId, codeRef.current, language);
+    window.addEventListener("beforeunload", beforeUnloadHandler); // For page refresh
 
-    return async () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnloadHandler);
       handleDisconnect(userId, questionId, roomId, codeRef.current, language); // For component unmount (navigating away)
     };
   }, [questionId, userId, language, roomId]);
-
-  // Apply theme by adding/removing 'dark' class on the html element
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -126,7 +135,7 @@ function CollaborationPage() {
     fontFamily: "JetBrains Mono, monospace",
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
-    theme: theme === 'dark' ? "vs-dark" : "light", // Dynamically set theme
+    theme: isDarkMode ? "vs-dark" : "light", // Dynamic theme based on state
     lineHeight: 18,
     padding: { top: 16 },
   };
@@ -144,57 +153,47 @@ function CollaborationPage() {
   const handleLanguageChange = async (event) => {
     const newLanguage = event.target.value;
     translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
+    setLanguage(newLanguage);
   };
 
-  // Toggle theme handler
+  // **Theme Toggle Handler**
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem('theme', newMode ? 'dark' : 'light');
+      return newMode;
+    });
   };
 
   return (
-    <div className="h-[calc(100vh-65px)] w-full flex flex-col">
+    // **Apply theme classes based on isDarkMode state with transition effects**
+    <div className={`h-[calc(100vh-65px)] w-full flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       
-      {/* Theme Toggle Switch with Sun and Moon Icons */}
-      <div className="flex justify-end p-4 bg-black">
-        <label className="swap swap-rotate">
-          <input 
-            type="checkbox" 
-            checked={theme === 'dark'} 
-            onChange={toggleTheme} 
-          />
-          
-          {/* Sun Icon (Visible when in Dark Mode) */}
-          <svg 
-            className="swap-on fill-current w-6 h-6 text-white" 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 4.5a1 1 0 011 1V7a1 1 0 11-2 0V5.5a1 1 0 011-1zm0 13a1 1 0 011 1V19a1 1 0 11-2 0v-1.5a1 1 0 011-1zm8-8a1 1 0 011 1H19a1 1 0 110-2h2a1 1 0 011 1zm-15 0a1 1 0 011 1H5a1 1 0 110-2H4a1 1 0 011 1zm12.364-5.364a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L16.364 6.05a1 1 0 010-1.414zm-12.728 12.728a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L3.636 18.364a1 1 0 010-1.414zm12.728 0a1 1 0 010 1.414l-1.061 1.061a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zm-12.728-12.728a1 1 0 010 1.414L4.05 6.05a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zM12 8a4 4 0 100 8 4 4 0 000-8z" />
-          </svg>
-
-          {/* Moon Icon (Visible when in Light Mode) */}
-          <svg 
-            className="swap-off fill-current w-6 h-6 text-white" 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24"
-          >
-            <path d="M21.752 15.002A9 9 0 1111.002 2a7 7 0 109.75 13.002z" />
-          </svg>
-        </label>
+      {/* **Header with Theme Toggle** */}
+      <div className="flex justify-end p-4">
+        <button 
+          onClick={toggleTheme} 
+          className="btn btn-ghost text-xl transition-colors duration-300"
+          aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+        >
+          {isDarkMode ? <FaSun /> : <FaMoon />}
+        </button>
       </div>
 
       <div className="flex flex-row flex-grow h-2/3">
-        <div className={`w-1/2 flex text-white overflow-y-auto px-3 border-r-2 border-black ${theme === 'dark' ? 'bg-[#1e1e1e]' : 'bg-white text-black'}`}>
+        {/* **Question Display Section** */}
+        <div className={`w-1/2 flex overflow-y-auto px-3 border-r-2 border-black transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
           <QuestionDisplay
             language={selectedLanguage}
             question={questionObject}
           />
         </div>
 
-        <div className={`w-1/2 h-full flex relative ${theme === 'dark' ? 'bg-[#1e1e1e]' : 'bg-gray-100'}`}>
+        {/* **Editor Section** */}
+        <div className={`w-1/2 h-full flex relative transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
           {isReadOnly && (
             <div>
-              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
+              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10 transition-opacity duration-300">
                 <span className="text-white font-semibold">
                   Other user is typing...
                 </span>
@@ -206,9 +205,7 @@ function CollaborationPage() {
               <select
                 value={selectedLanguage}
                 onChange={handleLanguageChange}
-                className={`text-gray-800 font-medium text-xs border rounded-md p-2 mt-8 mx-4 ${
-                  theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'
-                }`}
+                className={`font-medium text-xs border rounded-md p-2 mt-8 mx-4 transition-colors duration-300 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
               >
                 {languages.map((lang) => (
                   <option key={lang.code} value={lang.code}>
@@ -223,7 +220,7 @@ function CollaborationPage() {
               language={editorLanguage}
               value={codeRef.current}
               onChange={(newCode) => codeRef.current = newCode}
-              theme={theme === 'dark' ? "vs-dark" : "light"} // Dynamically set theme
+              theme={isDarkMode ? "vs-dark" : "light"} // Switch Monaco theme
               options={editorOptions}
               onMount={handleEditorDidMount}
             />
@@ -231,28 +228,26 @@ function CollaborationPage() {
         </div>
       </div>
 
-      {/* Chatbox at the bottom */}
-      <div className={`h-1/3 w-full border-t border-gray-700 flex flex-col ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100 text-black'}`}>
+      {/* **Chatbox at the Bottom** */}
+      <div className={`h-1/3 w-full border-t border-gray-700 flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}>
         <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
             <div
               key={index}
-              className={`flex flex-col mb-2 ${
-                msg.sender === "You" ? "items-end" : "items-start"
-              }`}
+              className={`flex flex-col mb-2 ${msg.sender === "You" ? "items-end" : "items-start"}`}
             >
               <div
-                className={`text-sm font-semibold ${
-                  msg.sender === "You" ? "text-right text-gray-700 dark:text-gray-300" : "text-left text-gray-700 dark:text-gray-300"
-                }`}
+                className={`text-sm font-semibold ${msg.sender === "You" ? "text-right text-white" : "text-left text-gray-800"}`}
               >
                 {msg.sender}
               </div>
               <div
-                className={`max-w-md p-2 rounded-lg break-words ${
+                className={`max-w-md p-2 rounded-lg break-words transition-colors duration-300 ${
                   msg.sender === "You"
                     ? "bg-blue-600 text-white text-right"
-                    : "bg-gray-300 text-black dark:bg-gray-700 dark:text-white"
+                    : isDarkMode
+                      ? "bg-gray-700 text-white"
+                      : "bg-gray-300 text-gray-900"
                 }`}
               >
                 <p>{msg.message}</p>
@@ -261,12 +256,12 @@ function CollaborationPage() {
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <div className="p-3 border-t border-gray-700">
+        <div className="p-3 border-t border-gray-700 transition-colors duration-300">
           <div className="flex">
             <input
               type="text"
-              className={`input input-bordered w-full rounded-l-full rounded-r-full ${
-                theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-black'
+              className={`input input-bordered w-full rounded-l-full rounded-r-full transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
               }`}
               placeholder="Type a message..."
               value={newMessage}
