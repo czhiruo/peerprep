@@ -4,7 +4,7 @@ import { BeakerIcon} from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { getLanguageNameFromCode, languages } from "../commons/constants";
+import { getLanguageNameFromCode, languageList } from "../commons/constants";
 import { extractCode } from "../commons/utils";
 
 function GenerateSolutionButton( { language, questionDescription }) {
@@ -141,7 +141,7 @@ function GenerateSolutionButton( { language, questionDescription }) {
                           onChange={handleLanguageChange}
                           className="text-gray-800 font-semibold text-base bg-gray-200 border rounded-md p-2"
                         >
-                          {languages.map((lang) => (
+                          {languageList.map((lang) => (
                             <option key={lang.code} value={lang.code}>
                               {lang.name}
                             </option>

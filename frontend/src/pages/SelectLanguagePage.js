@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { languageList } from '../commons/constants';
 
 function SelectLanguagePage({ languages, setLanguages }) {
   const languageList = [
@@ -33,11 +34,11 @@ function SelectLanguagePage({ languages, setLanguages }) {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {languageList.map((language) => (
             <div
-              key={language}
-              className={`btn text-white ${languages.includes(language) ? 'border-primary border-2' : 'border-white'} bg-neutral hover:bg-neutral-focus`}
-              onClick={() => toggleLanguage(language)}
+              key={language.code}
+              className={`btn text-white ${languages.includes(language.code) ? 'border-primary border-2' : 'border-white'} bg-neutral hover:bg-neutral-focus`}
+              onClick={() => toggleLanguage(language.code)}
             >
-              {language}
+              {language.name}
             </div>
           ))}
         </div>

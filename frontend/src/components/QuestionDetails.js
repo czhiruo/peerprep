@@ -2,33 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { getData as getQuestion } from '../services/questionService';
 import { Cog6ToothIcon, TagIcon } from '@heroicons/react/24/solid';
 import ReactMarkdown from 'react-markdown';
+import { getComplexityColor, getRandomColorSet } from '../commons/utils';
 
 
 const QuestionDetails = ({ questionId, theme }) => {
   const [question, setQuestion] = useState(null);
-
-  const colorSets = [
-    { bg: 'bg-blue-100', text: 'text-blue-800', ring: 'ring-blue-600/10' },
-    { bg: 'bg-purple-100', text: 'text-purple-800', ring: 'ring-purple-600/10' },
-    { bg: 'bg-gray-100', text: 'text-gray-800', ring: 'ring-gray-600/10' },
-    { bg: 'bg-indigo-100', text: 'text-indigo-800', ring: 'ring-indigo-600/10' },
-    { bg: 'bg-pink-100', text: 'text-pink-800', ring: 'ring-pink-600/10' },
-  ];
-
-  const getRandomColorSet = () => colorSets[Math.floor(Math.random() * colorSets.length)];
-
-  const getComplexityColor = (complexity) => {
-    switch (complexity) {
-      case 'easy':
-        return { bg: 'bg-green-100', text: 'text-green-800', ring: 'ring-green-600/10' };
-      case 'medium':
-        return { bg: 'bg-yellow-100', text: 'text-yellow-800', ring: 'ring-yellow-600/10' };
-      case 'hard':
-        return { bg: 'bg-red-100', text: 'text-red-800', ring: 'ring-red-600/10' };
-      default:
-        return { bg: 'bg-gray-100', text: 'text-gray-800', ring: 'ring-gray-600/10' };
-    }
-  };
 
   useEffect(() => {
     const fetchQuestionDetails = async () => {

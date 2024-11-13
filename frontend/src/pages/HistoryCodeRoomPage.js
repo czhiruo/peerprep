@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { useParams } from 'react-router-dom';
 import '.././index.css';
-import QuestionDisplay from '../components/QuestionDisplay';
 import { getHistoryDetails } from '../controllers/historyCodeRoomController';
 import HistoryQuestionDisplay from '../components/HistoryQuestionDisplay';
+import { editorOptions } from '../commons/constants';
 
 function HistoryCodeRoomPage() {
   const { userId, attemptId } = useParams();
@@ -37,16 +37,6 @@ function HistoryCodeRoomPage() {
     initializeRoom();
   }, [attemptId, userId]);
 
-  const editorOptions = {
-    fontSize: 12,
-    fontFamily: "JetBrains Mono, monospace",
-    minimap: { enabled: true },
-    scrollBeyondLastLine: false,
-    theme: "vs-dark",
-    lineHeight: 18,
-    padding: { top: 16 },
-    readOnly: true
-  };
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
