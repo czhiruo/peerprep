@@ -3,10 +3,6 @@ import { Link } from 'react-router-dom';
 import { languageList } from '../commons/constants';
 
 function SelectLanguagePage({ languages, setLanguages }) {
-  const languageList = [
-    'Python', 'Java', 'Javascript',
-    'Typescript', 'C#', 'C', 'C++'
-  ];
 
   const toggleLanguage = (language) => {
     setLanguages((prevSelected) => {

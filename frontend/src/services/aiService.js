@@ -6,7 +6,7 @@ export async function translateCodeService(code, sourceLang, targetLang) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        code,
+        code: code,
         source_lang: sourceLang,
         target_lang: targetLang,
       }),
