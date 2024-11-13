@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
 import QuestionDisplay from '../components/QuestionDisplay';
-import { languages } from "../commons/constants";
+import { languageList } from "../commons/constants";
 import { initializeRoom, translateCode, handleChatMessage, handleDisconnect, handleCodeChange, handleOtherUserDisconnect } from '../controllers/collabController';
 
 function CollaborationPage() {
@@ -216,7 +216,7 @@ function CollaborationPage() {
                 onChange={handleLanguageChange}
                 className="text-gray-800 font-medium text-xs bg-gray-200 border rounded-md p-2 mt-8 mx-4"
               >
-                {languages.map((lang) => (
+                {languageList.map((lang) => (
                   <option key={lang.code} value={lang.code}>
                     {lang.name}
                   </option>

@@ -4,36 +4,15 @@ import { Button, Card, Container, Row, Col } from 'react-bootstrap';
 import { getData, deleteData } from "../services/questionService";
 import { Cog6ToothIcon } from '@heroicons/react/24/solid';
 import './QuestionList.css'; // Custom CSS for QuestionList
+import { getComplexityColor
 
+ } from '../commons/utils';
 const QuestionList = () => {
   const [allQuestions, setAllQuestions] = useState([]); // Original list of questions
   const [displayedQuestions, setDisplayedQuestions] = useState([]); // Filtered list
   const [filters, setFilters] = useState({ difficulty: '', category: '' });
   const navigate = useNavigate();
-  const colorSets = [
-    { bg: 'bg-blue-100', text: 'text-blue-800', ring: 'ring-blue-600/10' },
-    { bg: 'bg-purple-100', text: 'text-purple-800', ring: 'ring-purple-600/10' },
-    { bg: 'bg-gray-100', text: 'text-gray-800', ring: 'ring-gray-600/10' },
-    { bg: 'bg-indigo-100', text: 'text-indigo-800', ring: 'ring-indigo-600/10' },
-    { bg: 'bg-pink-100', text: 'text-pink-800', ring: 'ring-pink-600/10' },
-  ];
 
-  // Randomly select a color set for each category
-  const getRandomColorSet = () => colorSets[Math.floor(Math.random() * colorSets.length)];
-
-  // Get color classes based on complexity
-  const getComplexityColor = (complexity) => {
-    switch (complexity) {
-      case 'easy':
-        return { bg: 'bg-green-100', text: 'text-green-800', ring: 'ring-green-600/10' };
-      case 'medium':
-        return { bg: 'bg-yellow-100', text: 'text-yellow-800', ring: 'ring-yellow-600/10' };
-      case 'hard':
-        return { bg: 'bg-red-100', text: 'text-red-800', ring: 'ring-red-600/10' };
-      default:
-        return { bg: 'bg-gray-100', text: 'text-gray-800', ring: 'ring-gray-600/10' };
-    }
-  };
 
   // Fetch questions from backend
   useEffect(() => {

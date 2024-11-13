@@ -52,9 +52,6 @@ const socketService = {
     socket.on('open-collab-room', callback);
   },
 
-  // sendRematchNotification: (rematchData) => {
-  //   socket.emit('rematch-notification', rematchData);
-  // },
 };
 
 export default socketService;
