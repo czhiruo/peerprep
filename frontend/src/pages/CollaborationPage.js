@@ -1,5 +1,3 @@
-// CollaborationPage.js
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
@@ -10,17 +8,7 @@ import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
 import QuestionDisplay from '../components/QuestionDisplay';
 import { languages } from "../commons/constants";
-import { 
-  initializeRoom, 
-  translateCode, 
-  handleChatMessage, 
-  handleDisconnect, 
-  handleCodeChange, 
-  handleOtherUserDisconnect 
-} from '../controllers/collabController';
-
-// Import icons from react-icons
-import { FaSun, FaMoon } from 'react-icons/fa';
+import { initializeRoom, translateCode, handleChatMessage, handleDisconnect, handleCodeChange, handleOtherUserDisconnect } from '../controllers/collabController';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -39,7 +27,7 @@ function CollaborationPage() {
     questionCategory: ["Algorithms", "Strings"],
     questionComplexity: "easy",
     questionDescription:
-      "Given an integer n, calculate the nth Fibonacci number F(n). \n \n The Fibonacci sequence is defined as follows: \n- F(0) = 0 \n- F(1) = 1 \n- F(n) = F(n-1) + F(n-2) for n > 1\n ",
+      "Given an integer `n`, calculate the `nth` Fibonacci number `F(n)`. \n \n The Fibonacci sequence is defined as follows: \n- `F(0) = 0` \n- `F(1) = 1` \n- `F(n) = F(n-1) + F(n-2) for n > 1`\n ",
   };
 
   const [questionObject, setQuestionObject] = useState(example_question);
@@ -56,15 +44,16 @@ function CollaborationPage() {
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [editorLanguage, setEditorLanguage] = useState("javascript");
 
-  // **Theme State**
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      return savedTheme === 'dark';
-    }
-    // If no preference, use system preference
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // **1. Theme State Management**
+  const [editorTheme, setEditorTheme] = useState(() => {
+    // Initialize theme from localStorage or default to 'dark'
+    return localStorage.getItem('editorTheme') || 'dark';
   });
+
+  useEffect(() => {
+    // **Persist Theme Preference**
+    localStorage.setItem('editorTheme', editorTheme);
+  }, [editorTheme]);
 
   useEffect(() => {
     const setters = {
@@ -84,7 +73,7 @@ function CollaborationPage() {
       handleCodeChange(setters, newCode, editorRef, timeoutRef, isRemoteChange)
     });
 
-    collabService.onChatMessage((data) => handleChatMessage(data, setChatMessages));
+    collabService.onChatMessage((data) => handleChatMessage(data));
     
     collabService.onOtherUserDisconnect(() => handleOtherUserDisconnect(setters, countdownRef, navigate));
     
@@ -104,11 +93,15 @@ function CollaborationPage() {
 
   // On navigating away
   useEffect(() => {
-    const beforeUnloadHandler = () => handleDisconnect(userId, questionId, roomId, codeRef.current, language);
-    window.addEventListener("beforeunload", beforeUnloadHandler); // For page refresh
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      handleDisconnect(userId, questionId, roomId, codeRef.current, language);
+      e.returnValue = '';
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload); // For page refresh
 
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnloadHandler);
+    return async () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       handleDisconnect(userId, questionId, roomId, codeRef.current, language); // For component unmount (navigating away)
     };
   }, [questionId, userId, language, roomId]);
@@ -135,7 +128,7 @@ function CollaborationPage() {
     fontFamily: "JetBrains Mono, monospace",
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
-    theme: isDarkMode ? "vs-dark" : "light", // Dynamic theme based on state
+    theme: editorTheme === 'dark' ? "vs-dark" : "light", // Dynamically set theme
     lineHeight: 18,
     padding: { top: 16 },
   };
@@ -153,47 +146,29 @@ function CollaborationPage() {
   const handleLanguageChange = async (event) => {
     const newLanguage = event.target.value;
     translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
-    setLanguage(newLanguage);
   };
 
-  // **Theme Toggle Handler**
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => {
-      const newMode = !prevMode;
-      localStorage.setItem('theme', newMode ? 'dark' : 'light');
-      return newMode;
-    });
+  // **2. Theme Toggle Handler**
+  const toggleEditorTheme = () => {
+    setEditorTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
 
   return (
-    // **Apply theme classes based on isDarkMode state with transition effects**
-    <div className={`h-[calc(100vh-65px)] w-full flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <div className="h-[calc(100vh-65px)] w-full flex flex-col">
       
-      {/* **Header with Theme Toggle** */}
-      <div className="flex justify-end p-4">
-        <button 
-          onClick={toggleTheme} 
-          className="btn btn-ghost text-xl transition-colors duration-300"
-          aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
-        >
-          {isDarkMode ? <FaSun /> : <FaMoon />}
-        </button>
-      </div>
-
+      {/* **3. DaisyUI Toggle Switch within the Editor Panel** */}
       <div className="flex flex-row flex-grow h-2/3">
-        {/* **Question Display Section** */}
-        <div className={`w-1/2 flex overflow-y-auto px-3 border-r-2 border-black transition-colors duration-300 ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+        <div className="w-1/2 bg-[#1e1e1e] flex text-white overflow-y-auto px-3 border-r-2 border-black">
           <QuestionDisplay
             language={selectedLanguage}
             question={questionObject}
           />
         </div>
 
-        {/* **Editor Section** */}
-        <div className={`w-1/2 h-full flex relative transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`w-1/2 h-full flex relative bg-[#1e1e1e]`}>
           {isReadOnly && (
             <div>
-              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10 transition-opacity duration-300">
+              <div className={`absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10`}>
                 <span className="text-white font-semibold">
                   Other user is typing...
                 </span>
@@ -201,11 +176,40 @@ function CollaborationPage() {
             </div>
           )}
           <div className="flex flex-col w-full">
+            {/* **4. Theme Toggle Switch for Editor Only** */}
+            <div className="flex justify-end p-2">
+              <label className="swap swap-rotate" aria-label="Toggle Editor Theme">
+                <input 
+                  type="checkbox" 
+                  checked={editorTheme === 'dark'} 
+                  onChange={toggleEditorTheme} 
+                />
+                
+                {/* Sun Icon (Visible when in Dark Mode) */}
+                <svg 
+                  className="swap-on fill-current w-6 h-6 text-yellow-500" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 4.5a1 1 0 011 1V7a1 1 0 11-2 0V5.5a1 1 0 011-1zm0 13a1 1 0 011 1V19a1 1 0 11-2 0v-1.5a1 1 0 011-1zm8-8a1 1 0 011 1H19a1 1 0 110-2h2a1 1 0 011 1zm-15 0a1 1 0 011 1H5a1 1 0 110-2H4a1 1 0 011 1zm12.364-5.364a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L16.364 6.05a1 1 0 010-1.414zm-12.728 12.728a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L3.636 18.364a1 1 0 010-1.414zm12.728 0a1 1 0 010 1.414l-1.061 1.061a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zm-12.728-12.728a1 1 0 010 1.414L4.05 6.05a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zM12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+      
+                {/* Moon Icon (Visible when in Light Mode) */}
+                <svg 
+                  className="swap-off fill-current w-6 h-6 text-gray-800" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M21.752 15.002A9 9 0 1111.002 2a7 7 0 109.75 13.002z" />
+                </svg>
+              </label>
+            </div>
+
             <div className="pb-2">
               <select
                 value={selectedLanguage}
                 onChange={handleLanguageChange}
-                className={`font-medium text-xs border rounded-md p-2 mt-8 mx-4 transition-colors duration-300 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                className="text-gray-800 font-medium text-xs bg-gray-200 border rounded-md p-2 mt-8 mx-4"
               >
                 {languages.map((lang) => (
                   <option key={lang.code} value={lang.code}>
@@ -220,7 +224,7 @@ function CollaborationPage() {
               language={editorLanguage}
               value={codeRef.current}
               onChange={(newCode) => codeRef.current = newCode}
-              theme={isDarkMode ? "vs-dark" : "light"} // Switch Monaco theme
+              theme={editorTheme === 'dark' ? "vs-dark" : "light"} // Dynamically set theme
               options={editorOptions}
               onMount={handleEditorDidMount}
             />
@@ -228,26 +232,28 @@ function CollaborationPage() {
         </div>
       </div>
 
-      {/* **Chatbox at the Bottom** */}
-      <div className={`h-1/3 w-full border-t border-gray-700 flex flex-col transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}>
+      {/* Chatbox at the bottom */}
+      <div className={`h-1/3 w-full border-t border-gray-700 flex flex-col bg-gray-800`}>
         <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
             <div
               key={index}
-              className={`flex flex-col mb-2 ${msg.sender === "You" ? "items-end" : "items-start"}`}
+              className={`flex flex-col mb-2 ${
+                msg.sender === "You" ? "items-end" : "items-start"
+              }`}
             >
               <div
-                className={`text-sm font-semibold ${msg.sender === "You" ? "text-right text-white" : "text-left text-gray-800"}`}
+                className={`text-sm font-semibold text-white ${
+                  msg.sender === "You" ? "text-right" : "text-left"
+                }`}
               >
                 {msg.sender}
               </div>
               <div
-                className={`max-w-md p-2 rounded-lg break-words transition-colors duration-300 ${
+                className={`max-w-md p-2 rounded-lg break-words ${
                   msg.sender === "You"
                     ? "bg-blue-600 text-white text-right"
-                    : isDarkMode
-                      ? "bg-gray-700 text-white"
-                      : "bg-gray-300 text-gray-900"
+                    : "bg-gray-700 text-white"
                 }`}
               >
                 <p>{msg.message}</p>
@@ -256,13 +262,11 @@ function CollaborationPage() {
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <div className="p-3 border-t border-gray-700 transition-colors duration-300">
+        <div className="p-3 border-t border-gray-700">
           <div className="flex">
             <input
               type="text"
-              className={`input input-bordered w-full rounded-l-full rounded-r-full transition-colors duration-300 ${
-                isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
-              }`}
+              className="input input-bordered w-full bg-white text-black rounded-l-full rounded-r-full"
               placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
