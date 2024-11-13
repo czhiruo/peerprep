@@ -160,10 +160,10 @@ function CollaborationPage() {
           />
         </div>
 
-        <div className={"w-1/2 h-full flex relative bg-[#1e1e1e]"}>
+        <div className="w-1/2 h-full flex relative bg-[#1e1e1e]">
           {isReadOnly && (
             <div>
-              <div className={"absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10"}>
+              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
                 <span className="text-white font-semibold">
                   Other user is typing...
                 </span>
@@ -228,7 +228,7 @@ function CollaborationPage() {
       </div>
 
       {/* Chatbox at the bottom */}
-      <div className={"h-1/3 w-full border-t border-gray-700 flex flex-col bg-gray-800"}>
+      <div className="h-1/3 w-full border-t border-gray-700 flex flex-col bg-gray-800">
         <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
             <div
