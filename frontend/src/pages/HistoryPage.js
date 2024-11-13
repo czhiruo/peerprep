@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { loadHistoryData } from '../controllers/historyController';
 import LoadingPage from './LoadingPage';
-import { Link } from 'react-router-dom';
 
 function HistoryComponent() {
   const { userId } = useParams();
@@ -49,7 +48,7 @@ function HistoryComponent() {
   }
 
   return (
-    <div className="h-[calc(100vh-65px)] w-full flex flex-col items-center justify-start bg-[#1a1a1a] px-2">
+    <div className="h-[calc(100vh-65px)] w-full flex flex-col items-center justify-start bg-[#1a1a1a] px-2 overflow-y-auto">
       <h2 className="w-full text-center text-white text-4xl font-bold">
         History
       </h2>
@@ -71,38 +70,24 @@ function HistoryComponent() {
         </div>
 
         {questions.map((question) => (
-            <Link to={`${location.pathname}/${question.attemptId}`}>
-              <button className='btn w-full'>
-                <HistoryRow
-                  key={question._id}
-                  index={question.index}
-                  title={question.title}
-                  difficulty={question.difficulty}
-                  topics={question.topics}
-                  attemptTime={question.attemptedAt}
-                />
-              </button>
-            </Link>
+          <HistoryRow
+            key={question._id}
+            index={question.index}
+            title={question.title}
+            difficulty={question.difficulty}
+            topics={question.topics}
+            attemptTime={question.attemptedAt}
+            onClick={() => navigate(`${location.pathname}/${question.attemptId}`)}
+          />
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="join">
-        {Array.from({ length: numPages }, (_, i) => (
-          <button
-            key={i}
-            className={`join-item btn ${page === i + 1 ? 'btn-active text-primary' : 'text-white'}`}
-            onClick={() => navigate(`?p=${i + 1}`)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+      <HistoryPagination numPages={numPages} currentPage={page} navigate={navigate}/>
     </div>
   );
 };
 
-function HistoryRow({ index, title, difficulty, topics, attemptTime }) {
+function HistoryRow({ index, title, difficulty, topics, attemptTime, onClick }) {
   const difficultyColorMap = {
     easy: 'text-[#1a8754]',
     medium: 'text-[#ffc008]',
@@ -113,17 +98,68 @@ function HistoryRow({ index, title, difficulty, topics, attemptTime }) {
   const difficultyColor = difficultyColorMap[difficulty.toLowerCase()] || difficultyColorMap.default;
 
   return (
-    <div className="grid grid-cols-5 items-center border-b border-[#5b5b5b] h-10">
+    <button className="grid grid-cols-5 items-center border-b border-[#5b5b5b] py-2 hover:bg-[#151515]" onClick={onClick}>
       <div className="text-white text-xs text-center">{ index }</div>
       <div className="text-white text-xs text-center">{ title }</div>
       <div className={`${difficultyColor} text-xs text-center`}>{ difficulty }</div>
-      <div className="flex justify-center space-x-2">
+      <div className="flex justify-center gap-2 flex-wrap">
         { topics.map((topic) => (
           <span key={ topic } className="badge badge-secondary">{ topic }</span>
         )) }
       </div>
-      <div className="text-white text-xs text-center">{ attemptTime }</div>
+      <div className="text-white text-xs text-center text-wrap">{ attemptTime }</div>
+    </button>
+  )
+}
+
+const HistoryPagination = ({ numPages, currentPage, navigate }) => {
+  return (
+    <div className="flex gap-2">
+      <HistoryPaginationButton 
+        onClick={() => navigate(`?p=1`)}
+      >
+        {"<<"}
+      </HistoryPaginationButton>
+      {Array.from({ length: numPages }, (_, i) => {
+        const pageNumber = i + 1;
+        const showPage = (
+          pageNumber >= Math.max(1, currentPage - 2) && 
+          pageNumber <= Math.min(numPages, currentPage + 2)
+        );
+        
+        if (showPage) {
+          return (
+            <HistoryPaginationButton 
+              active={currentPage === pageNumber} 
+              onClick={() => navigate(`?p=${pageNumber}`)}
+            >
+              {i + 1}
+            </HistoryPaginationButton>
+          );
+        }
+
+        return null;
+      })}
+      <HistoryPaginationButton
+        onClick={() => navigate(`?p=${numPages}`)}
+      >
+        {">>"}
+      </HistoryPaginationButton>
     </div>
+  )
+}
+
+const HistoryPaginationButton = ({ children, active, onClick }) => {
+  return (
+    <button
+      className={`
+        text-white rounded-lg w-8 h-8
+        ${active ? 'bg-[#1f6feb]' : 'hover:border hover:border-white'}`
+      }
+      onClick={onClick}
+    >
+      {children}
+    </button>
   )
 }
 
