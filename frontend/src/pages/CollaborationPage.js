@@ -44,14 +44,14 @@ function CollaborationPage() {
   const [selectedLanguage, setSelectedLanguage] = useState(language);
   const [editorLanguage, setEditorLanguage] = useState("javascript");
 
-  // **1. Theme State Management**
+  // ** introduce theme variables **
   const [editorTheme, setEditorTheme] = useState(() => {
-    // Initialize theme from localStorage or default to 'dark'
+    // saved local theme or default to 'dark'
     return localStorage.getItem('editorTheme') || 'dark';
   });
 
+  // local storage
   useEffect(() => {
-    // **Persist Theme Preference**
     localStorage.setItem('editorTheme', editorTheme);
   }, [editorTheme]);
 
@@ -148,7 +148,7 @@ function CollaborationPage() {
     translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
   };
 
-  // **2. Theme Toggle Handler**
+  // ** toggle handler **
   const toggleEditorTheme = () => {
     setEditorTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
@@ -156,7 +156,7 @@ function CollaborationPage() {
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
       
-      {/* **3. DaisyUI Toggle Switch within the Editor Panel** */}
+      {/* ** DaisyUI toggle within the editor ** */}
       <div className="flex flex-row flex-grow h-2/3">
         <div className="w-1/2 bg-[#1e1e1e] flex text-white overflow-y-auto px-3 border-r-2 border-black">
           <QuestionDisplay
@@ -176,7 +176,7 @@ function CollaborationPage() {
             </div>
           )}
           <div className="flex flex-col w-full">
-            {/* **4. Theme Toggle Switch for Editor Only** */}
+            {/* ** theme toggle code ** */}
             <div className="flex justify-end p-2">
               <label className="swap swap-rotate" aria-label="Toggle Editor Theme">
                 <input 
@@ -196,7 +196,7 @@ function CollaborationPage() {
       
                 {/* Moon Icon (Visible when in Light Mode) */}
                 <svg 
-                  className="swap-off fill-current w-6 h-6 text-gray-800" 
+                  className="swap-off fill-current w-6 h-6 text-white-800" 
                   xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 24 24"
                 >
