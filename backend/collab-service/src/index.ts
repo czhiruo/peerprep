@@ -8,6 +8,7 @@ import { connectProducer, sendCodeMessage, sendLanguageMessage, sendChatMessage 
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
 import { connectChatConsumer } from './kafka/chatConsumer';
+import { connectLanguageConsumer } from './kafka/languageConsumer';
 import { roomManager } from './services/roomManager';
 import redis from './redisClient';
 
@@ -149,6 +150,7 @@ const startServer = async () => {
     await connectRoomConsumer();
     await connectCodeConsumer(io);
     await connectChatConsumer(io);
+    await connectLanguageConsumer(io);
 
     const PORT = 8888;
     httpServer.listen(PORT, () => {
