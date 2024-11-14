@@ -81,6 +81,17 @@ class RoomManager {
     await redis.hset(this.roomIdToRoomsKey, roomId, JSON.stringify(room));
   }
 
+    public async updateLanguage(roomId: string, language: string): Promise<void> {
+    const roomData = await redis.hget(this.roomIdToRoomsKey, roomId);
+    if (!roomData) {
+      throw new Error('Room does not exist');
+    }
+
+    const room: Room = JSON.parse(roomData);
+    room.language = language;
+    await redis.hset(this.roomIdToRoomsKey, roomId, JSON.stringify(room));
+  }
+
   // Get roomId from username
   public async getRoomId(username: string): Promise<string | null> {
     return await redis.hget(this.usersToRoomsKey, username);

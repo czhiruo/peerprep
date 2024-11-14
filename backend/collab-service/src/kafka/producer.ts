@@ -26,6 +26,14 @@ export async function sendCodeMessage(topic: string, message: { key: string; val
     console.log(`Sent message: ${JSON.stringify(result)}`);
 }
 
+export async function sendLanguageMessage(topic: string, message: { key: string; value: any }): Promise<void> {
+    const result = await producer.send({
+        topic,
+        messages: [{ key: message.key, value: JSON.stringify(message.value) }],
+    });
+    console.log(`Sent message: ${JSON.stringify(result)}`);
+}
+
 export async function sendChatMessage(topic: string, message: { key: string; value: string }): Promise<void> {
     const result = await producer.send({
         topic,
