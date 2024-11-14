@@ -46,6 +46,18 @@ services:
     networks:
       - peerprep-network
 
+  ai-service:
+    build:
+      context: ./backend/ai-service
+      dockerfile: Dockerfile
+    container_name: ai-service
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - peerprep-network
+
   frontend:
     build: ./frontend
     container_name: frontend

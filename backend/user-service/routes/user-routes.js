@@ -4,12 +4,12 @@ import {
   addAttemptedQuestion,
   createUser,
   deleteUser,
-  deleteAttemptedQuestion,
   getAllUsers,
   getUser,
   updateUser,
   updateUserPrivilege,
   getAttemptedQuestions,
+  getAttemptedQuestionById
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -31,6 +31,6 @@ router.get("/:id/attempts", verifyAccessToken, verifyIsOwnerOrAdmin, getAttempte
 
 router.post("/:id/attempts", verifyAccessToken, verifyIsOwnerOrAdmin, addAttemptedQuestion);
 
-router.delete("/:id/attempts/:questionId", verifyAccessToken, verifyIsOwnerOrAdmin, deleteAttemptedQuestion);
+router.get("/:id/attempts/:attemptId", verifyAccessToken, verifyIsOwnerOrAdmin, getAttemptedQuestionById);
 
 export default router;

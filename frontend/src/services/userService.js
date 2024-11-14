@@ -214,9 +214,10 @@ const getAttemptedQuestions = async (userId) => {
   }
 }
 
-const addAttemptedQuestion = async (userId, questionId) => {
+const addAttemptedQuestion = async (userId, questionId, roomId, code, language) => {
   try {
-    const response = await api.post(`/users/${userId}/attempts`, { questionId }, {
+    console.log(`adding attempted question with code: ${code}`);
+    const response = await api.post(`/users/${userId}/attempts`, { questionId, roomId, code, language }, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -232,4 +233,22 @@ const addAttemptedQuestion = async (userId, questionId) => {
   }
 }
 
-export { addAttemptedQuestion, userLogin, userLogout, createUser, getUser, getAttemptedQuestions, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken, resetPassword, requestPasswordReset };
+const getAttemptedQuestionById = async (userId, attemptId) => {
+  try {
+    const response = await api.get(`/users/${userId}/attempts/${attemptId}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data.data.attemptedQuestions[0]; // 200 OK
+  } catch (error) {
+    if (error.response) {
+      console.error('Error:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export { addAttemptedQuestion, userLogin, userLogout, createUser, getUser, getAttemptedQuestions, getAttemptedQuestionById, getAllUsers, getToken, isUserAdmin, updateUser, updateUserPrivilege, deleteUser, verifyToken, resetPassword, requestPasswordReset };

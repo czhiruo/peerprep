@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@monaco-editor/react';
 import collabService from '../services/collabService';
-import ReactMarkdown from 'react-markdown';
 import debounce from 'lodash.debounce';
 import { useParams } from 'react-router-dom';
-import { getToken, verifyToken } from '../services/userService';
 import { useNavigate } from 'react-router-dom';
-import { addAttemptedQuestion } from '../services/userService';
 import '.././index.css';
 import DisconnectAlert from '../components/DisconnectAlert';
+import QuestionDisplay from '../components/QuestionDisplay';
+import { languageList } from "../commons/constants";
+import { initializeRoom, translateCode, handleChatMessage, handleDisconnect, handleCodeChange, handleOtherUserDisconnect } from '../controllers/collabController';
 
 function CollaborationPage() {
   const navigate = useNavigate();
@@ -19,164 +19,87 @@ function CollaborationPage() {
   const timeoutRef = useRef(null); // Timeout reference for the read-only state of the editor
   const countdownRef = useRef(null); // Timeout reference for the countdown when user gets kicked out
   const messagesEndRef = useRef(null); // Reference to the end of the chat messages
+  const codeRef = useRef(""); // Reference to the code
 
-  const [code, setCode] = useState('');
-  const [question, setQuestion] = useState('');
-  const [questionId, setQuestionId] = useState('');
-  const [language, setLanguage] = useState('javascript');
+  // Testing Data
+  const example_question = {
+    questionTitle: "Fibonacci Number",
+    questionCategory: ["Algorithms", "Strings"],
+    questionComplexity: "easy",
+    questionDescription:
+      "Given an integer `n`, calculate the `nth` Fibonacci number `F(n)`. \n \n The Fibonacci sequence is defined as follows: \n- `F(0) = 0` \n- `F(1) = 1` \n- `F(n) = F(n-1) + F(n-2) for n > 1`\n ",
+  };
+
+  const [questionObject, setQuestionObject] = useState(example_question);
+  const [questionId, setQuestionId] = useState("");
+  const [language, setLanguage] = useState("javascript");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [isGettingKickedOut, setIsGettingKickedOut] = useState(false);
   const [countdown, setCountdown] = useState(10);
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [currentUsername, setCurrentUsername] = useState('');
+  const [newMessage, setNewMessage] = useState("");
+  const [currentUsername, setCurrentUsername] = useState("");
+  const [response, setResponse] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState(language);
+  const [editorLanguage, setEditorLanguage] = useState("javascript");
 
-  function formatQuestion(question) {
-    return `
-### **${question.questionTitle}**
+  // ** introduce theme variables **
+  const [editorTheme, setEditorTheme] = useState(() => {
+    // saved local theme or default to 'dark'
+    return localStorage.getItem('editorTheme') || 'dark';
+  });
 
-**Topic**: ${question.questionCategory}  
-**Complexity**: ${question.questionComplexity}  
-
-**Question Description**  
-${question.questionDescription}
-    `.trim();
-  }
+  // local storage
+  useEffect(() => {
+    localStorage.setItem('editorTheme', editorTheme);
+  }, [editorTheme]);
 
   useEffect(() => {
-    const initializeRoom = async () => {
-      const token = getToken();
+    const setters = {
+      setUserId,
+      setCurrentUsername,
+      setQuestionObject,
+      setQuestionId,
+      setLanguage,
+      setEditorLanguage,
+      setIsReadOnly,
+      setIsGettingKickedOut,
+      setCountdown,
+      setResponse
+    }
 
-      try {
-        const data = await verifyToken(token);
-        const username = data.data.username;
-        setUserId(data.data.id);
-        setCurrentUsername(username);
-
-        console.log("Username:", username);
-
-        if (!roomId) {
-          console.log("No room ID provided; fetching room ID...");
-          const fetchedRoomId = await fetchRoomIdWithRetry(username);
-          console.log("Fetched room ID:", fetchedRoomId);
-          navigate(`/room/${fetchedRoomId}`);
-          return;
-        }
-
-        const room = await collabService.getRoomDetails(roomId);
-        const users = room.users;
-
-        if (!users.includes(username)) {
-          navigate('/');
-          return;
-        }
-
-        await collabService.register(username);
-
-        setQuestion(formatQuestion(room.question));
-        setQuestionId(room.question.questionId);
-        setCode(room.code);
-        setLanguage(room.language);
-      } catch (error) {
-        console.error("Error initializing room:", error);
-        navigate('/');
-      }
-    };
-
-    initializeRoom();
-  }, [navigate, roomId]);
-
-  useEffect(() => {
-    // Listen for code changes from the matched user
     collabService.onCodeChange((newCode) => {
-      if (editorRef.current) {
-        isRemoteChange.current = true;
-        setIsReadOnly(true);
-
-        editorRef.current.updateOptions({
-          readOnly: true,
-        });
-
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          setIsReadOnly(false);
-          editorRef.current.updateOptions({
-            readOnly: false,
-          });
-        }, 1000);
-
-        const cursorPosition = editorRef.current.getPosition();
-        editorRef.current.setValue(newCode);
-        editorRef.current.setPosition(cursorPosition);
-      }
+      handleCodeChange(setters, newCode, editorRef, timeoutRef, isRemoteChange)
     });
 
-    // Listen for chat messages
-    const handleChatMessage = (data) => {
-      setChatMessages((prevMessages) => [...prevMessages, { sender: data.sender, message: data.message }]);
-    };
-
-    collabService.onChatMessage(handleChatMessage);
+    collabService.onChatMessage((data) => handleChatMessage(data));
+    
+    collabService.onOtherUserDisconnect(() => handleOtherUserDisconnect(setters, countdownRef, navigate));
+    
+    initializeRoom(setters, roomId, codeRef, navigate);
 
     return () => {
       collabService.offChatMessage(handleChatMessage);
     };
-  }, []);
+  }, [navigate, roomId]);
 
   // Auto-scroll to the bottom when new messages are added
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
 
-  // Kick user out if other user disconnects
-  useEffect(() => {
-    collabService.onOtherUserDisconnect(() => {
-      setIsGettingKickedOut(true);
-      setCountdown(10);
-
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
-
-      // Start countdown timer
-      countdownRef.current = setInterval(() => {
-        setCountdown(prevCount => {
-          if (prevCount === 1) {
-            clearInterval(countdownRef.current);
-            navigate('/'); // Redirect when countdown reaches zero
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-      return () => {
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-        }
-      };
-
-    });
-  }, [navigate]);
-
   // On navigating away
   useEffect(() => {
-    const handleDisconnect = async () => {
-      if (userId && questionId) {
-        collabService.disconnect();
-        console.log("Adding attempted question:", questionId);
-        await addAttemptedQuestion(userId, questionId);
-      }
-    }
-
-    window.addEventListener('beforeunload', handleDisconnect); // For page refresh
+    window.addEventListener("beforeunload", () => handleDisconnect(userId, questionId, roomId, codeRef.current, language)); // For page refresh
 
     return async () => {
-      window.removeEventListener('beforeunload', handleDisconnect);
-      handleDisconnect(); // For component unmount (navigating away)
-    }
-  }, [questionId, userId]);
+      window.removeEventListener("beforeunload", () => handleDisconnect(userId, questionId, roomId, codeRef.current, language));
+      handleDisconnect(userId, questionId, roomId, codeRef.current, language); // For component unmount (navigating away)
+    };
+  }, [questionId, userId, language, roomId]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -188,7 +111,7 @@ ${question.questionDescription}
       }
 
       const changedCode = editor.getValue();
-      setCode(changedCode);
+      codeRef.current = changedCode;
       collabService.sendCode(changedCode);
     }, 300);
 
@@ -196,66 +119,137 @@ ${question.questionDescription}
   };
 
   const editorOptions = {
-    fontSize: 16,
+    fontSize: 12,
+    fontFamily: "JetBrains Mono, monospace",
     minimap: { enabled: true },
     scrollBeyondLastLine: false,
-    theme: "vs-dark",
+    theme: editorTheme === 'dark' ? "vs-dark" : "light", // Dynamically set theme
+    lineHeight: 18,
+    padding: { top: 16 },
   };
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
+    if (newMessage.trim() === "") return;
     collabService.sendChatMessage(newMessage);
-    setChatMessages((prevMessages) => [...prevMessages, { sender: 'You', message: newMessage }]);
-    setNewMessage('');
+    setChatMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "You", message: newMessage },
+    ]);
+    setNewMessage("");
+  };
+
+  const handleLanguageChange = async (event) => {
+    const newLanguage = event.target.value;
+    translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
+  };
+
+  // ** toggle handler **
+  const toggleEditorTheme = () => {
+    setEditorTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
 
   return (
     <div className="h-[calc(100vh-65px)] w-full flex flex-col">
-      <div className="bg-[#1e1e1e] flex text-white">
-        <button
-          className="btn btn-sm bg-error ml-2 text-white font-semibold"
-          onClick={() => navigate('/')}
-        >
-          Exit Room
-        </button>
-      </div>
-
-      <div className="flex flex-row flex-grow">
-        <div className="w-1/2 bg-[#1e1e1e] flex text-white h-full overflow-y-auto px-3 border-r-2 border-black">
-          <ReactMarkdown className="text-lg leading-tight whitespace-pre-wrap markdown">
-            {question}
-          </ReactMarkdown>
+      
+      {/* ** DaisyUI toggle within the editor ** */}
+      <div className="flex flex-row flex-grow h-2/3">
+        <div className="w-1/2 bg-[#1e1e1e] flex text-white overflow-y-auto px-3 border-r-2 border-black">
+          <QuestionDisplay
+            language={selectedLanguage}
+            question={questionObject}
+          />
         </div>
 
-        <div className="w-1/2 h-full flex relative">
+        <div className="w-1/2 h-full flex relative bg-[#1e1e1e]">
           {isReadOnly && (
-            <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
-              <span className="text-white font-semibold">Other user is typing...</span>
+            <div>
+              <div className="absolute inset-0 bg-gray-700 opacity-75 flex justify-center items-center z-10">
+                <span className="text-white font-semibold">
+                  Other user is typing...
+                </span>
+              </div>
             </div>
           )}
+          <div className="flex flex-col w-full">
+            {/* ** theme toggle code ** */}
+            <div className="flex justify-end p-2">
+              <label className="swap swap-rotate" aria-label="Toggle Editor Theme">
+                <input 
+                  type="checkbox" 
+                  checked={editorTheme === 'dark'} 
+                  onChange={toggleEditorTheme} 
+                />
+                
+                {/* Sun Icon (Visible when in Dark Mode) */}
+                <svg 
+                  className="swap-on fill-current w-6 h-6 text-yellow-500" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 4.5a1 1 0 011 1V7a1 1 0 11-2 0V5.5a1 1 0 011-1zm0 13a1 1 0 011 1V19a1 1 0 11-2 0v-1.5a1 1 0 011-1zm8-8a1 1 0 011 1H19a1 1 0 110-2h2a1 1 0 011 1zm-15 0a1 1 0 011 1H5a1 1 0 110-2H4a1 1 0 011 1zm12.364-5.364a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L16.364 6.05a1 1 0 010-1.414zm-12.728 12.728a1 1 0 011.414 0l1.061 1.061a1 1 0 11-1.414 1.414L3.636 18.364a1 1 0 010-1.414zm12.728 0a1 1 0 010 1.414l-1.061 1.061a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zm-12.728-12.728a1 1 0 010 1.414L4.05 6.05a1 1 0 11-1.414-1.414l1.061-1.061a1 1 0 011.414 0zM12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+      
+                {/* Moon Icon (Visible when in Light Mode) */}
+                <svg 
+                  className="swap-off fill-current w-6 h-6 text-white-800" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M21.752 15.002A9 9 0 1111.002 2a7 7 0 109.75 13.002z" />
+                </svg>
+              </label>
+            </div>
 
-          <Editor
-            language={language}
-            value={code}
-            onChange={(newCode) => setCode(newCode)}
-            theme="vs-dark"
-            options={editorOptions}
-            onMount={handleEditorDidMount}
-          />
+            <div className="pb-2">
+              <select
+                value={selectedLanguage}
+                onChange={handleLanguageChange}
+                className="text-gray-800 font-medium text-xs bg-gray-200 border rounded-md p-2 mt-8 mx-4"
+              >
+                {languageList.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <Editor
+              className="h-full text-sm"
+              language={editorLanguage}
+              value={codeRef.current}
+              onChange={(newCode) => codeRef.current = newCode}
+              theme={editorTheme === 'dark' ? "vs-dark" : "light"} // Dynamically set theme
+              options={editorOptions}
+              onMount={handleEditorDidMount}
+            />
+          </div>
         </div>
       </div>
 
       {/* Chatbox at the bottom */}
-      <div className="h-1/4 w-full border-t border-gray-700 flex flex-col bg-gray-800">
+      <div className="h-1/3 w-full border-t border-gray-700 flex flex-col bg-gray-800">
         <div className="flex-grow overflow-y-auto overflow-x-hidden p-3">
           {chatMessages.map((msg, index) => (
-            <div key={index} className={`flex flex-col mb-2 ${msg.sender === 'You' ? 'items-end' : 'items-start'}`}>
-              <div className={`text-sm font-semibold text-white ${msg.sender === 'You' ? 'text-right' : 'text-left'}`}>
+            <div
+              key={index}
+              className={`flex flex-col mb-2 ${
+                msg.sender === "You" ? "items-end" : "items-start"
+              }`}
+            >
+              <div
+                className={`text-sm font-semibold text-white ${
+                  msg.sender === "You" ? "text-right" : "text-left"
+                }`}
+              >
                 {msg.sender}
               </div>
               <div
-                className={`max-w-md p-2 rounded-lg break-words ${msg.sender === 'You' ? 'bg-blue-600 text-white text-right' : 'bg-gray-700 text-white'
-                  }`}
+                className={`max-w-md p-2 rounded-lg break-words ${
+                  msg.sender === "You"
+                    ? "bg-blue-600 text-white text-right"
+                    : "bg-gray-700 text-white"
+                }`}
               >
                 <p>{msg.message}</p>
               </div>
@@ -272,7 +266,7 @@ ${question.questionDescription}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   handleSendMessage();
                 }
               }}
@@ -289,32 +283,14 @@ ${question.questionDescription}
 
       {isGettingKickedOut && (
         <div className="fixed bottom-0 left-0 w-full flex justify-center p-4 z-50">
-          <DisconnectAlert text={`Other user disconnected! Redirecting to home page in ${countdown}s...`} />
+          <DisconnectAlert
+            text={`Other user disconnected! Saving changes and redirecting in ${countdown}s...`}
+          />
         </div>
       )}
     </div>
   );
 }
 
-async function fetchRoomIdWithRetry(username, maxRetries = 3, delayMs = 500) {
-  let attempt = 0;
-  while (attempt < maxRetries) {
-    try {
-      // Try to fetch the room ID
-      const fetchedRoomId = await collabService.getRoomId(username);
-      return fetchedRoomId; // Exit function if successful
-    } catch (error) {
-      attempt++;
-      console.log(`Attempt ${attempt} failed: ${error.message}`);
-
-      if (attempt >= maxRetries) {
-        throw new Error(`Failed to fetch room ID after ${maxRetries} attempts`);
-      }
-
-      // Optionally add a delay before retrying
-      await new Promise(resolve => setTimeout(resolve, delayMs));
-    }
-  }
-}
-
 export default CollaborationPage;
+
