@@ -101,15 +101,6 @@ function CollaborationPage() {
     };
   }, [questionId, userId, language, roomId]);
 
-
-  useEffect(() => {
-    collabService.onLanguageChange((newLanguage) => {
-      setLanguage(newLanguage);
-      setEditorLanguage(newLanguage); 
-      setSelectedLanguage(newLanguage); 
-    });
-  }, []);
-
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
 
@@ -150,7 +141,6 @@ function CollaborationPage() {
   const handleLanguageChange = async (event) => {
     const newLanguage = event.target.value;
     translateCode({ setSelectedLanguage, setEditorLanguage }, codeRef, language, newLanguage);
-    collabService.sendLanguageChange(newLanguage);
   };
 
   // ** toggle handler **

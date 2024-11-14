@@ -50,10 +50,6 @@ const collabService = {
     });
   },
 
-  sendLanguageChange: (newLanguage) => {
-    socket.emit("language-change", newLanguage);
-  },
-
   onLanguageChange: (callback) => {
     socket.on("language-change", (newLanguage) => {
       callback(newLanguage);
