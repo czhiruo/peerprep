@@ -15,30 +15,30 @@ const kafka = new Kafka({
     },
 });
 
-const consumer: Consumer = kafka.consumer({ groupId: 'collab-code-group' });
+const consumer: Consumer = kafka.consumer({ groupId: 'collab-language-group' });
 
 const usersToSocketsKey = 'usersToSockets';
 
-export async function connectCodeConsumer(
+export async function connectLanguageConsumer(
   io: any,
 ): Promise<void> {
     await consumer.connect();
-    console.log('Code consumer connected');
-    await consumer.subscribe({ topic: 'collab-code', fromBeginning: false });
+    console.log('Language consumer connected');
+    await consumer.subscribe({ topic: 'collab-language', fromBeginning: false });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
-            if (topic !== 'collab-code') return;
+            if (topic !== 'collab-language') return;
             
             const username = message.key?.toString()!;
-            const code: string = JSON.parse(message.value?.toString()!);
+            const language: string = JSON.parse(message.value?.toString()!);
 
             const roomId = await roomManager.getRoomId(username);
             if (!roomId) {
                 console.log('User not in a room');
                 return;
             }
-            await roomManager.updateCode(roomId, code);
+            await roomManager.updateLanguage(roomId, language);
 
             const otherUser = await roomManager.getOtherUser(username);
             const otherUserSocketId = await redis.hget(usersToSocketsKey, otherUser);
@@ -46,7 +46,7 @@ export async function connectCodeConsumer(
             // Send the code change to the other user
             if (otherUserSocketId) {
                 console.log(`Sending: ${username} -> ${otherUser}`);
-                io.to(otherUserSocketId).emit('code-change', code);
+                io.to(otherUserSocketId).emit('language-change', language);
             }
         },
     });

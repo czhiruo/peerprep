@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { connectProducer, sendCodeMessage, sendChatMessage } from './kafka/producer';
+import { connectProducer, sendCodeMessage, sendLanguageMessage, sendChatMessage } from './kafka/producer';
 import { connectRoomConsumer } from './kafka/roomConsumer';
 import { connectCodeConsumer } from './kafka/codeConsumer';
 import { connectChatConsumer } from './kafka/chatConsumer';
@@ -50,6 +50,15 @@ io.on('connection', (socket) => {
     }
 
     await sendCodeMessage('collab-code', { key: username, value: code });
+  });
+
+  socket.on('language-change', async (language: string) => {
+    const username = await redis.hget(socketsToUsersKey, socket.id);
+    if (!username) {
+      console.log('User not registered, cannot send language change');
+      return;
+    }
+    await sendLanguageMessage('collab-language', { key: username, value: language });
   });
 
   socket.on('get-room-details', async (roomId: string, callback) => {
@@ -98,9 +107,6 @@ io.on('connection', (socket) => {
     await sendChatMessage('collab-chat', { key: username, value: message });
   });
 
-  socket.on('language-change', (newLanguage) => {
-    socket.broadcast.emit('language-change', newLanguage);
-  });
 });
 
 async function handleDisconnect(id: string) {
